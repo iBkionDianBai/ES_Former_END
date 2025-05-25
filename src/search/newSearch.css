@@ -1,0 +1,46 @@
+.page {
+    opacity: 0.9;
+}
+.page::before {
+    content:'';
+    filter:blur(3px);
+    background: url(/public/bg1.jpg);
+    background-size: cover;
+    width: 100%;
+    height: 100%;
+    margin-left: 0;
+    position: absolute;
+    z-index:-1;
+}
+.searchContainer {
+    width: 85%;
+    margin-top: 24px;
+    display: flex;
+    justify-content: space-around;
+    margin-left: 10%;
+}
+
+.basic {
+    display: flex;
+    justify-content: space-around;
+}
+
+.searchContainer button:hover {
+    background-color: #0056b3;
+}
+
+.searchResult {
+    width: 80%;
+    margin-left: 10%;
+    margin-top: 24px;
+    overflow: auto;
+}
+
+.submit{
+    background-color: rgba(150, 122, 91, 0.87);
+    width: 100px;
+    position: absolute;
+    bottom: 12px;
+    right: 80px;
+    margin: 0;
+}

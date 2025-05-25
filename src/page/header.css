@@ -1,0 +1,55 @@
+/* Top Section */
+.top-section {
+    text-align: center;
+    margin-bottom: 20px;
+    background: rgba(150, 122, 91, 0.87);
+    /*background: rgba(150, 122, 91, 0.87);*/
+    height:60px;
+    font-size: 12px;
+}
+
+.top-section h1 {
+    display: inline;
+    /* 装饰topbar中的字体 *BOBOBO*/
+    color: rgba(0, 0, 0, 0.94);
+    /* 字间距 */
+}
+/* 使得列表值横向排列 */
+.top-section li{
+    display: inline;
+    /* 装饰topbar中的字体 *BOBOBO*/
+    color:black;
+    /* 字间距 */
+    margin-right: 13px;
+}
+.top-section ul{
+    /* border: 1px red solid; */
+    display: inline-block;
+
+    /* ul行高设置 */
+    line-height:38px ;
+}
+.top-section-right{
+    position: absolute;
+    right: 150px;
+}
+.top-section-middle{
+    display: flex;
+    text-align: center;
+    /* margin-left: 150px; */
+}
+
+.top-section-left{
+    position: absolute;
+    left: 150px;
+}
+
+.logout-button {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: #000; /* 按钮文本颜色 */
+    cursor: pointer;
+    /* 添加其他样式属性 */
+  }

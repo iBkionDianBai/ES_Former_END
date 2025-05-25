@@ -1,0 +1,271 @@
+/* 基础样式 */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* 导航栏样式 */
+.navigation {
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #ddd;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 15px;
+}
+
+.nav-tabs {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.tab-item {
+    padding: 12px 18px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.tab-item:hover {
+    background-color: #e0e0e0;
+}
+
+.tab-item.active {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    margin-bottom: -1px;
+    color: #4285f4;
+}
+
+.toolbar {
+    display: flex;
+}
+
+.tool-btn {
+    display: flex;
+    align-items: center;
+    margin: 8px 5px;
+    padding: 6px 12px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 0.9em;
+}
+
+.tool-btn:hover {
+    background-color: #f8f9fa;
+}
+
+.tool-btn .icon {
+    margin-right: 5px;
+}
+
+/* 主内容区样式 */
+.main-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #f8f9fa;
+    border-right: 1px solid #e0e0e0;
+    overflow-y: auto;
+    padding: 15px 0;
+}
+
+.toc {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.toc-item {
+    padding: 8px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-weight: 500;
+}
+
+.toc-item:hover {
+    background-color: #e9ecef;
+}
+
+.sub-toc-item {
+    padding-left: 30px;
+    font-weight: normal;
+}
+
+.media-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.media-item {
+    padding: 8px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+}
+
+.media-item:hover {
+    background-color: #e9ecef;
+}
+
+.media-type {
+    display: inline-block;
+    width: 20px;
+    text-align: center;
+    margin-right: 5px;
+    font-weight: bold;
+}
+
+.event-article {
+    flex: 1;
+    padding: 30px 50px;
+    overflow-y: auto;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.article-title {
+    font-size: 2em;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.article-meta {
+    margin-bottom: 30px;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.article-meta span {
+    margin-right: 20px;
+}
+
+.article-content h2 {
+    font-size: 1.5em;
+    margin-top: 40px;
+    margin-bottom: 15px;
+    color: #222;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.article-content h3 {
+    font-size: 1.2em;
+    margin-top: 30px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.article-content p {
+    margin-bottom: 15px;
+    line-height: 1.8;
+}
+
+.article-content img {
+    max-width: 100%;
+    height: auto;
+    margin: 20px 0;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.article-content figure {
+    margin: 30px 0;
+    text-align: center;
+}
+
+.article-content figcaption {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 10px;
+}
+
+.article-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.article-content th, .article-content td {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.article-content th {
+    background-color: #f8f9fa;
+    font-weight: 500;
+}
+
+.table-caption {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: -10px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.references {
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.references h3 {
+    margin-bottom: 20px;
+}
+
+.references ol {
+    padding-left: 20px;
+}
+
+.references li {
+    margin-bottom: 10px;
+}
+
+blockquote {
+    margin: 20px 0;
+    padding: 15px 20px;
+    border-left: 4px solid #4285f4;
+    background-color: #f8f9fa;
+    font-style: italic;
+}
+
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-size: 1.5em;
+    color: #666;
+}
