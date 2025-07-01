@@ -105,7 +105,7 @@ function SearchComponent() {
                     ))}
                 </ul>
 
-                {/* 搜索栏内容区（不同 tab 切换不同内容） */}
+                {/* 搜索栏内容区域（不同 tab 切换不同内容） */}
                 <div className={activeTab === 0 ? "search-tab-content-normal" : "search-tab-content-other"}>
                     <div className="input-box">
                         {/* 下拉选择框 */}
@@ -160,7 +160,7 @@ function MainPage() {
             {/* 顶部区域（欢迎信息 + 退出按钮） */}
             <Headermain />
 
-            {/* 搜索功能区域 */}
+            {/* 搜索功能区域  */}
             <SearchComponent />
         </div>
     );
