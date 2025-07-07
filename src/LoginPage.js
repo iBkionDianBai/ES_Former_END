@@ -12,7 +12,6 @@ import loginBackground from './image/bg1.jpg';
 import smallBackground from './image/bg2.jpg';
 import { useNavigate } from'react-router-dom';
 
-asdsadsa
 // 模拟验证码接口的 mock 函数
 // 该函数返回一个Promise对象，使用setTimeout模拟网络延迟500毫秒后
 // 成功返回包含验证码图片URL和验证码文本的对象
