@@ -1,0 +1,71 @@
+/* 404、500、403 错误页面通用样式 */
+.error-page {
+    font-family: "Microsoft yahei";
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f9f9f9;
+}
+
+.error-page h1 {
+    font-size: 36px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.error-page p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 40px;
+}
+
+.error-page .back-home-btn {
+    padding: 12px 24px;
+    background-color: #1D67E7;
+    color: #fff;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.error-page .back-home-btn:hover {
+    background-color: #3040d1;
+}
+
+/* 404 页面特定样式 */
+.error-404 {
+    background: url("../image/banner.jpg") top center repeat-x #1b66e6;
+    color: #fff;
+}
+
+.error-404 h1 {
+    color: #fff;
+}
+
+.error-404 p {
+    color: #fff;
+}
+
+/* 500 页面特定样式 */
+.error-500 {
+    background-color: #f8f9fa;
+}
+
+/* 403 页面特定样式 */
+.error-403 {
+    background: url("../image/banner.jpg") top center repeat-x #1b66e6;
+    color: #fff;
+}
+
+.error-403 h1 {
+    color: #fff;
+}
+
+.error-403 p {
+    color: #fff;
+}
