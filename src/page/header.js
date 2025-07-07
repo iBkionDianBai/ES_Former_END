@@ -1,5 +1,5 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import React, { useEffect } from "react";
+import {useNavigate } from "react-router-dom";
+import React from "react";
 import axios from 'axios';
 import './header.css';
 
@@ -27,7 +27,7 @@ function Header() {
             <button className="logout-button" onClick={handleMain} >
                 返回首页
             </button>
-            <ul className="top-section-middle"><h1 >秦文明数据库</h1></ul>
+            <ul className="top-section-middle"><h1 >舆情系统</h1></ul>
             <ul className="top-section-right">
                 <li> 欢迎: {username}</li>
                 <button className="logout-button" onClick={handleLogout}>

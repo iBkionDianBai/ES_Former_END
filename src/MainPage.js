@@ -1,54 +1,14 @@
 // 引入 React 相关钩子
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 // 引入 react-router-dom 的一些路由工具
-import { useLocation, Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 // 页面标题设置插件
 import { Helmet } from 'react-helmet';
 // 引入样式
 import './MainPage.css';
 // 多余的一行 './' 应该可以删除，没引用文件会报错
 import './'
-import axios from "axios";
-
-// 顶部导航栏组件
-function Headermain() {
-    // 页面渲染完成时执行的逻辑
-    useEffect(() => {
-        // 控制台输出当前 token，方便调试
-        console.log(sessionStorage.getItem('token'));
-        // 如果未登录（token 不存在），跳转到登录页
-        if (sessionStorage.getItem('token') == null) {
-            navigate("/");  // 注意这里的 navigate 在 useEffect 外定义，顺序可能导致问题，建议上移
-        }
-    }, []);
-
-    // 获取路由跳转函数
-    const navigate = useNavigate();
-    // 从 sessionStorage 获取当前用户名
-    const username = sessionStorage.getItem('username');
-
-    // 退出登录处理函数
-    const handleLogout = () => {
-        // 清除 sessionStorage 中的登录信息
-        sessionStorage.removeItem("token");
-        sessionStorage.removeItem("username");
-        // 删除 axios 中默认的授权头
-        delete axios.defaults.headers.common["Authorization"];
-        // 跳转到登录页面
-        navigate("/");
-    };
-
-    return (
-        <div className="top-section">
-            <ul className="top-section-right">
-                <li> 欢迎: {username}</li>
-                <button className="logout-button" onClick={handleLogout}>
-                    退出登录
-                </button>
-            </ul>
-        </div>
-    );
-}
+import Header from "./page/header";
 
 // 搜索组件
 function SearchComponent() {
@@ -146,9 +106,6 @@ function SearchComponent() {
 
 // 主页面组件
 function MainPage() {
-    // 获取当前路由传递的数据
-    const location = useLocation();
-    const username = location.state?.username; // 可选链，防止报错
 
     return (
         <div>
@@ -158,7 +115,7 @@ function MainPage() {
             </Helmet>
 
             {/* 顶部区域（欢迎信息 + 退出按钮） */}
-            <Headermain />
+            <Header />
 
             {/* 搜索功能区域  */}
             <SearchComponent />

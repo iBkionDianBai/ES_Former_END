@@ -1,47 +1,31 @@
-/* Top Section */
 .top-section {
     text-align: center;
     margin-bottom: 20px;
-    background: rgba(150, 122, 91, 0.87);
-    /*background: rgba(150, 122, 91, 0.87);*/
-    height:60px;
+    background: rgba(45, 62, 89, 0.6);
+    height: 60px;
     font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px; /* 使用相对单位设置内边距 */
 }
 
 .top-section h1 {
+    margin-left: 60px;
     display: inline;
-    /* 装饰topbar中的字体 *BOBOBO*/
-    color: rgba(0, 0, 0, 0.94);
-    /* 字间距 */
+    color: rgba(255, 255, 255, 0.94);
 }
+
 /* 使得列表值横向排列 */
-.top-section li{
+.top-section li {
     display: inline;
-    /* 装饰topbar中的字体 *BOBOBO*/
-    color:black;
-    /* 字间距 */
+    color: rgba(255, 255, 255, 0.96);
     margin-right: 13px;
 }
-.top-section ul{
-    /* border: 1px red solid; */
-    display: inline-block;
 
-    /* ul行高设置 */
-    line-height:38px ;
-}
-.top-section-right{
-    position: absolute;
-    right: 150px;
-}
-.top-section-middle{
+.top-section ul {
     display: flex;
-    text-align: center;
-    /* margin-left: 150px; */
-}
-
-.top-section-left{
-    position: absolute;
-    left: 150px;
+    align-items: center;
 }
 
 .logout-button {
@@ -49,7 +33,19 @@
     border: none;
     padding: 0;
     font: inherit;
-    color: #000; /* 按钮文本颜色 */
+    color: rgba(255, 255, 255, 0.96); /* 按钮文本颜色 */
     cursor: pointer;
-    /* 添加其他样式属性 */
+}
+
+/* 响应式设计：小屏幕设备 */
+@media (max-width: 768px) {
+    .top-section {
+        flex-direction: column;
+        height: auto;
+        padding: 10px;
+    }
+
+    .top-section ul {
+        margin-top: 10px;
+    }
 }

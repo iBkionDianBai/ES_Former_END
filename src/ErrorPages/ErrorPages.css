@@ -39,7 +39,7 @@
 
 /* 404 页面特定样式 */
 .error-404 {
-    background: url("../image/banner.jpg") top center repeat-x #1b66e6;
+    background: url("../image/banner-wave.jpg") top center repeat-x #1b66e6;
     color: #fff;
 }
 
@@ -58,7 +58,7 @@
 
 /* 403 页面特定样式 */
 .error-403 {
-    background: url("../image/banner.jpg") top center repeat-x #1b66e6;
+    background: url("../image/banner-wave.jpg") top center repeat-x #1b66e6;
     color: #fff;
 }
 
