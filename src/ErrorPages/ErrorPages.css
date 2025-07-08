@@ -37,17 +37,16 @@
     background-color: #3040d1;
 }
 
-/* 404 页面特定样式 */
-.error-404 {
-    background: url("../image/banner-wave.jpg") top center repeat-x #1b66e6;
-    color: #fff;
-}
-
 .error-404 h1 {
     color: #fff;
 }
 
 .error-404 p {
+    color: #fff;
+}
+
+.error-404 {
+    background: url("../image/banner.png") top center repeat-x #1b66e6;
     color: #fff;
 }
 
@@ -58,7 +57,7 @@
 
 /* 403 页面特定样式 */
 .error-403 {
-    background: url("../image/banner-wave.jpg") top center repeat-x #1b66e6;
+    background: url("../image/banner.png") top center repeat-x #1b66e6;
     color: #fff;
 }
 

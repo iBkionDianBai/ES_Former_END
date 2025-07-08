@@ -7,36 +7,37 @@ import NotFoundPage from "./ErrorPages/NotFoundPage";
 import ForbiddenPage from "./ErrorPages/ForbiddenPage";
 import SearchResultPage from './SearchResultPage';
 import GaojiSearchResultPage from './search/GaojiSearchResultPage';
+import ServerErrorPage from "./ErrorPages/ServerErrorPage";
 
 
 function App() {
-    return (
-        <Router>
-            <Routes>
-                {/* 登录页 */}
-                <Route path="/" element={<LoginPage />} />
+  return (
+      <Router>
+        <Routes>
+          {/* 登录页 */}
+          <Route path="/" element={<LoginPage />} />
 
-                {/* 主页面 */}
-                <Route path="/main" element={
-                    <>
-                        <MainPage /></>
-                } />
+            {/* 主页面 */}
+            <Route path="/main" element={
+            <>
+            <MainPage /></>
+            } />
 
-                {/* 高级搜索页 */}
-                <Route path="/gaojiSearch" element={<GaojiSearch />} />
-                {/* 搜索结果页 */}
-                <Route path="/searchResult" element={<SearchResultPage />} />
-                {/* 高级搜索结果页 */}
-                <Route path="/gaojiSearchResult" element={<GaojiSearchResultPage />} />
-                {/* 404页面 */}
-                <Route path="*" element={<NotFoundPage />} />
-                {/* 500页面 */}
-                <Route path="/500" element={<NotFoundPage />} />
-                {/* 403页面 */}
-                <Route path="/403" element={<ForbiddenPage />} />
-            </Routes>
-        </Router>
-    )
+            {/* 高级搜索页 */}
+            <Route path="/gaojiSearch" element={<GaojiSearch />} />
+            {/* 404页面 */}
+            <Route path="*" element={<NotFoundPage />} />
+            {/* 500页面 */}
+            <Route path="/500" element={<ServerErrorPage />} />
+            {/* 403页面 */}
+            <Route path="/403" element={<ForbiddenPage />} />
+            {/* 搜索结果页 */}
+            <Route path="/searchResult" element={<SearchResultPage />} />
+            {/* 高级搜索结果页 */}
+            <Route path="/gaojiSearchResult" element={<GaojiSearchResultPage />} />
+        </Routes>
+      </Router>
+  )
 }
 
 export default App
