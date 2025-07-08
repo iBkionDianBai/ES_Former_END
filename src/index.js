@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import './mock/captchaMock'; // 模拟接口的引入
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

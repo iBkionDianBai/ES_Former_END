@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './ContentViewerPage.css';
+import Header from "./header";
 
 // 工具函数：解析文章内容
 const parseArticleContent = (htmlContent) => {
@@ -45,7 +46,8 @@ const fetchArticle = async () => {
     try {
         const response = await fetch('/api/article');
         if (!response.ok) throw new Error('Failed to fetch article');
-        return await response.json();
+        const result = await response.json();
+        return result.data; // 提取 data 字段
     } catch (error) {
         console.error('API Error:', error);
         throw error;
@@ -74,8 +76,6 @@ const Navigation = ({ activeTab, onTabChange }) => {
                 <div className="toolbar">
                     <button className="tool-btn"><i className="icon">🔍</i><span>放大</span></button>
                     <button className="tool-btn"><i className="icon">🔎</i><span>缩小</span></button>
-                    <button className="tool-btn"><i className="icon">🔖</i><span>添加书签</span></button>
-                    <button className="tool-btn"><i className="icon">📄</i><span>打印</span></button>
                 </div>
             </div>
         </nav>
@@ -167,9 +167,12 @@ const ContentViewerPage = () => {
                 const { toc, media } = parseArticleContent(data.content);
                 setTableOfContents(toc);
                 setMediaItems(media);
+                setLoading(false);
             })
-            .catch((error) => console.error('Error fetching article:', error))
-            .finally(() => setLoading(false));
+            .catch((error) => {
+                console.error('Error fetching article:', error);
+                alert('加载文章失败，请稍后重试。');
+            });
 
         const handleResize = () => setWindowHeight(window.innerHeight);
         window.addEventListener('resize', handleResize);
@@ -184,9 +187,9 @@ const ContentViewerPage = () => {
 
     return (
         <div className="app-container">
-            {/* 头部组件将在后续调整中添加 */}
+            <Header />
             <Navigation activeTab={activeTab} onTabChange={handleTabChange} />
-            <div className="main-content">
+            <div className="content-wrapper">
                 <Sidebar
                     activeTab={activeTab}
                     tableOfContents={tableOfContents}
@@ -194,11 +197,13 @@ const ContentViewerPage = () => {
                     onItemClick={handleScrollTo}
                     windowHeight={windowHeight}
                 />
-                {loading ? (
-                    <div className="loading">加载文章中...</div>
-                ) : (
-                    <Article articleContent={articleContent} />
-                )}
+                <div className="main-content">
+                    {loading ? (
+                        <div className="loading">文章加载中，请稍候...</div>
+                    ) : (
+                        <Article articleContent={articleContent} />
+                    )}
+                </div>
             </div>
         </div>
     );

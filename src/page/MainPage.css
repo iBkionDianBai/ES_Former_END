@@ -114,8 +114,8 @@
     border: none;
     outline: none;
     padding: 17px 0 17px 20px;
-    width: 580px;
-    height: 20px;
+    width: 600px;
+    height: 52px;
     line-height: 20px;
     color: #333;
     font-size: 14px;
@@ -131,7 +131,7 @@
     font-size: 16px;
     background-color: #1D67E7;
     float: right;
-    margin-top: 4px;
+    margin-top: 3px;
     margin-right: 3px;
     color: #fff;
     letter-spacing: 2px;

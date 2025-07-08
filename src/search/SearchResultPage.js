@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import axios from "axios";
 import "./SearchResultPage.css";
 import '../index'
 import Header from "../page/header";
