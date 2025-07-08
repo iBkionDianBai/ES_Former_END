@@ -8,8 +8,8 @@ import {
     EyeTwoTone
 } from '@ant-design/icons';
 import './LoginPage.css';
-import loginBackground from './image/bg1.jpg';
-import smallBackground from './image/bg2.jpg';
+import loginBackground from '../image/bg1.jpg';
+import smallBackground from '../image/bg2.jpg';
 import { useNavigate } from'react-router-dom';
 
 // 模拟验证码接口的 mock 函数

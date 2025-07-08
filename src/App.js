@@ -1,13 +1,14 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import LoginPage from './LoginPage'
-import MainPage from './MainPage'
+import LoginPage from './page/LoginPage'
+import MainPage from './page/MainPage'
 import GaojiSearch from './search/gaojiSearch'
 import NotFoundPage from "./ErrorPages/NotFoundPage";
 import ForbiddenPage from "./ErrorPages/ForbiddenPage";
-import SearchResultPage from './SearchResultPage';
+import SearchResultPage from './search/SearchResultPage';
 import GaojiSearchResultPage from './search/GaojiSearchResultPage';
 import ServerErrorPage from "./ErrorPages/ServerErrorPage";
+import ContentViewerPage from "./page/ContentViewerPage";
 
 
 function App() {
@@ -35,6 +36,8 @@ function App() {
             <Route path="/searchResult" element={<SearchResultPage />} />
             {/* 高级搜索结果页 */}
             <Route path="/gaojiSearchResult" element={<GaojiSearchResultPage />} />
+            {/* 内容展示页 */}
+            <Route path="/contentViewer" element={<ContentViewerPage />} />
         </Routes>
       </Router>
   )

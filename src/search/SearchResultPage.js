@@ -3,8 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import axios from "axios";
 import "./SearchResultPage.css";
-import './'
-import Header from "./page/header";
+import '../index'
+import Header from "../page/header";
 
 
 

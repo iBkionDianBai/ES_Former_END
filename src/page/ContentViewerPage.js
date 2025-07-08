@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from'react';
-import './styles.css';
+import './ContentViewerPage.css';
 
 // 工具函数：解析文章内容
 const parseArticleContent = (htmlContent) => {

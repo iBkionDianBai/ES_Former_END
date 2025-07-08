@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import GaojiSearchComponent from "./gaojiSearch";
-import "../SearchResultPage.css";
+import "./SearchResultPage.css";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const themes = ["主题（频度）", "主题（频度）", "主题（频度）", "主题（频度）", "主题（频度）"];

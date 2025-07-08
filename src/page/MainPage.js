@@ -7,7 +7,7 @@ import { Helmet } from 'react-helmet';
 // 引入样式
 import './MainPage.css';
 // 多余的一行 './' 应该可以删除，没引用文件会报错
-import Header from "./page/header";
+import Header from "./header";
 
 // 搜索组件
 function SearchComponent() {
