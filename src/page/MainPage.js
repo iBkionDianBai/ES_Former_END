@@ -37,7 +37,7 @@ function SearchComponent() {
         console.log(selectedValue);
         // 新增：如果输入为1，跳转到SearchResultPage，否则跳转到404
         if (inputContent === '1') {
-            navigate('/searchResult');
+            navigate('/searchResult?q=' + encodeURIComponent(inputContent));
             return;
         } else {
             navigate('*'); // 触发404页面

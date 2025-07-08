@@ -17,8 +17,12 @@ const fuzzyOptions = ['模糊', '精确'];
 
 function GaojiSearchComponent() {
     const navigate = useNavigate();
+    const location = useLocation();
+    // 新增：从URL参数q获取初始值
+    const searchParams = new URLSearchParams(location.search);
+    const q = searchParams.get('q') || '';
     // 存储搜索行的状态，每行包含多个搜索条件
-    const [searchRows, setSearchRows] = useState([{ keyword1: '', container: '全部容器', operator: '并且', keyword2: '', fuzzy: '模糊' }]);
+    const [searchRows, setSearchRows] = useState([{ keyword1: q, container: '全部容器', operator: '并且', keyword2: '', fuzzy: '模糊' }]);
     // 存储搜索开始日期
     const [startDate, setStartDate] = useState('');
     // 存储搜索结束日期
@@ -112,9 +116,28 @@ function GaojiSearchComponent() {
 
     // 处理搜索按钮点击事件的函数
     const handleSearch = () => {
-        // 只要主输入框有内容就跳转
-        if (searchRows[0]?.keyword1 && searchRows[0]?.keyword1.trim() !== '') {
-            navigate('/gaojiSearchResult');
+        const k1 = searchRows[0]?.keyword1?.trim();
+        const k2 = searchRows[0]?.keyword2?.trim();
+        const operator = searchRows[0]?.operator || '';
+        const fuzzy = searchRows[0]?.fuzzy || '';
+        let url = '';
+        // 新增：日期参数
+        const dateParams = [];
+        if (startDate) dateParams.push(`startDate=${encodeURIComponent(startDate)}`);
+        if (endDate) dateParams.push(`endDate=${encodeURIComponent(endDate)}`);
+        // 新增：类型参数
+        let typesStr = '';
+        if (searchTypes.length > 0) {
+            typesStr = `&types=${encodeURIComponent(searchTypes.join('/'))}`;
+        }
+        const dateStr = dateParams.length ? '&' + dateParams.join('&') : '';
+        if (k1 && k2) {
+            url = `/gaojiSearchResult?q1=${encodeURIComponent(k1)}&q2=${encodeURIComponent(k2)}&operator=${encodeURIComponent(operator)}&fuzzy=${encodeURIComponent(fuzzy)}${dateStr}${typesStr}`;
+        } else if (k1) {
+            url = `/gaojiSearchResult?q=${encodeURIComponent(k1)}&fuzzy=${encodeURIComponent(fuzzy)}${dateStr}${typesStr}`;
+        }
+        if (url) {
+            navigate(url);
             return;
         }
         // 其他情况可自定义处理（如提示、留在原页等）
