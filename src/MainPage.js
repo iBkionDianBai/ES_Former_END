@@ -7,7 +7,6 @@ import { Helmet } from 'react-helmet';
 // 引入样式
 import './MainPage.css';
 // 多余的一行 './' 应该可以删除，没引用文件会报错
-import './'
 import Header from "./page/header";
 
 // 搜索组件
@@ -36,6 +35,14 @@ function SearchComponent() {
     const handleSearchClick = () => {
         // 当前选择的搜索类型（如：标题、作者等）
         console.log(selectedValue);
+        // 新增：如果输入为1，跳转到SearchResultPage，否则跳转到404
+        if (inputContent === '1') {
+            navigate('/searchResult');
+            return;
+        } else {
+            navigate('*'); // 触发404页面
+            return;
+        }
         // 实际应用中应将搜索条件和关键词传递到结果页或发起查询
     };
 
@@ -46,57 +53,59 @@ function SearchComponent() {
     };
 
     return (
-        <div className="banner">
-            <div className="searchmain">
-                <div className="page-title">
-                    <h1>Search Doc.</h1> {/* 页面主标题 */}
-                </div>
-
-                {/* 顶部 tab 标签栏 */}
-                <ul className="search-tab">
-                    {tabs.map((tab, index) => (
-                        <li
-                            key={index}
-                            className={activeTab === index ? "on active" : ""} // 设置当前选中项高亮
-                            onClick={() => setActiveTab(index)} // 点击切换 tab
-                        >
-                            {tab.name}
-                        </li>
-                    ))}
-                </ul>
-
-                {/* 搜索栏内容区域（不同 tab 切换不同内容） */}
-                <div className={activeTab === 0 ? "search-tab-content-normal" : "search-tab-content-other"}>
-                    <div className="input-box">
-                        {/* 下拉选择框 */}
-                        <div>
-                            <select className="sort" value={selectedValue} onChange={(e) => setSelectedValue(e.target.value)}>
-                                {options.map((item) => (
-                                    <option key={item.value} value={item.value}>{item.label}</option>
-                                ))}
-                            </select>
-                        </div>
-
-                        {/* 输入框 */}
-                        <div className="input-content">
-                            <input
-                                className="input"
-                                type="text"
-                                value={inputContent}
-                                onChange={(e) => setInputContent(e.target.value)}
-                                placeholder="键入搜索"
-                            />
-                        </div>
-
-                        {/* 搜索按钮 */}
-                        <div className="search-btn">
-                            <button className="btn" onClick={handleSearchClick}>搜索</button>
-                        </div>
+        <div className="search-area">
+            <div className="banner">
+                <div className="searchmain">
+                    <div className="page-title">
+                        <h1>Search Doc.</h1> {/* 页面主标题 */}
                     </div>
 
-                    {/* 高级搜索按钮 */}
-                    <div className="readvce">
-                        <button className="GaojiSearchButton" onClick={handleGaojiSearchClick}>高级搜索</button>
+                    {/* 顶部 tab 标签栏 */}
+                    <ul className="search-tab">
+                        {tabs.map((tab, index) => (
+                            <li
+                                key={index}
+                                className={activeTab === index ? "on active" : ""} // 设置当前选中项高亮
+                                onClick={() => setActiveTab(index)} // 点击切换 tab
+                            >
+                                {tab.name}
+                            </li>
+                        ))}
+                    </ul>
+
+                    {/* 搜索栏内容区域（不同 tab 切换不同内容） */}
+                    <div className={activeTab === 0 ? "search-tab-content-normal" : "search-tab-content-other"}>
+                        <div className="input-box">
+                            {/* 下拉选择框 */}
+                            <div>
+                                <select className="sort" value={selectedValue} onChange={(e) => setSelectedValue(e.target.value)}>
+                                    {options.map((item) => (
+                                        <option key={item.value} value={item.value}>{item.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* 输入框 */}
+                            <div className="input-content">
+                                <input
+                                    className="input"
+                                    type="text"
+                                    value={inputContent}
+                                    onChange={(e) => setInputContent(e.target.value)}
+                                    placeholder="键入搜索"
+                                />
+                            </div>
+
+                            {/* 搜索按钮 */}
+                            <div className="search-btn">
+                                <button className="btn" onClick={handleSearchClick}>搜索</button>
+                            </div>
+                        </div>
+
+                        {/* 高级搜索按钮 */}
+                        <div className="readvce">
+                            <button className="GaojiSearchButton" onClick={handleGaojiSearchClick}>高级搜索</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -106,19 +115,16 @@ function SearchComponent() {
 
 // 主页面组件
 function MainPage() {
-
     return (
         <div>
             {/* 设置页面标题 */}
             <Helmet>
                 <title>ElasticDataSearch</title>
             </Helmet>
-
             {/* 顶部区域（欢迎信息 + 退出按钮） */}
-            <Header />
-
+            <div><Header /></div>
             {/* 搜索功能区域  */}
-            <SearchComponent />
+            <div><SearchComponent /></div>
         </div>
     );
 }

@@ -3,6 +3,7 @@ import {Helmet} from 'react-helmet';
 import './gaojiSearch.css'
 import axios from "axios";
 import {useLocation, useNavigate} from "react-router-dom";
+import Header from "../page/header";
 
 // 定义搜索条件操作符
 const operators = ['并且', '或者', '不包含'];
@@ -13,38 +14,9 @@ const containers = ['全部容器', '标题', '作者', '摘要'];
 // 定义模糊搜索选项
 const fuzzyOptions = ['模糊', '精确'];
 
-function Headermain() {
-    useEffect(() => {
-        // 初始化操作，判断是否登录
-        console.log(sessionStorage.getItem('token'));
-        if (sessionStorage.getItem('token') == null) {
-            navigate("/");
-        }
-    }, []);
-    const navigate = useNavigate();
-    const username = sessionStorage.getItem('username');
-    const handleLogout = () => {
-        // 清除token
-        sessionStorage.removeItem("token");
-        sessionStorage.removeItem("username");
-        // 返回登录页面
-        navigate("/");
-        delete axios.defaults.headers.common["Authorization"];
-    };
-
-    return (
-        <div className="top-section">
-            <ul className="top-section-right">
-                <li> 欢迎: {username}</li>
-                <button className="logout-button" onClick={handleLogout}>
-                    退出登录
-                </button>
-            </ul>
-        </div>
-    );
-}
 
 function GaojiSearchComponent() {
+    const navigate = useNavigate();
     // 存储搜索行的状态，每行包含多个搜索条件
     const [searchRows, setSearchRows] = useState([{ keyword1: '', container: '全部容器', operator: '并且', keyword2: '', fuzzy: '模糊' }]);
     // 存储搜索开始日期
@@ -140,7 +112,12 @@ function GaojiSearchComponent() {
 
     // 处理搜索按钮点击事件的函数
     const handleSearch = () => {
-        console.log('搜索条件:', { searchRows, startDate, endDate, searchTypes });
+        // 只要主输入框有内容就跳转
+        if (searchRows[0]?.keyword1 && searchRows[0]?.keyword1.trim() !== '') {
+            navigate('/gaojiSearchResult');
+            return;
+        }
+        // 其他情况可自定义处理（如提示、留在原页等）
     };
 
     // 处理清除按钮点击事件的函数
@@ -282,13 +259,14 @@ function GaojiSearchComponent() {
 function GaojiSearch() {
     const location = useLocation();
     const username = location.state?.username;
+    const navigate = useNavigate();
     return (
         <div>
             <Helmet>
                 <title>ElasticDataSearch</title>
             </Helmet>
             {/* 顶部区域 */}
-            <Headermain/>
+            <Header />
             {/* 插入搜索组件 */}
             <GaojiSearchComponent/>
         </div>
