@@ -1,4 +1,3 @@
-
 .search-bar-container {
     padding: 20px;
     background-color: #f8f9fa;
@@ -65,12 +64,23 @@
 
 .filter-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     padding: 10px 15px;
     background-color: #f8f9fa;
     cursor: pointer;
     font-weight: 500;
+}
+
+.filter-header h3 {
+    margin: 0;
+    flex-grow: 1; /* 让标题占据剩余空间 */
+}
+
+.chart-icon {
+    margin-left: auto; /* 让显示图表的图标靠右 */
+    margin-right: 8px; /* 为 Filter icon 留出一些间距 */
+    cursor: pointer;
+    color: #1D67E7;
 }
 
 .filter-icon {
@@ -93,13 +103,6 @@
 
 .filter-item:last-child {
     border-bottom: none;
-}
-
-.chart-icon {
-    text-align: right;
-    margin-top: 10px;
-    color: #1D67E7;
-    cursor: pointer;
 }
 
 .results-section {

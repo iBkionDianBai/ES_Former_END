@@ -178,7 +178,7 @@ function GaojiSearchResultPage() {
                     <div className="filter-container">
                         <div className="filter-header" onClick={() => toggleFilter('theme')} style={{ display: 'flex', alignItems: 'center' }}>
                             <h3 style={{ margin: 0 }}>事件名(频度)</h3>
-                            <span style={{ marginLeft: 8, cursor: 'pointer' }} title="查看柱状图" onClick={e => { e.stopPropagation(); setShowChart(true); }}>📊</span>
+                            <span className="chart-icon" style={{ marginLeft: 8, cursor: 'pointer' }} title="查看柱状图" onClick={e => { e.stopPropagation(); setShowChart(true); }}>📊</span>
                             <span className="filter-icon">{filterOpen.theme ? '▼' : '▶'}</span>
                         </div>
                         {filterOpen.theme && (
@@ -198,7 +198,7 @@ function GaojiSearchResultPage() {
                     <div className="filter-container">
                         <div className="filter-header" onClick={() => toggleFilter('source')} style={{ display: 'flex', alignItems: 'center' }}>
                             <h3 style={{ margin: 0 }}>来源</h3>
-                            <span style={{ marginLeft: 8, cursor: 'pointer' }} title="查看柱状图" onClick={e => { e.stopPropagation(); setShowSourceChart(true); }}>📊</span>
+                            <span className="chart-icon" style={{ marginLeft: 8, cursor: 'pointer' }} title="查看柱状图" onClick={e => { e.stopPropagation(); setShowSourceChart(true); }}>📊</span>
                             <span className="filter-icon">{filterOpen.source ? '▼' : '▶'}</span>
                         </div>
                         {filterOpen.source && (
@@ -218,7 +218,7 @@ function GaojiSearchResultPage() {
                     <div className="filter-container">
                         <div className="filter-header" onClick={() => toggleFilter('year')} style={{ display: 'flex', alignItems: 'center' }}>
                             <h3 style={{ margin: 0 }}>年份</h3>
-                            <span style={{ marginLeft: 8, cursor: 'pointer' }} title="查看柱状图" onClick={e => { e.stopPropagation(); setShowYearChart(true); }}>📊</span>
+                            <span className="chart-icon" style={{ marginLeft: 8, cursor: 'pointer' }} title="查看柱状图" onClick={e => { e.stopPropagation(); setShowYearChart(true); }}>📊</span>
                             <span className="filter-icon">{filterOpen.year ? '▼' : '▶'}</span>
                         </div>
                         {filterOpen.year && (
