@@ -9,6 +9,7 @@ import SearchResultPage from './search/SearchResultPage';
 import GaojiSearchResultPage from './search/GaojiSearchResultPage';
 import ServerErrorPage from "./ErrorPages/ServerErrorPage";
 import ContentViewerPage from "./page/ContentViewerPage";
+import UploadFilePage from "./page/UploadFilePage";
 
 
 function App() {
@@ -38,6 +39,8 @@ function App() {
             <Route path="/gaojiSearchResult" element={<GaojiSearchResultPage />} />
             {/* 内容展示页 */}
             <Route path="/contentViewer" element={<ContentViewerPage />} />
+            {/*  上传文件页面  */}
+            <Route path="/uploadFile" element={<UploadFilePage />} />
         </Routes>
       </Router>
   )

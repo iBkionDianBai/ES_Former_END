@@ -15,7 +15,7 @@
     z-index: -1;
     width: 100%;
     min-width: 1200px;
-    height: 400px;
+    height: 490px;
     background: url("../image/banner.png") bottom center repeat-x #1b66e6;
     overflow: hidden;
 }
@@ -34,7 +34,7 @@
 .searchmain {
     width: 1090px;
     height: 280px;
-    margin: 100px auto 0 auto;
+    margin: 50px auto 0 auto;
     clear: both;
 }
 
@@ -162,22 +162,63 @@
     border: none;
 }
 
-.toolkit-bar {
+.button-bar-container {
     width: 1090px;
     height: 280px;
-    margin: 0 auto 0 auto;
-}
-.toolkit-bar .btn-tab {
-    height: 50px;
-    margin-left: 120px;
+    margin: -50px auto 0 auto;
     clear: both;
 }
-.toolkit-bar .btn-tab li {
-    position: relative;
+
+.button-bar-title {
     float: left;
-    width: 110px;
-    height: 36px;
-    line-height: 32px;
-    text-align: center;
-    font-size: 15px;
+    margin-top: 12px;
+    margin-left: 60px;
+    color: #fff;
+}
+
+.button-bar {
+    float: left;
+    width: 1000px;
+    height: 90px;
+    margin-left: 60px;
+    border-radius: 16px;
+    background-color: rgba(31, 195, 221, 0.07);
+    -webkit-box-shadow: -0.07px 2px 4px 0 rgba(0,0,0,0.3608);
+    -moz-box-shadow: -0.07px 2px 4px 0 rgba(0,0,0,0.3608);
+    -ms-box-shadow: -0.07px 2px 4px 0 rgba(0,0,0,0.3608);
+    -o-box-shadow: -0.07px 2px 4px 0 rgba(0,0,0,0.3608);
+    box-shadow: -0.07px 2px 4px 0 rgba(0,0,0,0.3608);
+}
+
+/* 工具栏按钮列表样式 */
+.select-list {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100%;
+    padding-left: 20px;
+    gap: 20px; /* 按钮之间的间距 */
+}
+
+/* 单个按钮容器 */
+.select-list li {
+    list-style: none;
+}
+
+/* 工具栏按钮样式 */
+.select-list .btn {
+    padding: 10px 20px;
+    font-size: 20px;
+    color: #1D67E7;
+    background-color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* 悬停效果 */
+.select-list .btn:hover {
+    background-color: #1D67E7;
+    color: #fff;
 }
