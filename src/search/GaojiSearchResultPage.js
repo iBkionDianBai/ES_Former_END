@@ -44,6 +44,7 @@ function GaojiSearchResultPage() {
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [sortOrder, setSortOrder] = useState('desc');
+    const [sortField, setSortField] = useState('relevance'); // 添加排序字段状态
     const [selectedIds, setSelectedIds] = useState([]);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
@@ -126,6 +127,32 @@ function GaojiSearchResultPage() {
 
     // 动态生成主题选项（事件名频度）
     const themes = calculateEventNameFrequency(searchResults);
+
+    // 添加过滤逻辑
+    const filteredResults = searchResults.filter(item => {
+        const eventName = item.title.split(' ')[0];
+        const themeOk = selectedThemes.length === 0 || selectedThemes.some(theme => {
+            const themeName = theme.split('（')[0];
+            return eventName === themeName;
+        });
+        const sourceOk = selectedSources.length === 0 || selectedSources.includes(item.source);
+        const yearOk = selectedYears.length === 0 || selectedYears.includes(item.time);
+        return themeOk && sourceOk && yearOk;
+    });
+
+    // 添加排序逻辑
+    const sortedResults = [...filteredResults].sort((a, b) => {
+        if (sortField === 'relevance') {
+            // 相关度排序（按ID排序，模拟相关度）
+            return sortOrder === 'asc' ? a.id - b.id : b.id - a.id;
+        } else if (sortField === 'date') {
+            // 时间排序
+            const dateA = new Date(a.time);
+            const dateB = new Date(b.time);
+            return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+        }
+        return 0;
+    });
 
     const handleGaojiSearch = (val) => {
         if (val && val.trim() !== "") {
@@ -246,7 +273,7 @@ function GaojiSearchResultPage() {
                                 </div>
                                 <div className="results-toolbar">
                                     <span>排序：</span>
-                                    <select className="sort-select">
+                                    <select className="sort-select" value={sortField} onChange={e => setSortField(e.target.value)}>
                                         <option value="relevance">相关度</option>
                                         <option value="date">发表时间</option>
                                     </select>
@@ -278,7 +305,7 @@ function GaojiSearchResultPage() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {searchResults.map((result, index) => (
+                                    {sortedResults.map((result, index) => (
                                         <tr key={result.id}>
                                             <td>
                                                 <input
@@ -332,24 +359,28 @@ function GaojiSearchResultPage() {
                     <div style={{ background: '#fff', padding: 24, borderRadius: 8, minWidth: 400, minHeight: 300 }} onClick={e => e.stopPropagation()}>
                         <h4 style={{textAlign:'center'}}>事件名频度柱状图 {selectedThemes.length > 0 ? `(已选择${selectedThemes.length}个事件)` : ''}</h4>
                         {/* 简单SVG柱状图 */}
-                        <svg width="360" height="200">
+                        <svg width="700" height="220">
                             {(selectedThemes.length > 0 ? selectedThemes : themes).map((item, idx) => {
                                 // 提取事件名和频度
                                 const eventName = item.split('（')[0];
                                 const freq = parseInt(item.match(/（(\d+)）/)[1]);
+                                const barWidth = 40;
+                                const barSpacing = 16;
+                                const startX = 40;
+                                const x = startX + idx * (barWidth + barSpacing);
                                 return (
                                     <g key={item}>
-                                        <rect x={30+idx*60} y={180-freq*20} width={40} height={freq*20} fill="#1890ff" />
-                                        <text x={30+idx*60+20} y={195} textAnchor="middle" fontSize="12">{eventName}</text>
-                                        <text x={30+idx*60+20} y={180-freq*20-5} textAnchor="middle" fontSize="12">{freq}</text>
+                                        <rect x={x} y={180-freq*20} width={barWidth} height={freq*20} fill="#1890ff" />
+                                        <text x={x + barWidth/2} y={205} textAnchor="middle" fontSize="12">{eventName}</text>
+                                        <text x={x + barWidth/2} y={180-freq*20-5} textAnchor="middle" fontSize="12">{freq}</text>
                                     </g>
                                 );
                             })}
                             {/* 坐标轴 */}
-                            <line x1="20" y1="0" x2="20" y2="180" stroke="#333" />
-                            <line x1="20" y1="180" x2="350" y2="180" stroke="#333" />
+                            <line x1="30" y1="0" x2="30" y2="180" stroke="#333" />
+                            <line x1="30" y1="180" x2="690" y2="180" stroke="#333" />
                             <text x="0" y="10" fontSize="12">频度</text>
-                            <text x="340" y="195" fontSize="12">事件名</text>
+                            <text x="620" y="210" fontSize="12">事件名</text>
                         </svg>
                         <div style={{textAlign:'center',marginTop:8}}><button onClick={()=>setShowChart(false)}>关闭</button></div>
                     </div>
@@ -360,21 +391,25 @@ function GaojiSearchResultPage() {
                 <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowSourceChart(false)}>
                     <div style={{ background: '#fff', padding: 24, borderRadius: 8, minWidth: 400, minHeight: 300 }} onClick={e => e.stopPropagation()}>
                         <h4 style={{textAlign:'center'}}>来源事件数量柱状图</h4>
-                        <svg width="360" height="200">
+                        <svg width="700" height="220">
                             {sources.map((item, idx) => {
-                                const count = searchResults.filter(r => r.source === item).length;
+                                const count = filteredResults.filter(r => r.source === item).length;
+                                const barWidth = 40;
+                                const barSpacing = 16;
+                                const startX = 40;
+                                const x = startX + idx * (barWidth + barSpacing);
                                 return (
                                     <g key={item}>
-                                        <rect x={30+idx*60} y={180-count*20} width={40} height={count*20} fill="#52c41a" />
-                                        <text x={30+idx*60+20} y={195} textAnchor="middle" fontSize="12">{item}</text>
-                                        <text x={30+idx*60+20} y={180-count*20-5} textAnchor="middle" fontSize="12">{count}</text>
+                                        <rect x={x} y={180-count*20} width={barWidth} height={count*20} fill="#52c41a" />
+                                        <text x={x + barWidth/2} y={205} textAnchor="middle" fontSize="12">{item}</text>
+                                        <text x={x + barWidth/2} y={180-count*20-5} textAnchor="middle" fontSize="12">{count}</text>
                                     </g>
                                 );
                             })}
-                            <line x1="20" y1="0" x2="20" y2="180" stroke="#333" />
-                            <line x1="20" y1="180" x2="350" y2="180" stroke="#333" />
+                            <line x1="30" y1="0" x2="30" y2="180" stroke="#333" />
+                            <line x1="30" y1="180" x2="690" y2="180" stroke="#333" />
                             <text x="0" y="10" fontSize="12">来源</text>
-                            <text x="340" y="195" fontSize="12">事件数</text>
+                            <text x="620" y="210" fontSize="12">事件数</text>
                         </svg>
                         <div style={{textAlign:'center',marginTop:8}}><button onClick={()=>setShowSourceChart(false)}>关闭</button></div>
                     </div>
@@ -387,7 +422,7 @@ function GaojiSearchResultPage() {
                         <h4 style={{textAlign:'center'}}>年份事件数量柱状图</h4>
                         <svg width="700" height="220">
                             {years.map((item, idx) => {
-                                const count = searchResults.filter(r => r.time === item).length;
+                                const count = filteredResults.filter(r => r.time === item).length;
                                 const barWidth = 40;
                                 const barSpacing = 16;
                                 const startX = 40;
