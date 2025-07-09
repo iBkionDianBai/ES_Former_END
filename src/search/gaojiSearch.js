@@ -116,31 +116,59 @@ function GaojiSearchComponent() {
 
     // 处理搜索按钮点击事件的函数
     const handleSearch = () => {
-        const k1 = searchRows[0]?.keyword1?.trim();
-        const k2 = searchRows[0]?.keyword2?.trim();
-        const operator = searchRows[0]?.operator || '';
-        const fuzzy = searchRows[0]?.fuzzy || '';
-        let url = '';
-        // 新增：日期参数
-        const dateParams = [];
-        if (startDate) dateParams.push(`startDate=${encodeURIComponent(startDate)}`);
-        if (endDate) dateParams.push(`endDate=${encodeURIComponent(endDate)}`);
-        // 新增：类型参数
-        let typesStr = '';
+        // 构建多行搜索条件
+        const searchConditions = [];
+        searchRows.forEach((row, index) => {
+            const k1 = row.keyword1?.trim();
+            const k2 = row.keyword2?.trim();
+            const operator = row.operator || '';
+            const fuzzy = row.fuzzy || '';
+            const relation = row.relation || '';
+            const container = row.container || '';
+            
+            if (k1 || k2) {
+                let condition = '';
+                if (k1 && k2) {
+                    condition = `${k1} ${operator} ${k2}`;
+                } else if (k1) {
+                    condition = k1;
+                }
+                
+                if (container && container !== '全部容器') {
+                    condition = `[${container}] ${condition}`;
+                }
+                
+                if (fuzzy) {
+                    condition += ` (${fuzzy})`;
+                }
+                
+                if (index > 0 && relation) {
+                    condition = `${relation} ${condition}`;
+                }
+                
+                searchConditions.push(condition);
+            }
+        });
+        
+        // 构建URL参数
+        const params = new URLSearchParams();
+        
+        // 添加搜索条件
+        if (searchConditions.length > 0) {
+            params.set('searchConditions', searchConditions.join(' | '));
+        }
+        
+        // 添加日期参数
+        if (startDate) params.set('startDate', startDate);
+        if (endDate) params.set('endDate', endDate);
+        
+        // 添加类型参数
         if (searchTypes.length > 0) {
-            typesStr = `&types=${encodeURIComponent(searchTypes.join('/'))}`;
+            params.set('types', searchTypes.join('/'));
         }
-        const dateStr = dateParams.length ? '&' + dateParams.join('&') : '';
-        if (k1 && k2) {
-            url = `/gaojiSearchResult?q1=${encodeURIComponent(k1)}&q2=${encodeURIComponent(k2)}&operator=${encodeURIComponent(operator)}&fuzzy=${encodeURIComponent(fuzzy)}${dateStr}${typesStr}`;
-        } else if (k1) {
-            url = `/gaojiSearchResult?q=${encodeURIComponent(k1)}&fuzzy=${encodeURIComponent(fuzzy)}${dateStr}${typesStr}`;
-        }
-        if (url) {
-            navigate(url);
-            return;
-        }
-        // 其他情况可自定义处理（如提示、留在原页等）
+        
+        const url = `/gaojiSearchResult?${params.toString()}`;
+        navigate(url);
     };
 
     // 处理清除按钮点击事件的函数

@@ -35,8 +35,8 @@ function SearchComponent() {
     const handleSearchClick = () => {
         // 当前选择的搜索类型（如：标题、作者等）
         console.log(selectedValue);
-        // 新增：如果输入为1，跳转到SearchResultPage，否则跳转到404
-        if (inputContent === '1') {
+        // 新增：如果输入为1或2，跳转到SearchResultPage，否则跳转到404
+        if (inputContent === '1' || inputContent === '2') {
             navigate('/searchResult?q=' + encodeURIComponent(inputContent));
             return;
         } else {

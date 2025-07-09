@@ -4,13 +4,26 @@ import GaojiSearchComponent from "./gaojiSearch";
 import "./SearchResultPage.css";
 import { useNavigate, useLocation } from "react-router-dom";
 
-const themes = ["主题（频度）", "主题（频度）", "主题（频度）", "主题（频度）", "主题（频度）"];
-const sources = ["来源（该来源事件数量）", "来源（该来源事件数量）", "来源（该来源事件数量）", "来源（该来源事件数量）", "来源（该来源事件数量）"];
-const years = ["年份（该年份事件数量）", "年份（该年份事件数量）", "年份（该年份事件数量）", "年份（该年份事件数量）", "年份（该年份事件数量）"];
-
-const themeOptions = ["主题（频度）", "主题（频度）", "主题（频度）", "主题（频度）", "主题（频度）"];
-const sourceOptions = ["平台名"];
-const yearOptions = ["2020-01-15", "2020-02-20", "2020-03-10", "2020-04-05", "2020-05-25", "2020-06-18", "2020-07-12", "2020-08-08", "2020-09-30", "2020-10-22"];
+// 计算事件名频度的函数
+const calculateEventNameFrequency = (results) => {
+    const eventNameCount = {};
+    
+    results.forEach(item => {
+        // 提取事件名（取标题的第一部分作为事件名）
+        const eventName = item.title.split(' ')[0];
+        eventNameCount[eventName] = (eventNameCount[eventName] || 0) + 1;
+    });
+    
+    // 转换为数组并按频度排序，取前5个
+    const sortedEvents = Object.entries(eventNameCount)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 5)
+        .map(([name, count]) => `${name}（${count}）`);
+    
+    return sortedEvents;
+};
+const sources = ["平台名"];
+const years = ["2020-01-15", "2020-02-20", "2020-03-10", "2020-04-05", "2020-05-25", "2020-06-18", "2020-07-12", "2020-08-08", "2020-09-30", "2020-10-22"];
 
 function GaojiSearchBox({onSearch}) {
     const [input, setInput] = useState("");
@@ -27,13 +40,6 @@ function GaojiSearchBox({onSearch}) {
     );
 }
 
-function formatDate(dateStr) {
-    if (!dateStr) return '';
-    const d = new Date(dateStr);
-    if (isNaN(d)) return dateStr;
-    return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;
-}
-
 function GaojiSearchResultPage() {
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -42,45 +48,55 @@ function GaojiSearchResultPage() {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [filterOpen, setFilterOpen] = useState({ theme: true, source: true, year: true });
-    const navigate = useNavigate();
-    const location = useLocation();
-    const searchParams = new URLSearchParams(location.search);
-    const q = searchParams.get('q') || '';
-    const q1 = searchParams.get('q1') || '';
-    const q2 = searchParams.get('q2') || '';
-    const startDateParam = searchParams.get('startDate') || '';
-    const endDateParam = searchParams.get('endDate') || '';
-    const typesParam = searchParams.get('types') || '';
-    const operatorParam = searchParams.get('operator') || '并且';
-    const fuzzyParam = searchParams.get('fuzzy') || '';
-
-    // 构建检索内容描述
-    let searchSummary = '';
-    if (q1 && q2) {
-        searchSummary = `${q1} ${operatorParam} ${q2}`;
-        if (fuzzyParam) searchSummary += `，${fuzzyParam}`;
-    } else if (q1) {
-        searchSummary = q1;
-        if (fuzzyParam) searchSummary += `，${fuzzyParam}`;
-    } else if (q) {
-        searchSummary = q;
-        if (fuzzyParam) searchSummary += `，${fuzzyParam}`;
-    }
-    let dateStr = '';
-    if (startDateParam || endDateParam) {
-        dateStr = `，${formatDate(startDateParam)}${(startDateParam && endDateParam) ? ' 至 ' : ''}${formatDate(endDateParam)}`;
-    }
-    let typeStr = '';
-    if (typesParam) {
-        typeStr = `，类型: ${typesParam}`;
-    }
-    const [searchText, setSearchText] = useState(searchSummary);
-    const [selectedThemes, setSelectedThemes] = useState([]);
-    const [selectedSources, setSelectedSources] = useState([]);
-    const [selectedYears, setSelectedYears] = useState([]);
     const [showChart, setShowChart] = useState(false);
     const [showSourceChart, setShowSourceChart] = useState(false);
     const [showYearChart, setShowYearChart] = useState(false);
+    const [selectedThemes, setSelectedThemes] = useState([]);
+    const [selectedSources, setSelectedSources] = useState([]);
+    const [selectedYears, setSelectedYears] = useState([]);
+    const navigate = useNavigate();
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const searchConditions = searchParams.get('searchConditions') || '';
+    const startDateParam = searchParams.get('startDate') || '';
+    const endDateParam = searchParams.get('endDate') || '';
+    const types = searchParams.get('types') || '';
+    
+    // 构建完整的检索内容显示
+    const buildSearchText = () => {
+        let text = '';
+        
+        // 处理搜索条件
+        if (searchConditions) {
+            const conditions = searchConditions.split(' | ');
+            text = conditions.join('\n');
+        }
+        
+        // 添加日期范围
+        if (startDateParam || endDateParam) {
+            const dateRange = [];
+            if (startDateParam) dateRange.push(startDateParam);
+            if (endDateParam) dateRange.push(endDateParam);
+            if (text) {
+                text += `\n[日期: ${dateRange.join(' - ')}]`;
+            } else {
+                text = `[日期: ${dateRange.join(' - ')}]`;
+            }
+        }
+        
+        // 添加类型
+        if (types) {
+            if (text) {
+                text += `\n[类型: ${types}]`;
+            } else {
+                text = `[类型: ${types}]`;
+            }
+        }
+        
+        return text;
+    };
+    
+    const [searchText, setSearchText] = useState(buildSearchText());
 
     useEffect(() => {
         setIsLoading(true);
@@ -99,27 +115,23 @@ function GaojiSearchResultPage() {
                 { id: 10, title: "事件题目十 题目第二行", source: "平台名", time: "2020-10-22" }
             ]);
             setIsLoading(false);
-            setSearchText(searchSummary);
+            setSearchText(buildSearchText());
         }, 500);
         return () => clearTimeout(timer);
-    }, [searchSummary]);
+    }, [searchConditions, startDateParam, endDateParam, types]);
 
     const toggleFilter = (filterName) => {
         setFilterOpen({ ...filterOpen, [filterName]: !filterOpen[filterName] });
     };
+
+    // 动态生成主题选项（事件名频度）
+    const themes = calculateEventNameFrequency(searchResults);
 
     const handleGaojiSearch = (val) => {
         if (val && val.trim() !== "") {
             navigate(`/gaojiSearchResult?q=${encodeURIComponent(val)}`);
         }
     };
-
-    const filteredResults = searchResults.filter(item => {
-        const themeOk = selectedThemes.length === 0 || selectedThemes.includes("主题（频度）");
-        const sourceOk = selectedSources.length === 0 || selectedSources.includes(item.source);
-        const yearOk = selectedYears.length === 0 || selectedYears.includes(item.time);
-        return themeOk && sourceOk && yearOk;
-    });
 
     return (
         <div>
@@ -130,9 +142,7 @@ function GaojiSearchResultPage() {
             <GaojiSearchComponent />
             {/* 检索内容 */}
             <div className="search-bar-container">
-                <div className="search-params">
-                    检索内容: {searchText}{dateStr}{typeStr}
-                </div>
+                <div className="search-params" style={{ whiteSpace: 'pre-line' }}>检索内容: {searchText}</div>
             </div>
             <div className="main-content">
                 {/* 左侧筛选区域，样式与SearchResultPage一致 */}
@@ -140,12 +150,13 @@ function GaojiSearchResultPage() {
                     {/* 主题筛选 */}
                     <div className="filter-container">
                         <div className="filter-header" onClick={() => toggleFilter('theme')} style={{ display: 'flex', alignItems: 'center' }}>
-                            <h3 style={{ margin: 0 }}>主题</h3>
+                            <h3 style={{ margin: 0 }}>事件名(频度)</h3>
                             <span style={{ marginLeft: 8, cursor: 'pointer' }} title="查看柱状图" onClick={e => { e.stopPropagation(); setShowChart(true); }}>📊</span>
+                            <span className="filter-icon">{filterOpen.theme ? '▼' : '▶'}</span>
                         </div>
                         {filterOpen.theme && (
-                            <div className="filter-content">
-                                {themeOptions.map((item, idx) => (
+                            <div className="filter-content" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                                {themes.map((item, idx) => (
                                     <div className="filter-item" key={idx}>
                                         <input type="checkbox" checked={selectedThemes.includes(item)} onChange={e => {
                                             if (e.target.checked) setSelectedThemes([...selectedThemes, item]);
@@ -156,34 +167,6 @@ function GaojiSearchResultPage() {
                             </div>
                         )}
                     </div>
-                    {/* 柱状图弹窗 */}
-                    {showChart && (
-                        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowChart(false)}>
-                            <div style={{ background: '#fff', padding: 24, borderRadius: 8, minWidth: 400, minHeight: 300 }} onClick={e => e.stopPropagation()}>
-                                <h4 style={{textAlign:'center'}}>主题频度柱状图</h4>
-                                {/* 简单SVG柱状图 */}
-                                <svg width="360" height="200">
-                                    {themeOptions.map((item, idx) => {
-                                        // 统计频度（模拟：统计filteredResults中title包含该主题的数量）
-                                        const freq = filteredResults.filter(r => r.title.includes(item)).length;
-                                        return (
-                                            <g key={item}>
-                                                <rect x={30+idx*60} y={180-freq*20} width={40} height={freq*20} fill="#1890ff" />
-                                                <text x={30+idx*60+20} y={195} textAnchor="middle" fontSize="12">{item.replace(/(主题|（频度）|\(频度\))/g,"")}</text>
-                                                <text x={30+idx*60+20} y={180-freq*20-5} textAnchor="middle" fontSize="12">{freq}</text>
-                                            </g>
-                                        );
-                                    })}
-                                    {/* 坐标轴 */}
-                                    <line x1="20" y1="0" x2="20" y2="180" stroke="#333" />
-                                    <line x1="20" y1="180" x2="350" y2="180" stroke="#333" />
-                                    <text x="0" y="10" fontSize="12">频度</text>
-                                    <text x="340" y="195" fontSize="12">主题</text>
-                                </svg>
-                                <div style={{textAlign:'center',marginTop:8}}><button onClick={()=>setShowChart(false)}>关闭</button></div>
-                            </div>
-                        </div>
-                    )}
                     {/* 来源筛选 */}
                     <div className="filter-container">
                         <div className="filter-header" onClick={() => toggleFilter('source')} style={{ display: 'flex', alignItems: 'center' }}>
@@ -192,8 +175,8 @@ function GaojiSearchResultPage() {
                             <span className="filter-icon">{filterOpen.source ? '▼' : '▶'}</span>
                         </div>
                         {filterOpen.source && (
-                            <div className="filter-content">
-                                {sourceOptions.map((item, idx) => (
+                            <div className="filter-content" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                                {sources.map((item, idx) => (
                                     <div className="filter-item" key={idx}>
                                         <input type="checkbox" checked={selectedSources.includes(item)} onChange={e => {
                                             if (e.target.checked) setSelectedSources([...selectedSources, item]);
@@ -204,30 +187,6 @@ function GaojiSearchResultPage() {
                             </div>
                         )}
                     </div>
-                    {showSourceChart && (
-                        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowSourceChart(false)}>
-                            <div style={{ background: '#fff', padding: 24, borderRadius: 8, minWidth: 400, minHeight: 300 }} onClick={e => e.stopPropagation()}>
-                                <h4 style={{textAlign:'center'}}>来源事件数量柱状图</h4>
-                                <svg width="360" height="200">
-                                    {sourceOptions.map((item, idx) => {
-                                        const count = filteredResults.filter(r => r.source === item).length;
-                                        return (
-                                            <g key={item}>
-                                                <rect x={30+idx*60} y={180-count*20} width={40} height={count*20} fill="#52c41a" />
-                                                <text x={30+idx*60+20} y={195} textAnchor="middle" fontSize="12">{item}</text>
-                                                <text x={30+idx*60+20} y={180-count*20-5} textAnchor="middle" fontSize="12">{count}</text>
-                                            </g>
-                                        );
-                                    })}
-                                    <line x1="20" y1="0" x2="20" y2="180" stroke="#333" />
-                                    <line x1="20" y1="180" x2="350" y2="180" stroke="#333" />
-                                    <text x="0" y="10" fontSize="12">来源</text>
-                                    <text x="340" y="195" fontSize="12">事件数</text>
-                                </svg>
-                                <div style={{textAlign:'center',marginTop:8}}><button onClick={()=>setShowSourceChart(false)}>关闭</button></div>
-                            </div>
-                        </div>
-                    )}
                     {/* 年份筛选 */}
                     <div className="filter-container">
                         <div className="filter-header" onClick={() => toggleFilter('year')} style={{ display: 'flex', alignItems: 'center' }}>
@@ -236,8 +195,8 @@ function GaojiSearchResultPage() {
                             <span className="filter-icon">{filterOpen.year ? '▼' : '▶'}</span>
                         </div>
                         {filterOpen.year && (
-                            <div className="filter-content">
-                                {yearOptions.map((item, idx) => (
+                            <div className="filter-content" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                                {years.map((item, idx) => (
                                     <div className="filter-item" key={idx}>
                                         <input type="checkbox" checked={selectedYears.includes(item)} onChange={e => {
                                             if (e.target.checked) setSelectedYears([...selectedYears, item]);
@@ -248,30 +207,6 @@ function GaojiSearchResultPage() {
                             </div>
                         )}
                     </div>
-                    {showYearChart && (
-                        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowYearChart(false)}>
-                            <div style={{ background: '#fff', padding: 24, borderRadius: 8, minWidth: 400, minHeight: 300 }} onClick={e => e.stopPropagation()}>
-                                <h4 style={{textAlign:'center'}}>年份事件数量柱状图</h4>
-                                <svg width="360" height="200">
-                                    {yearOptions.map((item, idx) => {
-                                        const count = filteredResults.filter(r => r.time === item).length;
-                                        return (
-                                            <g key={item}>
-                                                <rect x={30+idx*30} y={180-count*20} width={20} height={count*20} fill="#faad14" />
-                                                <text x={30+idx*30+10} y={195} textAnchor="middle" fontSize="12">{item}</text>
-                                                <text x={30+idx*30+10} y={180-count*20-5} textAnchor="middle" fontSize="12">{count}</text>
-                                            </g>
-                                        );
-                                    })}
-                                    <line x1="20" y1="0" x2="20" y2="180" stroke="#333" />
-                                    <line x1="20" y1="180" x2="350" y2="180" stroke="#333" />
-                                    <text x="0" y="10" fontSize="12">年份</text>
-                                    <text x="340" y="195" fontSize="12">事件数</text>
-                                </svg>
-                                <div style={{textAlign:'center',marginTop:8}}><button onClick={()=>setShowYearChart(false)}>关闭</button></div>
-                            </div>
-                        </div>
-                    )}
                 </div>
                 {/* 右侧结果区域 */}
                 <div className="results-section">
@@ -343,7 +278,7 @@ function GaojiSearchResultPage() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredResults.map((result, index) => (
+                                    {searchResults.map((result, index) => (
                                         <tr key={result.id}>
                                             <td>
                                                 <input
@@ -390,6 +325,91 @@ function GaojiSearchResultPage() {
                     )}
                 </div>
             </div>
+
+            {/* 柱状图弹窗 */}
+            {showChart && (
+                <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowChart(false)}>
+                    <div style={{ background: '#fff', padding: 24, borderRadius: 8, minWidth: 400, minHeight: 300 }} onClick={e => e.stopPropagation()}>
+                        <h4 style={{textAlign:'center'}}>事件名频度柱状图 {selectedThemes.length > 0 ? `(已选择${selectedThemes.length}个事件)` : ''}</h4>
+                        {/* 简单SVG柱状图 */}
+                        <svg width="360" height="200">
+                            {(selectedThemes.length > 0 ? selectedThemes : themes).map((item, idx) => {
+                                // 提取事件名和频度
+                                const eventName = item.split('（')[0];
+                                const freq = parseInt(item.match(/（(\d+)）/)[1]);
+                                return (
+                                    <g key={item}>
+                                        <rect x={30+idx*60} y={180-freq*20} width={40} height={freq*20} fill="#1890ff" />
+                                        <text x={30+idx*60+20} y={195} textAnchor="middle" fontSize="12">{eventName}</text>
+                                        <text x={30+idx*60+20} y={180-freq*20-5} textAnchor="middle" fontSize="12">{freq}</text>
+                                    </g>
+                                );
+                            })}
+                            {/* 坐标轴 */}
+                            <line x1="20" y1="0" x2="20" y2="180" stroke="#333" />
+                            <line x1="20" y1="180" x2="350" y2="180" stroke="#333" />
+                            <text x="0" y="10" fontSize="12">频度</text>
+                            <text x="340" y="195" fontSize="12">事件名</text>
+                        </svg>
+                        <div style={{textAlign:'center',marginTop:8}}><button onClick={()=>setShowChart(false)}>关闭</button></div>
+                    </div>
+                </div>
+            )}
+
+            {showSourceChart && (
+                <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowSourceChart(false)}>
+                    <div style={{ background: '#fff', padding: 24, borderRadius: 8, minWidth: 400, minHeight: 300 }} onClick={e => e.stopPropagation()}>
+                        <h4 style={{textAlign:'center'}}>来源事件数量柱状图</h4>
+                        <svg width="360" height="200">
+                            {sources.map((item, idx) => {
+                                const count = searchResults.filter(r => r.source === item).length;
+                                return (
+                                    <g key={item}>
+                                        <rect x={30+idx*60} y={180-count*20} width={40} height={count*20} fill="#52c41a" />
+                                        <text x={30+idx*60+20} y={195} textAnchor="middle" fontSize="12">{item}</text>
+                                        <text x={30+idx*60+20} y={180-count*20-5} textAnchor="middle" fontSize="12">{count}</text>
+                                    </g>
+                                );
+                            })}
+                            <line x1="20" y1="0" x2="20" y2="180" stroke="#333" />
+                            <line x1="20" y1="180" x2="350" y2="180" stroke="#333" />
+                            <text x="0" y="10" fontSize="12">来源</text>
+                            <text x="340" y="195" fontSize="12">事件数</text>
+                        </svg>
+                        <div style={{textAlign:'center',marginTop:8}}><button onClick={()=>setShowSourceChart(false)}>关闭</button></div>
+                    </div>
+                </div>
+            )}
+
+            {showYearChart && (
+                <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowYearChart(false)}>
+                    <div style={{ background: '#fff', padding: 24, borderRadius: 8, minWidth: 740, minHeight: 300 }} onClick={e => e.stopPropagation()}>
+                        <h4 style={{textAlign:'center'}}>年份事件数量柱状图</h4>
+                        <svg width="700" height="220">
+                            {years.map((item, idx) => {
+                                const count = searchResults.filter(r => r.time === item).length;
+                                const barWidth = 40;
+                                const barSpacing = 16;
+                                const startX = 40;
+                                const x = startX + idx * (barWidth + barSpacing);
+                                return (
+                                    <g key={item}>
+                                        <rect x={x} y={180-count*20} width={barWidth} height={count*20} fill="#faad14" />
+                                        <text x={x + barWidth/2} y={205} textAnchor="middle" fontSize="9">{item.split('-')[0]}</text>
+                                        <text x={x + barWidth/2} y={215} textAnchor="middle" fontSize="9">{item.split('-')[1] + '-' + item.split('-')[2]}</text>
+                                        <text x={x + barWidth/2} y={180-count*20-5} textAnchor="middle" fontSize="12">{count}</text>
+                                    </g>
+                                );
+                            })}
+                            <line x1="30" y1="0" x2="30" y2="180" stroke="#333" />
+                            <line x1="30" y1="180" x2="690" y2="180" stroke="#333" />
+                            <text x="0" y="10" fontSize="12">年份</text>
+                            <text x="620" y="210" fontSize="12">事件数</text>
+                        </svg>
+                        <div style={{textAlign:'center',marginTop:8}}><button onClick={()=>setShowYearChart(false)}>关闭</button></div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
