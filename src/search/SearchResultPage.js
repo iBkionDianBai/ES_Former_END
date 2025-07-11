@@ -5,6 +5,28 @@ import "./SearchResultPage.css";
 import '../index'
 import Header from "../page/header";
 
+const sources = ["平台名"];
+const years = ["2020-01-15", "2020-02-20", "2020-03-10", "2020-04-05", "2020-05-25", "2020-06-18", "2020-07-12", "2020-08-08", "2020-09-30", "2020-10-22"];
+
+// 计算事件名频度的函数
+const calculateEventNameFrequency = (results) => {
+    const eventNameCount = {};
+
+    results.forEach(item => {
+        // 提取事件名（取标题的第一部分作为事件名）
+        const eventName = item.title.split(' ')[0];
+        eventNameCount[eventName] = (eventNameCount[eventName] || 0) + 1;
+    });
+
+    // 转换为数组并按频度排序，取前5个
+    const sortedEvents = Object.entries(eventNameCount)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 5)
+        .map(([name, count]) => `${name}（${count}）`);
+
+    return sortedEvents;
+};
+
 function SearchResultPage() {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -26,19 +48,6 @@ function SearchResultPage() {
     const [pageSize, setPageSize] = useState(10);
     const [useLoadMore, setUseLoadMore] = useState(false);
 
-    const calculateEventNameFrequency = (results) => {
-        const eventNameCount = {};
-        results.forEach(item => {
-            const eventName = item.title.split(' ')[0];
-            eventNameCount[eventName] = (eventNameCount[eventName] || 0) + 1;
-        });
-        return Object.entries(eventNameCount)
-            .sort(([, a], [, b]) => b - a)
-            .slice(0, 5)
-            .map(([name, count]) => `${name}(${count})`);
-    };
-
-    const themeOptions = calculateEventNameFrequency(searchResults);
     const sourceOptions = ["平台名"];
     const yearOptions = ["2020-01-15", "2020-02-20", "2020-03-10", "2020-04-05", "2020-05-25", "2020-06-18", "2020-07-12", "2020-08-08", "2020-09-30", "2020-10-22"];
     const [selectedThemes, setSelectedThemes] = useState([]);
@@ -79,6 +88,9 @@ function SearchResultPage() {
     const toggleFilter = (filterName) => {
         setFilterOpen({ ...filterOpen, [filterName]: !filterOpen[filterName] });
     };
+
+    // 动态生成主题选项（事件名频度）
+    const themes = calculateEventNameFrequency(searchResults);
 
     const filteredResults = searchResults.filter(item => {
         const eventName = item.title.split(' ')[0];
@@ -138,7 +150,7 @@ function SearchResultPage() {
                         </div>
                         {filterOpen.theme && (
                             <div className="filter-content" style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                                {themeOptions.map((item, idx) => (
+                                {themes.map((item, idx) => (
                                     <div className="filter-item" key={idx}>
                                         <input type="checkbox" checked={selectedThemes.includes(item)} onChange={e => {
                                             if (e.target.checked) setSelectedThemes([...selectedThemes, item]);
@@ -291,6 +303,98 @@ function SearchResultPage() {
                                     </div>
                                 )}
                             </div>
+                            {/* 柱状图弹窗 */}
+                            {showChart && (
+                                <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowChart(false)}>
+                                    <div style={{ background: '#fff', padding: 24, borderRadius: 8, minWidth: 400, minHeight: 300 }} onClick={e => e.stopPropagation()}>
+                                        <h4 style={{textAlign:'center'}}>事件名频度柱状图 {selectedThemes.length > 0 ? `(已选择${selectedThemes.length}个事件)` : ''}</h4>
+                                        {/* 简单SVG柱状图 */}
+                                        <svg width="700" height="220">
+                                            {(selectedThemes.length > 0 ? selectedThemes : themes).map((item, idx) => {
+                                                // 提取事件名和频度
+                                                const eventName = item.split('（')[0];
+                                                const freq = parseInt(item.match(/（(\d+)）/)[1]);
+                                                const barWidth = 40;
+                                                const barSpacing = 60;
+                                                const startX = 80;
+                                                const x = startX + idx * (barWidth + barSpacing);
+                                                return (
+                                                    <g key={item}>
+                                                        <rect x={x} y={180-freq*20} width={barWidth} height={freq*20} fill="#1890ff" />
+                                                        <text x={x + barWidth/2} y={205} textAnchor="middle" fontSize="12">{eventName}</text>
+                                                        <text x={x + barWidth/2} y={180-freq*20-5} textAnchor="middle" fontSize="12">{freq}</text>
+                                                    </g>
+                                                );
+                                            })}
+                                            {/* 坐标轴 */}
+                                            <line x1="30" y1="0" x2="30" y2="180" stroke="#333" />
+                                            <line x1="30" y1="180" x2="690" y2="180" stroke="#333" />
+                                            <text x="0" y="10" fontSize="12">频度</text>
+                                            <text x="620" y="210" fontSize="12">事件名</text>
+                                        </svg>
+                                        <div style={{textAlign:'center',marginTop:8}}><button className="chart-close" onClick={()=>setShowChart(false)}>关闭</button></div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {showSourceChart && (
+                                <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowSourceChart(false)}>
+                                    <div style={{ background: '#fff', padding: 24, borderRadius: 8, minWidth: 400, minHeight: 300 }} onClick={e => e.stopPropagation()}>
+                                        <h4 style={{textAlign:'center'}}>来源事件数量柱状图</h4>
+                                        <svg width="700" height="220">
+                                            {sources.map((item, idx) => {
+                                                const count = filteredResults.filter(r => r.source === item).length;
+                                                const barWidth = 40;
+                                                const barSpacing = 60;
+                                                const startX = 80;
+                                                const x = startX + idx * (barWidth + barSpacing);
+                                                return (
+                                                    <g key={item}>
+                                                        <rect x={x} y={180-count*20} width={barWidth} height={count*20} fill="#52c41a" />
+                                                        <text x={x + barWidth/2} y={205} textAnchor="middle" fontSize="12">{item}</text>
+                                                        <text x={x + barWidth/2} y={180-count*20-5} textAnchor="middle" fontSize="12">{count}</text>
+                                                    </g>
+                                                );
+                                            })}
+                                            <line x1="40" y1="0" x2="40" y2="180" stroke="#333" />
+                                            <line x1="40" y1="180" x2="690" y2="180" stroke="#333" />
+                                            <text x="0" y="10" fontSize="12">事件数</text>
+                                            <text x="620" y="210" fontSize="12">来源</text>
+                                        </svg>
+                                        <div style={{textAlign:'center',marginTop:8}}><button className="chart-close" onClick={()=>setShowSourceChart(false)}>关闭</button></div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {showYearChart && (
+                                <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowYearChart(false)}>
+                                    <div style={{ background: '#fff', padding: 24, borderRadius: 8, minWidth: 740, minHeight: 300 }} onClick={e => e.stopPropagation()}>
+                                        <h4 style={{textAlign:'center'}}>年份事件数量柱状图</h4>
+                                        <svg width="700" height="220">
+                                            {years.map((item, idx) => {
+                                                const count = filteredResults.filter(r => r.time === item).length;
+                                                const barWidth = 40;
+                                                const barSpacing = 16;
+                                                const startX = 50;
+                                                const x = startX + idx * (barWidth + barSpacing);
+                                                return (
+                                                    <g key={item}>
+                                                        <rect x={x} y={180-count*20} width={barWidth} height={count*20} fill="#faad14" />
+                                                        <text x={x + barWidth/2} y={205} textAnchor="middle" fontSize="9">{item.split('-')[0]}</text>
+                                                        <text x={x + barWidth/2} y={215} textAnchor="middle" fontSize="9">{item.split('-')[1] + '-' + item.split('-')[2]}</text>
+                                                        <text x={x + barWidth/2} y={180-count*20-5} textAnchor="middle" fontSize="12">{count}</text>
+                                                    </g>
+                                                );
+                                            })}
+                                            <line x1="40" y1="0" x2="40" y2="180" stroke="#333" />
+                                            <line x1="40" y1="180" x2="690" y2="180" stroke="#333" />
+                                            <text x="0" y="10" fontSize="12">事件数</text>
+                                            <text x="620" y="210" fontSize="12">年份</text>
+                                        </svg>
+                                        <div style={{textAlign:'center',marginTop:8}}><button className="chart-close" onClick={()=>setShowYearChart(false)}>关闭</button></div>
+                                    </div>
+                                </div>
+                            )}
                         </>
                     )}
                 </div>

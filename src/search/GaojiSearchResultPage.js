@@ -25,20 +25,6 @@ const calculateEventNameFrequency = (results) => {
 const sources = ["平台名"];
 const years = ["2020-01-15", "2020-02-20", "2020-03-10", "2020-04-05", "2020-05-25", "2020-06-18", "2020-07-12", "2020-08-08", "2020-09-30", "2020-10-22"];
 
-function GaojiSearchBox({onSearch}) {
-    const [input, setInput] = useState("");
-    return (
-        <div className="search-bar-container">
-            <input
-                type="text"
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                placeholder="请输入高级搜索内容"
-            />
-            <button onClick={() => onSearch(input)}>搜索</button>
-        </div>
-    );
-}
 
 function GaojiSearchResultPage() {
     const [searchResults, setSearchResults] = useState([]);
@@ -401,8 +387,8 @@ function GaojiSearchResultPage() {
                                 const eventName = item.split('（')[0];
                                 const freq = parseInt(item.match(/（(\d+)）/)[1]);
                                 const barWidth = 40;
-                                const barSpacing = 16;
-                                const startX = 40;
+                                const barSpacing = 60;
+                                const startX = 80;
                                 const x = startX + idx * (barWidth + barSpacing);
                                 return (
                                     <g key={item}>
@@ -418,7 +404,7 @@ function GaojiSearchResultPage() {
                             <text x="0" y="10" fontSize="12">频度</text>
                             <text x="620" y="210" fontSize="12">事件名</text>
                         </svg>
-                        <div style={{textAlign:'center',marginTop:8}}><button onClick={()=>setShowChart(false)}>关闭</button></div>
+                        <div style={{textAlign:'center',marginTop:8}}><button className="chart-close" onClick={()=>setShowChart(false)}>关闭</button></div>
                     </div>
                 </div>
             )}
@@ -431,8 +417,8 @@ function GaojiSearchResultPage() {
                             {sources.map((item, idx) => {
                                 const count = filteredResults.filter(r => r.source === item).length;
                                 const barWidth = 40;
-                                const barSpacing = 16;
-                                const startX = 40;
+                                const barSpacing = 60;
+                                const startX = 80;
                                 const x = startX + idx * (barWidth + barSpacing);
                                 return (
                                     <g key={item}>
@@ -442,12 +428,12 @@ function GaojiSearchResultPage() {
                                     </g>
                                 );
                             })}
-                            <line x1="30" y1="0" x2="30" y2="180" stroke="#333" />
-                            <line x1="30" y1="180" x2="690" y2="180" stroke="#333" />
-                            <text x="0" y="10" fontSize="12">来源</text>
-                            <text x="620" y="210" fontSize="12">事件数</text>
+                            <line x1="40" y1="0" x2="40" y2="180" stroke="#333" />
+                            <line x1="40" y1="180" x2="690" y2="180" stroke="#333" />
+                            <text x="0" y="10" fontSize="12">事件数</text>
+                            <text x="620" y="210" fontSize="12">来源</text>
                         </svg>
-                        <div style={{textAlign:'center',marginTop:8}}><button onClick={()=>setShowSourceChart(false)}>关闭</button></div>
+                        <div style={{textAlign:'center',marginTop:8}}><button className="chart-close" onClick={()=>setShowSourceChart(false)}>关闭</button></div>
                     </div>
                 </div>
             )}
@@ -461,7 +447,7 @@ function GaojiSearchResultPage() {
                                 const count = filteredResults.filter(r => r.time === item).length;
                                 const barWidth = 40;
                                 const barSpacing = 16;
-                                const startX = 40;
+                                const startX = 50;
                                 const x = startX + idx * (barWidth + barSpacing);
                                 return (
                                     <g key={item}>
@@ -472,12 +458,12 @@ function GaojiSearchResultPage() {
                                     </g>
                                 );
                             })}
-                            <line x1="30" y1="0" x2="30" y2="180" stroke="#333" />
-                            <line x1="30" y1="180" x2="690" y2="180" stroke="#333" />
-                            <text x="0" y="10" fontSize="12">年份</text>
-                            <text x="620" y="210" fontSize="12">事件数</text>
+                            <line x1="40" y1="0" x2="40" y2="180" stroke="#333" />
+                            <line x1="40" y1="180" x2="690" y2="180" stroke="#333" />
+                            <text x="0" y="10" fontSize="12">事件数</text>
+                            <text x="620" y="210" fontSize="12">年份</text>
                         </svg>
-                        <div style={{textAlign:'center',marginTop:8}}><button onClick={()=>setShowYearChart(false)}>关闭</button></div>
+                        <div style={{textAlign:'center',marginTop:8}}><button className="chart-close" onClick={()=>setShowYearChart(false)}>关闭</button></div>
                     </div>
                 </div>
             )}
