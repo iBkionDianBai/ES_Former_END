@@ -7,19 +7,19 @@ import { useNavigate, useLocation } from "react-router-dom";
 // 计算事件名频度的函数
 const calculateEventNameFrequency = (results) => {
     const eventNameCount = {};
-    
+
     results.forEach(item => {
         // 提取事件名（取标题的第一部分作为事件名）
         const eventName = item.title.split(' ')[0];
         eventNameCount[eventName] = (eventNameCount[eventName] || 0) + 1;
     });
-    
+
     // 转换为数组并按频度排序，取前5个
     const sortedEvents = Object.entries(eventNameCount)
         .sort(([,a], [,b]) => b - a)
         .slice(0, 5)
         .map(([name, count]) => `${name}（${count}）`);
-    
+
     return sortedEvents;
 };
 const sources = ["平台名"];
@@ -62,17 +62,21 @@ function GaojiSearchResultPage() {
     const startDateParam = searchParams.get('startDate') || '';
     const endDateParam = searchParams.get('endDate') || '';
     const types = searchParams.get('types') || '';
-    
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [useLoadMore, setUseLoadMore] = useState(false);
+
+
     // 构建完整的检索内容显示
     const buildSearchText = () => {
         let text = '';
-        
+
         // 处理搜索条件
         if (searchConditions) {
             const conditions = searchConditions.split(' | ');
             text = conditions.join('\n');
         }
-        
+
         // 添加日期范围
         if (startDateParam || endDateParam) {
             const dateRange = [];
@@ -84,7 +88,7 @@ function GaojiSearchResultPage() {
                 text = `[日期: ${dateRange.join(' - ')}]`;
             }
         }
-        
+
         // 添加类型
         if (types) {
             if (text) {
@@ -93,10 +97,10 @@ function GaojiSearchResultPage() {
                 text = `[类型: ${types}]`;
             }
         }
-        
+
         return text;
     };
-    
+
     const [searchText, setSearchText] = useState(buildSearchText());
 
     useEffect(() => {
@@ -153,6 +157,22 @@ function GaojiSearchResultPage() {
         }
         return 0;
     });
+
+    const totalPages = Math.ceil(sortedResults.length / pageSize);
+
+    const generatePagination = () => {
+        return Array.from({ length: totalPages }, (_, i) => i + 1)
+            .filter(p => {
+                if (p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1) return true;
+                if (p === currentPage - 2 || p === currentPage + 2) return 'ellipsis';
+                return false;
+            })
+            .reduce((acc, val) => {
+                if (val === 'ellipsis' && acc[acc.length - 1] !== '...') acc.push('...');
+                else if (val !== 'ellipsis') acc.push(val);
+                return acc;
+            }, []);
+    };
 
     const handleGaojiSearch = (val) => {
         if (val && val.trim() !== "") {
@@ -286,7 +306,14 @@ function GaojiSearchResultPage() {
                                         {sortOrder === 'asc' ? '↑' : '↓'}
                                     </button>
                                     <span style={{marginLeft: '20px'}}>显示：</span>
-                                    <select className="page-size-select" value={20}>
+                                    <select
+                                        className="page-size-select"
+                                        value={pageSize}
+                                        onChange={e => {
+                                            setPageSize(Number(e.target.value));
+                                            setCurrentPage(1); // 重置为第一页
+                                        }}
+                                    >
                                         <option value="10">10条</option>
                                         <option value="20">20条</option>
                                         <option value="50">50条</option>
@@ -337,16 +364,25 @@ function GaojiSearchResultPage() {
                                     ))}
                                 </tbody>
                             </table>
+                            {/* 分页区 */}
                             <div className="pagination">
-                                <button>上一页</button>
-                                <button className="active">1</button>
-                                <button>2</button>
-                                <button>3</button>
-                                <button>4</button>
-                                <button>5</button>
-                                <button>...</button>
-                                <button>10</button>
-                                <button>下一页</button>
+                                <div style={{ marginTop: 5 }}>
+                                    <label><input type="checkbox" checked={useLoadMore} onChange={e => { setUseLoadMore(e.target.checked); setCurrentPage(1); }} /> 使用“加载更多”模式</label>
+                                </div>
+                                {useLoadMore ? (
+                                    <div style={{ textAlign: 'center', marginTop: 5 }}>
+                                        {currentPage * pageSize < sortedResults.length ? (
+                                            <button onClick={() => setCurrentPage(currentPage + 1)}>加载更多</button>
+                                        ) : (<span style={{marginLeft: 5}}>已加载全部</span>)}
+                                    </div>
+                                ) : (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+                                        <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>上一页</button>
+                                        {generatePagination().map((p, i) => p === '...' ? <span key={i}>...</span> : <button key={p} className={currentPage === p ? 'active' : ''} onClick={() => setCurrentPage(p)}>{p}</button>)}
+                                        <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages}>下一页</button>
+                                        <span style={{ marginLeft: 12 }}>跳转到：<input type="number" min={1} max={totalPages} value={currentPage} onChange={(e) => setCurrentPage(Math.min(totalPages, Math.max(1, Number(e.target.value))))} style={{ width: 50, marginLeft: 4 }} /> / {totalPages}</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
@@ -449,4 +485,4 @@ function GaojiSearchResultPage() {
     );
 }
 
-export default GaojiSearchResultPage; 
+export default GaojiSearchResultPage;
