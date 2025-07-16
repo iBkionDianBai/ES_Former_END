@@ -1,3 +1,14 @@
+/*global*/
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.page-wrapper > *:nth-child(2) {
+    flex: 1;
+}
+
 /* FileUpload.css */
 .upload-container {
     max-width: 600px;
@@ -109,3 +120,4 @@
         padding: 1rem;
     }
 }
+

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './ContentViewerPage.css';
 import Header from "./header";
+import {Helmet} from "react-helmet";
+import Footer from "./Footer";
 
 // 工具函数：解析文章内容
 const parseArticleContent = (htmlContent) => {
@@ -152,7 +154,7 @@ const Article = ({ articleContent }) => {
 };
 
 // 主内容查看页面
-const ContentViewerPage = () => {
+const ContentViewerPageContent = () => {
     const [activeTab, setActiveTab] = useState('目录');
     const [articleContent, setArticleContent] = useState(null);
     const [tableOfContents, setTableOfContents] = useState([]);
@@ -187,7 +189,9 @@ const ContentViewerPage = () => {
 
     return (
         <div className="app-container">
-            <Header />
+            <Helmet>
+                <title>{articleContent?.title || '文章详情'}</title>
+            </Helmet>
             <Navigation activeTab={activeTab} onTabChange={handleTabChange} />
             <div className="content-wrapper">
                 <Sidebar
@@ -208,5 +212,16 @@ const ContentViewerPage = () => {
         </div>
     );
 };
+
+function ContentViewerPage() {
+    return (
+        <div>
+            <>
+                <Header />
+                <ContentViewerPageContent />
+            </>
+        </div>
+    );
+}
 
 export default ContentViewerPage;

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './UploadFilePage.css';
 import Header from "./header";
+import Footer from "./Footer";
 
 const FileUploadComponent = () => {
     const [selectedFile, setSelectedFile] = useState(null);
@@ -104,9 +105,10 @@ const FileUploadComponent = () => {
 
 const FileUploadPage = () => {
     return (
-        <div>
+        <div className="page-wrapper">
             <Header />
             <FileUploadComponent />
+            <Footer />
         </div>
     )
 };

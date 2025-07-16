@@ -3,6 +3,8 @@ import { Helmet } from "react-helmet";
 import GaojiSearchComponent from "./gaojiSearch";
 import "./SearchResultPage.css";
 import { useNavigate, useLocation } from "react-router-dom";
+import Header from "../page/header";
+import Footer from "../page/Footer";
 
 // 计算事件名频度的函数
 const calculateEventNameFrequency = (results) => {
@@ -26,7 +28,7 @@ const sources = ["平台名"];
 const years = ["2020-01-15", "2020-02-20", "2020-03-10", "2020-04-05", "2020-05-25", "2020-06-18", "2020-07-12", "2020-08-08", "2020-09-30", "2020-10-22"];
 
 
-function GaojiSearchResultPage() {
+function GaojiSearchResultPageContent() {
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [sortOrder, setSortOrder] = useState('desc');
@@ -168,9 +170,6 @@ function GaojiSearchResultPage() {
 
     return (
         <div>
-            <Helmet>
-                <title>高级搜索结果</title>
-            </Helmet>
             {/* 顶部为完整高级搜索表单 */}
             <GaojiSearchComponent />
             {/* 检索内容 */}
@@ -467,6 +466,20 @@ function GaojiSearchResultPage() {
                     </div>
                 </div>
             )}
+        </div>
+    );
+}
+
+function GaojiSearchResultPage() {
+    return (
+        <div>
+            <>
+                <Helmet>
+                    <title>高级搜索结果</title>
+                </Helmet>
+                <GaojiSearchResultPageContent />
+                <Footer />
+            </>
         </div>
     );
 }

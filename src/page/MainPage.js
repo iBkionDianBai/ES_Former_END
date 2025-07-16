@@ -7,14 +7,15 @@ import { Helmet } from 'react-helmet';
 // 引入样式
 import './MainPage.css';
 import Header from "./header";
+import Footer from "./Footer";
 
 // 搜索组件
 function SearchComponent() {
     const [selectedValue, setSelectedValue] = useState('');
     const [options] = useState([
-        { value: 'option1', label: '选项 1' },
-        { value: 'option2', label: '选项 2' },
-        { value: 'option3', label: '选项 3' }
+        { value: 'option1', label: '主题' },
+        { value: 'option2', label: '学校' },
+        { value: 'option3', label: '摘要' }
     ]);
     const navigate = useNavigate();
     const [inputContent, setInputContent] = useState('');
@@ -112,13 +113,14 @@ function ButtonBar() {
 
 function MainPage() {
     return (
-        <div>
+        <div className="page-wrapper">
             <Helmet>
-                <title>ElasticDataSearch</title>
+                <title>欢迎使用此搜索界面</title>
             </Helmet>
             <Header />
             <SearchComponent />
             <ButtonBar />
+            <Footer />
         </div>
     );
 }

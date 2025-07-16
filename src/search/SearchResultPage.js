@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet";
 import "./SearchResultPage.css";
 import '../index'
 import Header from "../page/header";
+import Footer from "../page/Footer";
 
 const sources = ["平台名"];
 const years = ["2020-01-15", "2020-02-20", "2020-03-10", "2020-04-05", "2020-05-25", "2020-06-18", "2020-07-12", "2020-08-08", "2020-09-30", "2020-10-22"];
@@ -27,7 +28,7 @@ const calculateEventNameFrequency = (results) => {
     return sortedEvents;
 };
 
-function SearchResultPage() {
+function SearchResultPageContent() {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const searchText = searchParams.get('q') || '';
@@ -130,8 +131,6 @@ function SearchResultPage() {
 
     return (
         <div>
-            <Helmet><title>搜索结果</title></Helmet>
-            <Header />
             <div className="search-bar-container">
                 <div className="search-bar">
                     <input type="text" value={inputValue} placeholder="输入搜索内容..." onChange={e => setInputValue(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()} />
@@ -403,4 +402,18 @@ function SearchResultPage() {
     );
 }
 
+function SearchResultPage() {
+    return (
+        <div>
+            <>
+                <Helmet>
+                    <title>搜索结果</title>
+                </Helmet>
+                <Header />
+                <SearchResultPageContent />
+                <Footer />
+            </>
+        </div>
+    );
+}
 export default SearchResultPage;

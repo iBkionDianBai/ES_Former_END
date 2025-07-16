@@ -4,6 +4,7 @@ import './gaojiSearch.css'
 import axios from "axios";
 import {useLocation, useNavigate} from "react-router-dom";
 import Header from "../page/header";
+import Footer from "../page/Footer";
 
 // 定义搜索条件操作符
 const operators = ['并且', '或者', '不包含'];
@@ -312,9 +313,9 @@ function GaojiSearch() {
     const username = location.state?.username;
     const navigate = useNavigate();
     return (
-        <div>
+        <div >
             <Helmet>
-                <title>ElasticDataSearch</title>
+                <title>欢迎使用高级搜索</title>
             </Helmet>
             {/* 顶部区域 */}
             <Header />
