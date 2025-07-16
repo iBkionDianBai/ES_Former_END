@@ -11,7 +11,7 @@ const operators = ['并且', '或者', '不包含'];
 // 定义行关系操作符
 const rowRelations = ['并且', '或者'];
 // 定义搜索范围容器
-const containers = ['全部容器', '标题', '作者', '摘要'];
+const containers = ['全部容器', '标题', '学校', '摘要'];
 // 定义模糊搜索选项
 const fuzzyOptions = ['模糊', '精确'];
 
@@ -30,8 +30,6 @@ function GaojiSearchComponent() {
     const [endDate, setEndDate] = useState('');
     // 存储用户选择的搜索类型
     const [searchTypes, setSearchTypes] = useState([]);
-    // 定义可选择的搜索类型
-    const availableTypes = ['类型1', '类型2', '类型3'];
 
     // 处理添加新搜索行的函数
     const handleAddRow = () => {
@@ -106,14 +104,6 @@ function GaojiSearchComponent() {
         setEndDate(e.target.value);
     };
 
-    // 处理搜索类型复选框变化的函数
-    const handleTypeChange = (type) => {
-        if (searchTypes.includes(type)) {
-            setSearchTypes(searchTypes.filter((t) => t!== type));
-        } else {
-            setSearchTypes([...searchTypes, type]);
-        }
-    };
 
     // 处理搜索按钮点击事件的函数
     const handleSearch = () => {
@@ -278,21 +268,6 @@ function GaojiSearchComponent() {
                             onChange={handleEndDateChange}
                             className="input-box"
                         />
-                    </div>
-                    <div className="type-section">
-                        <label>类型:</label>
-                        <div className="type-options">
-                            {availableTypes.map((type) => (
-                                <div className="type-item" key={type}>
-                                    <input
-                                        type="checkbox"
-                                        checked={searchTypes.includes(type)}
-                                        onChange={() => handleTypeChange(type)}
-                                    />
-                                    {type}
-                                </div>
-                            ))}
-                        </div>
                     </div>
                     <div className="button-section">
                         <button onClick={handleClear} className="action-button">清除所有检索选项</button>

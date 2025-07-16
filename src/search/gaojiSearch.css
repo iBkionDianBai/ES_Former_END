@@ -135,7 +135,6 @@
 /* 检索说明区域样式 */
 .search-instruction {
     flex: 1;
-    margin-top: 20px;
     background-color: #fff;
     padding: 20px;
     border-radius: 8px;
