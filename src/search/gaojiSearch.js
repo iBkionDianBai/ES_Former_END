@@ -9,9 +9,9 @@ import Footer from "../page/Footer";
 // 定义搜索条件操作符
 const operators = ['并且', '或者', '不包含'];
 // 定义行关系操作符
-const rowRelations = ['并且', '或者'];
+const rowRelations = ['并且', '或者', '不包含'];
 // 定义搜索范围容器
-const containers = ['全部容器', '标题', '学校', '摘要'];
+const containers = ['全部容器', '标题', '学校', '摘要', '全文', '关键词'];
 // 定义模糊搜索选项
 const fuzzyOptions = ['模糊', '精确'];
 
