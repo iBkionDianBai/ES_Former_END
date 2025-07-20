@@ -12,11 +12,7 @@ import Footer from "./Footer";
 // 搜索组件
 function SearchComponent() {
     const [selectedValue, setSelectedValue] = useState('');
-    const [options] = useState([
-        { value: 'option1', label: '主题' },
-        { value: 'option2', label: '学校' },
-        { value: 'option3', label: '摘要' }
-    ]);
+    const searchOptions = ['全部容器', '标题', '学校', '摘要', '全文', '关键词'];
     const navigate = useNavigate();
     const [inputContent, setInputContent] = useState('');
     const [activeTab, setActiveTab] = useState(0);
@@ -58,9 +54,12 @@ function SearchComponent() {
                 <div className={activeTab === 0 ? "search-tab-content-normal" : "search-tab-content-other"}>
                     <div className="input-box">
                         <div>
-                            <select className="sort" value={selectedValue} onChange={(e) => setSelectedValue(e.target.value)}>
-                                {options.map((item) => (
-                                    <option key={item.value} value={item.value}>{item.label}</option>
+                            <select
+                                onChange={(e) => setSelectedValue(e.target.value)}
+                                className="sort"
+                            >
+                                {searchOptions.map((container) => (
+                                    <option key={container} value={container}>{container}</option>
                                 ))}
                             </select>
                         </div>
