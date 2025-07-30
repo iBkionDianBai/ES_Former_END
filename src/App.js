@@ -10,6 +10,7 @@ import GaojiSearchResultPage from './search/GaojiSearchResultPage';
 import ServerErrorPage from "./ErrorPages/ServerErrorPage";
 import ContentViewerPage from "./page/ContentViewerPage";
 import UploadFilePage from "./page/UploadFilePage";
+import { useTranslation } from 'react-i18next';
 
 
 function App() {

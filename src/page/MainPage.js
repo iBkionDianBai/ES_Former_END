@@ -1,24 +1,23 @@
-// 引入 React 相关钩子
+// src/page/MainPage.js
 import React, { useState } from "react";
-// 引入 react-router-dom 的一些路由工具
 import { useNavigate } from 'react-router-dom';
-// 页面标题设置插件
 import { Helmet } from 'react-helmet';
-// 引入样式
+import { useTranslation } from 'react-i18next'; // 引入 useTranslation
 import './MainPage.css';
 import Header from "./header";
 import Footer from "./Footer";
 
 // 搜索组件
 function SearchComponent() {
+    const { t } = useTranslation(); // 获取翻译函数
     const [selectedValue, setSelectedValue] = useState('');
-    const searchOptions = ['全部容器', '标题', '学校', '摘要', '全文', '关键词'];
+    const searchOptions = [t('allContainers'), t('title'), t('school'), t('abstract'), t('fullText'), t('keywords')];
     const navigate = useNavigate();
     const [inputContent, setInputContent] = useState('');
     const [activeTab, setActiveTab] = useState(0);
     const [tabs] = useState([
-        { name: "检索" },
-        { name: "其他" }
+        { name: t('retrieval') },
+        { name: t('other') }
     ]);
 
     const handleSearchClick = () => {
@@ -38,7 +37,7 @@ function SearchComponent() {
             <div className="banner"></div>
             <div className="searchmain">
                 <div className="page-title">
-                    <h1>Search Doc.</h1>
+                    <h1>{t('searchDoc')}</h1>
                 </div>
                 <ul className="search-tab">
                     {tabs.map((tab, index) => (
@@ -69,15 +68,15 @@ function SearchComponent() {
                                 type="text"
                                 value={inputContent}
                                 onChange={(e) => setInputContent(e.target.value)}
-                                placeholder="键入搜索"
+                                placeholder={t('typeToSearch')}
                             />
                         </div>
                         <div className="search-btn">
-                            <button className="btn" onClick={handleSearchClick}>搜索</button>
+                            <button className="btn" onClick={handleSearchClick}>{t('search')}</button>
                         </div>
                     </div>
                     <div className="readvce">
-                        <button className="GaojiSearchButton" onClick={handleGaojiSearchClick}>高级搜索</button>
+                        <button className="GaojiSearchButton" onClick={handleGaojiSearchClick}>{t('advancedSearch')}</button>
                     </div>
                 </div>
             </div>
@@ -86,17 +85,18 @@ function SearchComponent() {
 }
 
 function ButtonBar() {
+    const { t } = useTranslation(); // 获取翻译函数
     const navigate = useNavigate();
     const handleUploadFileClick = () => {
         navigate("/uploadFile");
     }
     const buttons = [
-        { label: "上传文件", onClick: handleUploadFileClick },
+        { label: t('uploadFile'), onClick: handleUploadFileClick },
     ];
 
     return (
         <div className="button-bar-container">
-            <div className="button-bar-title">🔧工具栏：</div>
+            <div className="button-bar-title">🔧{t('toolbar')}：</div>
             <div className="button-bar">
                 <ul className="select-list">
                     {buttons.map((btn, index) => (
@@ -111,10 +111,11 @@ function ButtonBar() {
 }
 
 function MainPage() {
+    const { t } = useTranslation(); // 获取翻译函数
     return (
         <div className="page-wrapper">
             <Helmet>
-                <title>欢迎使用此搜索界面</title>
+                <title>{t('welcome')}</title>
             </Helmet>
             <Header />
             <SearchComponent />
