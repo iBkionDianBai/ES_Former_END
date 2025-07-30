@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './UploadFilePage.css';
 import Header from "./header";
 import Footer from "./Footer";
+import { uploadDocumentAsync } from '../service';
 
 const FileUploadComponent = () => {
     const [selectedFile, setSelectedFile] = useState(null);
@@ -60,6 +61,25 @@ const FileUploadComponent = () => {
         }
     };
 
+    // 异步上传处理函数
+    const handleAsyncUpload = async () => {
+        if (!selectedFile) {
+            setError('请选择文件');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', selectedFile); // 只需file字段
+
+        try {
+            await uploadDocumentAsync(formData);
+            alert('上传请求已提交，后台正在处理');
+        } catch (err) {
+            setError('上传出错: ' + (err?.message || JSON.stringify(err)));
+            console.error('上传出错', err);
+        }
+    };
+
     return (
         <div className="upload-container">
             <h2 className="title">上传Word文档</h2>
@@ -96,8 +116,9 @@ const FileUploadComponent = () => {
             <button
                 className="upload-button"
                 disabled={!selectedFile}
+                onClick={handleAsyncUpload} // 绑定异步上传
             >
-                开始上传
+                异步上传
             </button>
         </div>
     );

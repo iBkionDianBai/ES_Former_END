@@ -1,29 +1,29 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useMemo} from 'react'
 import {Helmet} from 'react-helmet';
 import './gaojiSearch.css'
 import axios from "axios";
 import {useLocation, useNavigate} from "react-router-dom";
 import Header from "../page/header";
 import Footer from "../page/Footer";
-
-// 定义搜索条件操作符
-const operators = ['并且', '或者', '不包含'];
-// 定义行关系操作符
-const rowRelations = ['并且', '或者', '不包含'];
-// 定义搜索范围容器
-const containers = ['全部容器', '标题', '学校', '摘要', '全文', '关键词'];
-// 定义模糊搜索选项
-const fuzzyOptions = ['模糊', '精确'];
+import { useTranslation } from 'react-i18next';
 
 
 function GaojiSearchComponent() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const location = useLocation();
-    // 新增：从URL参数q获取初始值
+    
+    // 使用翻译函数定义常量，避免重名
+    const operators = useMemo(() => [t('and'), t('or'), t('notInclude')], [t]);
+    const rowRelations = useMemo(() => [t('and'), t('or'), t('notInclude')], [t]);
+    const containers = useMemo(() => [t('allContainers'), t('title'), t('school'), t('abstract'), t('fullText'), t('keywords')], [t]);
+    const fuzzyOptions = useMemo(() => [t('fuzzy'), t('exact')], [t]);
+    
+    // 从URL参数q获取初始值
     const searchParams = new URLSearchParams(location.search);
     const q = searchParams.get('q') || '';
     // 存储搜索行的状态，每行包含多个搜索条件
-    const [searchRows, setSearchRows] = useState([{ keyword1: q, container: '全部容器', operator: '并且', keyword2: '', fuzzy: '模糊' }]);
+    const [searchRows, setSearchRows] = useState([{ keyword1: q, container: t('allContainers'), operator: t('and'), keyword2: '', fuzzy: t('fuzzy') }]);
     // 存储搜索开始日期
     const [startDate, setStartDate] = useState('');
     // 存储搜索结束日期
@@ -31,15 +31,34 @@ function GaojiSearchComponent() {
     // 存储用户选择的搜索类型
     const [searchTypes, setSearchTypes] = useState([]);
 
+    // 处理语言切换时的状态更新
+    useEffect(() => {
+        // 当语言变化时，更新搜索行的默认值
+        setSearchRows(prevRows => 
+            prevRows.map(row => ({
+                ...row,
+                container: row.container === '全部容器' || row.container === 'All Containers' ? t('allContainers') : row.container,
+                operator: row.operator === '并且' || row.operator === 'And' ? t('and') : 
+                         row.operator === '或者' || row.operator === 'Or' ? t('or') : 
+                         row.operator === '不包含' || row.operator === 'Not Include' ? t('notInclude') : row.operator,
+                fuzzy: row.fuzzy === '模糊' || row.fuzzy === 'Fuzzy' ? t('fuzzy') : 
+                       row.fuzzy === '精确' || row.fuzzy === 'Exact' ? t('exact') : row.fuzzy,
+                relation: row.relation === '并且' || row.relation === 'And' ? t('and') : 
+                         row.relation === '或者' || row.relation === 'Or' ? t('or') : 
+                         row.relation === '不包含' || row.relation === 'Not Include' ? t('notInclude') : row.relation
+            }))
+        );
+    }, [t]); // 当翻译函数变化时触发
+
     // 处理添加新搜索行的函数
     const handleAddRow = () => {
         setSearchRows([...searchRows, {
-            relation: '并且',
+            relation: t('and'),
             keyword1: '',
-            container: '全部容器',
-            operator: '并且',
+            container: t('allContainers'),
+            operator: t('and'),
             keyword2: '',
-            fuzzy: '模糊'
+            fuzzy: t('fuzzy')
         }]);
     };
 
@@ -125,7 +144,7 @@ function GaojiSearchComponent() {
                     condition = k1;
                 }
                 
-                if (container && container !== '全部容器') {
+                if (container && container !== t('allContainers')) {
                     condition = `[${container}] ${condition}`;
                 }
                 
@@ -164,7 +183,7 @@ function GaojiSearchComponent() {
 
     // 处理清除按钮点击事件的函数
     const handleClear = () => {
-        setSearchRows([{ keyword1: '', container: '全部容器', operator: '并且', keyword2: '', fuzzy: '模糊' }]);
+        setSearchRows([{ keyword1: '', container: t('allContainers'), operator: t('and'), keyword2: '', fuzzy: t('fuzzy') }]);
         setStartDate('');
         setEndDate('');
         setSearchTypes([]);
@@ -172,7 +191,7 @@ function GaojiSearchComponent() {
 
     return (
         <div className="search-page">
-            <h2>高级检索</h2>
+                            <h2>{t('gaojiAdvancedRetrieval')}</h2>
             <div className="main-content">
                 <div className="search-content">
                     <div className="search-rows">
@@ -244,7 +263,7 @@ function GaojiSearchComponent() {
                                     </select>
                                 </div>
                                 <div className="search-item">
-                                    <button onClick={() => handleAddRow()} className="action-button">+</button>
+                                                                         <button onClick={() => handleAddRow()} className="action-button">Add</button>
                                     {/* 只在非第一行显示删除按钮 */}
                                     {index > 0 && (
                                         <button onClick={() => handleRemoveRow(index)} className="action-button">-</button>
@@ -254,14 +273,14 @@ function GaojiSearchComponent() {
                         ))}
                     </div>
                     <div className="date-section">
-                        <label>日期:</label>
+                        <label>{t('date')}:</label>
                         <input
                             type="date"
                             value={startDate}
                             onChange={handleStartDateChange}
                             className="input-box"
                         />
-                        <span>至:</span>
+                        <span>{t('gaojiDateRange')}:</span>
                         <input
                             type="date"
                             value={endDate}
@@ -270,13 +289,13 @@ function GaojiSearchComponent() {
                         />
                     </div>
                     <div className="button-section">
-                        <button onClick={handleClear} className="action-button">清除所有检索选项</button>
-                        <button onClick={handleSearch} className="action-button">检索</button>
+                                                 <button onClick={handleClear} className="action-button">{t('gaojiClear')}</button>
+                                                 <button onClick={handleSearch} className="action-button">{t('gaojiSearch')}</button>
                     </div>
                 </div>
                 <div className="search-instruction">
-                    <h3>检索说明区</h3>
-                    <p>这里可以添加检索的相关说明信息。</p>
+                    <h3>{t('gaojiSearchInstructions')}</h3>
+                    <p>{t('gaojiSearchInstructionsText')}</p>
                 </div>
             </div>
         </div>
@@ -284,13 +303,14 @@ function GaojiSearchComponent() {
 }
 
 function GaojiSearch() {
+    const { t } = useTranslation();
     const location = useLocation();
     const username = location.state?.username;
     const navigate = useNavigate();
     return (
         <div >
             <Helmet>
-                <title>欢迎使用高级搜索</title>
+                <title>{t('gaojiWelcomeToAdvancedSearch')}</title>
             </Helmet>
             {/* 顶部区域 */}
             <Header />

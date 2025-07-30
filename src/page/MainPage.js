@@ -21,10 +21,8 @@ function SearchComponent() {
     ]);
 
     const handleSearchClick = () => {
-        if (inputContent === '1' || inputContent === '2') {
-            navigate('/searchResult?q=' + encodeURIComponent(inputContent));
-        } else {
-            navigate('*');
+        if (inputContent.trim() !== '') {
+            navigate('/searchResult?q=' + encodeURIComponent(inputContent.trim()));
         }
     };
 

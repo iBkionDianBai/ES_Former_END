@@ -5,6 +5,7 @@ import "./SearchResultPage.css";
 import '../index'
 import Header from "../page/header";
 import Footer from "../page/Footer";
+import { useTranslation } from 'react-i18next';
 
 const sources = ["平台名"];
 const years = ["2020-01-15", "2020-02-20", "2020-03-10", "2020-04-05", "2020-05-25", "2020-06-18", "2020-07-12", "2020-08-08", "2020-09-30", "2020-10-22"];
@@ -29,6 +30,7 @@ const calculateEventNameFrequency = (results) => {
 };
 
 function SearchResultPageContent() {
+    const { t } = useTranslation();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const searchText = searchParams.get('q') || '';
@@ -55,11 +57,57 @@ function SearchResultPageContent() {
     const [selectedSources, setSelectedSources] = useState([]);
     const [selectedYears, setSelectedYears] = useState([]);
 
+    // 翻译搜索条件中的操作符和容器名称
+    const translateSearchConditions = (conditions) => {
+        if (!conditions) return '';
+        
+        // 双向翻译：中文到英文，英文到中文
+        let translated = conditions;
+        
+        // 中文到英文
+        translated = translated
+            .replace(/并且/g, t('and'))
+            .replace(/或者/g, t('or'))
+            .replace(/不包含/g, t('notInclude'))
+            .replace(/模糊/g, t('fuzzy'))
+            .replace(/精确/g, t('exact'))
+            .replace(/全部容器/g, t('allContainers'))
+            .replace(/标题/g, t('title'))
+            .replace(/学校/g, t('school'))
+            .replace(/摘要/g, t('abstract'))
+            .replace(/全文/g, t('fullText'))
+            .replace(/关键词/g, t('keywords'));
+        
+        // 英文到中文（反向翻译）
+        translated = translated
+            .replace(/\bAnd\b/g, t('and'))
+            .replace(/\bOr\b/g, t('or'))
+            .replace(/\bNot Include\b/g, t('notInclude'))
+            .replace(/\bFuzzy\b/g, t('fuzzy'))
+            .replace(/\bExact\b/g, t('exact'))
+            .replace(/\bAll Containers\b/g, t('allContainers'))
+            .replace(/\bTitle\b/g, t('title'))
+            .replace(/\bSchool\b/g, t('school'))
+            .replace(/\bAbstract\b/g, t('abstract'))
+            .replace(/\bFull Text\b/g, t('fullText'))
+            .replace(/\bKeywords\b/g, t('keywords'));
+        
+        return translated;
+    };
+
+    // 构建翻译后的搜索内容
+    const buildTranslatedSearchText = () => {
+        if (!searchText || searchText.trim() === '') {
+            return '';
+        }
+        return translateSearchConditions(searchText);
+    };
+
+    const [translatedSearchText, setTranslatedSearchText] = useState(buildTranslatedSearchText());
+
     const handleSearch = () => {
-        if (inputValue.trim() === '1' || inputValue.trim() === '2') {
+        if (inputValue.trim() !== '') {
             navigate('/searchResult?q=' + encodeURIComponent(inputValue.trim()));
-        } else {
-            navigate('*');
         }
     };
 
@@ -85,6 +133,11 @@ function SearchResultPageContent() {
     useEffect(() => {
         setCurrentPage(1);
     }, [searchText, selectedThemes, selectedSources, selectedYears]);
+
+    // 监听语言变化，重新翻译搜索内容
+    useEffect(() => {
+        setTranslatedSearchText(buildTranslatedSearchText());
+    }, [t, searchText]);
 
     const toggleFilter = (filterName) => {
         setFilterOpen({ ...filterOpen, [filterName]: !filterOpen[filterName] });
@@ -133,17 +186,17 @@ function SearchResultPageContent() {
         <div>
             <div className="search-bar-container">
                 <div className="search-bar">
-                    <input type="text" value={inputValue} placeholder="输入搜索内容..." onChange={e => setInputValue(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()} />
-                    <button className="refresh-search" onClick={handleSearch}>搜索</button>
+                    <input type="text" value={inputValue} placeholder={t('inputSearchContent')} onChange={e => setInputValue(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()} />
+                    <button className="refresh-search" onClick={handleSearch}>{t('refreshSearch')}</button>
                 </div>
-                <div className="search-params">检索内容: {searchText}</div>
+                <div className="search-params">{t('searchContent')}: {translatedSearchText}</div>
             </div>
             <div className="main-content">
                 {/* 左侧筛选区域 */}
                 <div className="filter-section">
                     <div className="filter-container">
                         <div className="filter-header" onClick={() => toggleFilter('theme')} style={{ display: 'flex', alignItems: 'center' }}>
-                            <h3 style={{ margin: 0 }}>主题(频度)</h3>
+                            <h3 style={{ margin: 0 }}>{t('eventNameFrequency')}</h3>
                             <span className="chart-icon" style={{ marginLeft: 8, cursor: 'pointer' }} title="查看柱状图" onClick={e => { e.stopPropagation(); setShowChart(true); }}>📊</span>
                             <span className="filter-icon">{filterOpen.theme ? '▼' : '▶'}</span>
                         </div>
@@ -163,7 +216,7 @@ function SearchResultPageContent() {
 
                     <div className="filter-container">
                         <div className="filter-header" onClick={() => toggleFilter('source')} style={{ display: 'flex', alignItems: 'center' }}>
-                            <h3 style={{ margin: 0 }}>来源</h3>
+                            <h3 style={{ margin: 0 }}>{t('source')}</h3>
                             <span className="chart-icon" style={{ marginLeft: 8, cursor: 'pointer' }} title="查看柱状图" onClick={e => { e.stopPropagation(); setShowSourceChart(true); }}>📊</span>
                             <span className="filter-icon">{filterOpen.source ? '▼' : '▶'}</span>
                         </div>
@@ -183,7 +236,7 @@ function SearchResultPageContent() {
 
                     <div className="filter-container">
                         <div className="filter-header" onClick={() => toggleFilter('year')} style={{ display: 'flex', alignItems: 'center' }}>
-                            <h3 style={{ margin: 0 }}>年份</h3>
+                            <h3 style={{ margin: 0 }}>{t('year')}</h3>
                             <span className="chart-icon" style={{ marginLeft: 8, cursor: 'pointer' }} title="查看柱状图" onClick={e => { e.stopPropagation(); setShowYearChart(true); }}>📊</span>
                             <span className="filter-icon">{filterOpen.year ? '▼' : '▶'}</span>
                         </div>
@@ -202,7 +255,7 @@ function SearchResultPageContent() {
                     </div>
                 </div>
                 <div className="results-section">
-                    {isLoading ? (<div className="loading">加载中...</div>) : (
+                    {isLoading ? (<div className="loading">{t('loading')}...</div>) : (
                         <>
                             {/* 工具栏 */}
                             <div className="toolbar-row">
@@ -218,9 +271,9 @@ function SearchResultPageContent() {
                                             }
                                         }}
                                     />
-                                    <span style={{marginLeft: 8}}>全选</span>
-                                    <span style={{marginLeft: 16}}>已选: {selectedIds.length}</span>
-                                    <span style={{marginLeft: 24}}>事件发生时间：</span>
+                                    <span style={{marginLeft: 8}}>{t('selectAll')}</span>
+                                    <span style={{marginLeft: 16}}>{t('selectedCount')}: {selectedIds.length}</span>
+                                    <span style={{marginLeft: 24}}>{t('eventTime')}: </span>
                                     <input
                                         type="date"
                                         value={startDate}
@@ -236,20 +289,20 @@ function SearchResultPageContent() {
                                     />
                                 </div>
                                 <div className="results-toolbar">
-                                    <span>排序：</span>
+                                    <span>{t('sort')}: </span>
                                     <select className="sort-select" value={sortField} onChange={e => setSortField(e.target.value)}>
-                                        <option value="relevance">相关度</option>
-                                        <option value="date">发表时间</option>
+                                        <option value="relevance">{t('relevance')}</option>
+                                        <option value="date">{t('publishTime')}</option>
                                     </select>
                                     <button
                                         className="sort-order-btn"
                                         onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                                        title={sortOrder === 'asc' ? '升序' : '降序'}
+                                        title={sortOrder === 'asc' ? t('ascending') : t('descending')}
                                         style={{marginLeft: '8px'}}
                                     >
                                         {sortOrder === 'asc' ? '↑' : '↓'}
                                     </button>
-                                    <span style={{marginLeft: '20px'}}>显示：</span>
+                                    <span style={{marginLeft: '20px'}}>{t('display')}: </span>
                                     <select
                                         className="page-size-select"
                                         value={pageSize}
@@ -258,15 +311,15 @@ function SearchResultPageContent() {
                                             setCurrentPage(1); // 重置为第一页
                                         }}
                                     >
-                                        <option value="10">10条</option>
-                                        <option value="20">20条</option>
-                                        <option value="50">50条</option>
+                                        <option value="10">{t('items10')}</option>
+                                        <option value="20">{t('items20')}</option>
+                                        <option value="50">{t('items50')}</option>
                                     </select>
                                 </div>
                             </div>
                             <table className="results-table">
                                 <thead>
-                                <tr><th></th><th>序号</th><th>题目</th><th>来源</th><th>事件发生时间</th><th>操作</th></tr>
+                                <tr><th></th><th>{t('serialNumber')}</th><th>{t('title')}</th><th>{t('source')}</th><th>{t('eventTime')}</th><th>{t('operation')}</th></tr>
                                 </thead>
                                 <tbody>
                                 {pagedResults.map((result, index) => (
@@ -276,7 +329,7 @@ function SearchResultPageContent() {
                                         <td><span style={{ color: '#1890ff', cursor: 'pointer' }} onClick={() => navigate(`/contentViewer?id=${result.id}`)}>{result.title.split(' ')[0]}<br />{result.title.split(' ').slice(1).join(' ')}</span></td>
                                         <td>{result.source}</td>
                                         <td>{result.time}</td>
-                                        <td><span title="阅读" style={{ cursor: 'pointer', fontSize: '20px', color: '#1890ff' }} onClick={() => navigate(`/contentViewer?id=${result.id}`)}>📖</span></td>
+                                        <td><span title={t('read')} style={{ cursor: 'pointer', fontSize: '20px', color: '#1890ff' }} onClick={() => navigate(`/contentViewer?id=${result.id}`)}>📖</span></td>
                                     </tr>
                                 ))}
                                 </tbody>
@@ -285,20 +338,20 @@ function SearchResultPageContent() {
                             {/* 分页区 */}
                             <div className="pagination">
                                 <div style={{ marginTop: 5 }}>
-                                    <label><input type="checkbox" checked={useLoadMore} onChange={e => { setUseLoadMore(e.target.checked); setCurrentPage(1); }} /> 使用“加载更多”模式</label>
+                                    <label><input type="checkbox" checked={useLoadMore} onChange={e => { setUseLoadMore(e.target.checked); setCurrentPage(1); }} /> {t('useLoadMore')}</label>
                                 </div>
                                 {useLoadMore ? (
                                     <div style={{ textAlign: 'center', marginTop: 5 }}>
                                         {currentPage * pageSize < sortedResults.length ? (
-                                            <button onClick={() => setCurrentPage(currentPage + 1)}>加载更多</button>
-                                        ) : (<span style={{marginLeft: 5 }}>已加载全部</span>)}
+                                            <button onClick={() => setCurrentPage(currentPage + 1)}>{t('loadMore')}</button>
+                                        ) : (<span style={{marginLeft: 5 }}>{t('loadedAll')}</span>)}
                                     </div>
                                 ) : (
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
-                                        <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>上一页</button>
+                                        <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>{t('previousPage')}</button>
                                         {generatePagination().map((p, i) => p === '...' ? <span key={i}>...</span> : <button key={p} className={currentPage === p ? 'active' : ''} onClick={() => setCurrentPage(p)}>{p}</button>)}
-                                        <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages}>下一页</button>
-                                        <span style={{ marginLeft: 12 }}>跳转到：<input type="number" min={1} max={totalPages} value={currentPage} onChange={(e) => setCurrentPage(Math.min(totalPages, Math.max(1, Number(e.target.value))))} style={{ width: 50, marginLeft: 4 }} /> / {totalPages}</span>
+                                        <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages}>{t('nextPage')}</button>
+                                        <span style={{ marginLeft: 12 }}>{t('jumpTo')}：<input type="number" min={1} max={totalPages} value={currentPage} onChange={(e) => setCurrentPage(Math.min(totalPages, Math.max(1, Number(e.target.value))))} style={{ width: 50, marginLeft: 4 }} /> / {totalPages}</span>
                                     </div>
                                 )}
                             </div>
@@ -306,7 +359,7 @@ function SearchResultPageContent() {
                             {showChart && (
                                 <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowChart(false)}>
                                     <div style={{ background: '#fff', padding: 24, borderRadius: 8, minWidth: 400, minHeight: 300 }} onClick={e => e.stopPropagation()}>
-                                        <h4 style={{textAlign:'center'}}>事件名频度柱状图 {selectedThemes.length > 0 ? `(已选择${selectedThemes.length}个事件)` : ''}</h4>
+                                        <h4 style={{textAlign:'center'}}>{t('eventNameFrequencyChart')} {selectedThemes.length > 0 ? `(${t('selectedEvents')}${selectedThemes.length}${t('events')})` : ''}</h4>
                                         {/* 简单SVG柱状图 */}
                                         <svg width="700" height="220">
                                             {(selectedThemes.length > 0 ? selectedThemes : themes).map((item, idx) => {
@@ -328,10 +381,10 @@ function SearchResultPageContent() {
                                             {/* 坐标轴 */}
                                             <line x1="30" y1="0" x2="30" y2="180" stroke="#333" />
                                             <line x1="30" y1="180" x2="690" y2="180" stroke="#333" />
-                                            <text x="0" y="10" fontSize="12">频度</text>
-                                            <text x="620" y="210" fontSize="12">事件名</text>
+                                            <text x="0" y="10" fontSize="12">{t('frequency')}</text>
+                                            <text x="620" y="210" fontSize="12">{t('eventName')}</text>
                                         </svg>
-                                        <div style={{textAlign:'center',marginTop:8}}><button className="chart-close" onClick={()=>setShowChart(false)}>关闭</button></div>
+                                        <div style={{textAlign:'center',marginTop:8}}><button className="chart-close" onClick={()=>setShowChart(false)}>{t('close')}</button></div>
                                     </div>
                                 </div>
                             )}
@@ -339,7 +392,7 @@ function SearchResultPageContent() {
                             {showSourceChart && (
                                 <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowSourceChart(false)}>
                                     <div style={{ background: '#fff', padding: 24, borderRadius: 8, minWidth: 400, minHeight: 300 }} onClick={e => e.stopPropagation()}>
-                                        <h4 style={{textAlign:'center'}}>来源事件数量柱状图</h4>
+                                        <h4 style={{textAlign:'center'}}>{t('sourceEventCountChart')}</h4>
                                         <svg width="700" height="220">
                                             {sources.map((item, idx) => {
                                                 const count = filteredResults.filter(r => r.source === item).length;
@@ -357,10 +410,10 @@ function SearchResultPageContent() {
                                             })}
                                             <line x1="40" y1="0" x2="40" y2="180" stroke="#333" />
                                             <line x1="40" y1="180" x2="690" y2="180" stroke="#333" />
-                                            <text x="0" y="10" fontSize="12">事件数</text>
-                                            <text x="620" y="210" fontSize="12">来源</text>
+                                            <text x="0" y="10" fontSize="12">{t('eventCount')}</text>
+                                            <text x="620" y="210" fontSize="12">{t('source')}</text>
                                         </svg>
-                                        <div style={{textAlign:'center',marginTop:8}}><button className="chart-close" onClick={()=>setShowSourceChart(false)}>关闭</button></div>
+                                        <div style={{textAlign:'center',marginTop:8}}><button className="chart-close" onClick={()=>setShowSourceChart(false)}>{t('close')}</button></div>
                                     </div>
                                 </div>
                             )}
@@ -368,7 +421,7 @@ function SearchResultPageContent() {
                             {showYearChart && (
                                 <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowYearChart(false)}>
                                     <div style={{ background: '#fff', padding: 24, borderRadius: 8, minWidth: 740, minHeight: 300 }} onClick={e => e.stopPropagation()}>
-                                        <h4 style={{textAlign:'center'}}>年份事件数量柱状图</h4>
+                                        <h4 style={{textAlign:'center'}}>{t('yearEventCountChart')}</h4>
                                         <svg width="700" height="220">
                                             {years.map((item, idx) => {
                                                 const count = filteredResults.filter(r => r.time === item).length;
@@ -387,10 +440,10 @@ function SearchResultPageContent() {
                                             })}
                                             <line x1="40" y1="0" x2="40" y2="180" stroke="#333" />
                                             <line x1="40" y1="180" x2="690" y2="180" stroke="#333" />
-                                            <text x="0" y="10" fontSize="12">事件数</text>
-                                            <text x="620" y="210" fontSize="12">年份</text>
+                                            <text x="0" y="10" fontSize="12">{t('eventCount')}</text>
+                                            <text x="620" y="210" fontSize="12">{t('year')}</text>
                                         </svg>
-                                        <div style={{textAlign:'center',marginTop:8}}><button className="chart-close" onClick={()=>setShowYearChart(false)}>关闭</button></div>
+                                        <div style={{textAlign:'center',marginTop:8}}><button className="chart-close" onClick={()=>setShowYearChart(false)}>{t('close')}</button></div>
                                     </div>
                                 </div>
                             )}
