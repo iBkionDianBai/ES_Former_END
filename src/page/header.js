@@ -4,6 +4,7 @@ import React from "react";
 import axios from 'axios';
 import './header.css';
 import { useTranslation } from 'react-i18next';
+import Cookies from 'js-cookie';
 
 function Header() {
     const navigate = useNavigate();
@@ -25,6 +26,8 @@ function Header() {
         i18n.changeLanguage(lng)
             .then(() => {
                 console.log(`Language changed to ${lng}`);
+                // 更新 cookie
+                Cookies.set('i18next', lng);
             })
             .catch((error) => {
                 console.error('Error changing language:', error);
@@ -38,13 +41,13 @@ function Header() {
             </button>
             <ul className="top-section-middle"><h1>{t('publicOpinionSystem')}</h1></ul>
             <ul className="top-section-right">
-                <li>{t('welcome')}: {username}</li>
+                <li>{t('welcomeUser')}: {username}</li>
                 <button className="logout-button" onClick={handleLogout}>
                     {t('logout')}
                 </button>
                 <div className="language-switcher">
-                    <button onClick={() => changeLanguage('en')}>EN</button>
-                    <button onClick={() => changeLanguage('zh')}>中文</button>
+                    <span onClick={() => changeLanguage('en')}>EN</span>
+                    <span onClick={() => changeLanguage('zh')}>中文</span>
                 </div>
             </ul>
         </div>

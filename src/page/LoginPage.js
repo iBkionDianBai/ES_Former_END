@@ -30,7 +30,7 @@ const mockFetchCaptcha = () => {
 };
 
 const LoginPage = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [form] = Form.useForm();
     // 用于存储从后端获取的验证码文本
     const [backendCaptcha, setBackendCaptcha] = useState('');
@@ -88,6 +88,16 @@ const LoginPage = () => {
         }
     };
 
+    const changeLanguage = (lng) => {
+        i18n.changeLanguage(lng)
+            .then(() => {
+                console.log(`Language changed to ${lng}`);
+            })
+            .catch((error) => {
+                console.error('Error changing language:', error);
+            });
+    };
+
     return (
         <>
             <Helmet>
@@ -95,6 +105,12 @@ const LoginPage = () => {
             </Helmet>
 
             <div className="App-container">
+                {/* 语言切换按钮 */}
+                <div className="language-switcher" style={{ position: 'absolute', top: 20, right: 20, zIndex: 100 }}>
+                    <span onClick={() => changeLanguage('en')}>EN</span>
+                    <span onClick={() => changeLanguage('zh')}>中文</span>
+                </div>
+
                 {/* 背景图层 */}
                 <div className="left-content-container">
                     <div className="auth_bg">

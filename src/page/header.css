@@ -14,7 +14,7 @@
 }
 
 .top-section h1 {
-    margin-left: 60px;
+    margin-left: 110px;
     display: inline;
     color: rgba(255, 255, 255, 0.94);
 }
@@ -39,18 +39,6 @@
     cursor: pointer;
 }
 
-/* 响应式设计：小屏幕设备 */
-@media (max-width: 768px) {
-    .top-section {
-        flex-direction: column;
-        height: auto;
-        padding: 10px;
-    }
-
-    .top-section ul {
-        margin-top: 10px;
-    }
-}
 
 /* src/page/header.css */
 .language-switcher {

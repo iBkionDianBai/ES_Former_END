@@ -38,3 +38,18 @@ html body {
 .auth_input {
     height: 50px;
 }
+
+.language-switcher {
+    display: flex;
+    align-items: center;
+}
+
+.language-switcher span {
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.96);
+    margin: 0 5px;
+}
+
+.language-switcher span:hover {
+    text-decoration: underline;
+}

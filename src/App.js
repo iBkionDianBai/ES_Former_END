@@ -9,21 +9,24 @@ import SearchResultPage from './search/SearchResultPage';
 import GaojiSearchResultPage from './search/GaojiSearchResultPage';
 import ServerErrorPage from "./ErrorPages/ServerErrorPage";
 import ContentViewerPage from "./page/ContentViewerPage";
-import UploadFilePage from "./page/UploadFilePage";
+import UploadFilePage from "./page/FileUploadPage";
 import { useTranslation } from 'react-i18next';
+import CookieNotice from "./CookieNotice/CookieNotice";
 
 
 function App() {
   return (
-      <Router>
-        <Routes>
-          {/* 登录页 */}
-          <Route path="/" element={<LoginPage />} />
+      <div>
+        <CookieNotice/>
+        <Router>
+          <Routes>
+            {/* 登录页 */}
+            <Route path="/" element={<LoginPage />} />
 
             {/* 主页面 */}
             <Route path="/main" element={
-            <>
-            <MainPage /></>
+              <>
+                <MainPage /></>
             } />
 
             {/* 高级搜索页 */}
@@ -42,8 +45,10 @@ function App() {
             <Route path="/contentViewer" element={<ContentViewerPage />} />
             {/*  上传文件页面  */}
             <Route path="/uploadFile" element={<UploadFilePage />} />
-        </Routes>
-      </Router>
+          </Routes>
+        </Router>
+      </div>
+
   )
 }
 

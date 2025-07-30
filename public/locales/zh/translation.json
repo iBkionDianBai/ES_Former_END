@@ -1,8 +1,19 @@
 {
+  "cookieNoticeText": "本网站使用cookie来提升您的浏览体验。继续浏览即表示您同意我们使用cookie。",
+  "acceptCookies": "接受",
+
+  "loginPageTitle": "登录页面",
+  "loginSystemName": "登录系统名称",
+  "inputUsername": "输入用户名",
+  "inputPassword": "输入密码",
+  "inputCaptcha": "输入验证码",
+  "loginButton": "登录",
+
   "returnHome": "返回首页",
   "toolbar": "工具栏",
   "publicOpinionSystem": "舆情系统",
   "welcome": "欢迎使用此搜索界面",
+  "welcomeUser": "欢迎",
   "logout": "退出登录",
   "search": "搜索",
   "advancedSearch": "高级搜索",
@@ -28,6 +39,17 @@
   "dateSort": "日期",
   "ascending": "升序",
   "descending": "降序",
+
+  "welcomeUploadDocument": "欢迎使用上传文档",
+  "uploadWordDocument": "上传Word文档",
+  "dragOrSelectFile": "拖拽文件到这里 或 点击选择文件",
+  "supportedFormats": "支持格式：.doc, .docx",
+  "onlySupportWordFiles": "仅支持上传Word文档 (.doc, .docx)",
+  "pleaseSelectFile": "请选择文件",
+  "uploadRequestSubmitted": "上传请求已提交，后台正在处理",
+  "uploadError": "上传出错: ",
+  "asyncUpload": "异步上传",
+
   "loading": "加载中，请稍候...",
   "loadArticleFailed": "加载文章失败，请稍后重试。",
   "articleDetails": "文章详情",
@@ -89,5 +111,17 @@
   "selectedEvents": "已选择",
   "events": "个事件",
   "eventName": "事件名",
-  "eventCount": "事件数"
+  "eventCount": "事件数",
+
+  "aboutUs": "关于我们",
+  "footerAboutUsDescription": "我们致力于打造一个高效、可靠且用户友好的平台。",
+  "quickLinks": "快速链接",
+  "about": "关于",
+  "services": "服务",
+  "contact": "联系",
+  "faq": "FAQ",
+  "contactInfo": "联系方式",
+  "email": "邮箱",
+  "phone": "电话",
+  "allRightsReserved": "保留所有权利。"
 }

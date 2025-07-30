@@ -1,8 +1,19 @@
 {
+  "cookieNoticeText": "This website uses cookies to enhance your browsing experience. By continuing to browse, you agree to our use of cookies.",
+  "acceptCookies": "Accept",
+
+  "loginPageTitle": "Login Page",
+  "loginSystemName": "Login System Name",
+  "inputUsername": "Enter Username",
+  "inputPassword": "Enter Password",
+  "inputCaptcha": "Enter Captcha",
+  "loginButton": "Login",
+
   "returnHome": "Return Home",
   "toolbar": "Tool Bar",
   "publicOpinionSystem": "Public Opinion System",
   "welcome": "Welcome to use this search interface",
+  "welcomeUser": "Welcome",
   "logout": "Logout",
   "search": "Search",
   "advancedSearch": "Advanced Search",
@@ -28,6 +39,17 @@
   "dateSort": "Date",
   "ascending": "Ascending",
   "descending": "Descending",
+
+  "welcomeUploadDocument": "Upload File You Like",
+  "uploadWordDocument": "Upload Word Document",
+  "dragOrSelectFile": "Drag files here or click to select files",
+  "supportedFormats": "Supported formats: .doc, .docx",
+  "onlySupportWordFiles": "Only Word documents (.doc, .docx) are supported.",
+  "pleaseSelectFile": "Please select a file.",
+  "uploadRequestSubmitted": "The upload request has been submitted and is being processed in the background.",
+  "uploadError": "Upload error: ",
+  "asyncUpload": "Async Upload",
+
   "loading": "Loading, please wait...",
   "loadArticleFailed": "Failed to load the article, please try again later.",
   "articleDetails": "Article Details",
@@ -60,10 +82,6 @@
   "gaojiSearchInstructionsText": "You can add search-related instructions here.",
   "gaojiClear": "Clear all",
   "gaojiSearch": "Research",
-
-
-
-
 
   "gaojiWelcomeToAdvancedSearch": "Welcome to Advanced Search",
   "searchContent": "Search Content",
@@ -105,5 +123,17 @@
   "eventName": "Event Name",
   "eventCount": "Event Count",
   "source": "Source",
-  "year": "Year"
+  "year": "Year",
+
+  "aboutUs": "About Us",
+  "footerAboutUsDescription": "We are committed to building an efficient, reliable, and user-friendly platform.",
+  "quickLinks": "Quick Links",
+  "about": "About",
+  "services": "Services",
+  "contact": "Contact",
+  "faq": "FAQ",
+  "contactInfo": "Contact Information",
+  "email": "Email",
+  "phone": "Phone",
+  "allRightsReserved": "All rights reserved."
 }

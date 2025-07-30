@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import './UploadFilePage.css';
+import './FileUploadPage.css';
 import Header from "./header";
 import Footer from "./Footer";
 import { uploadDocumentAsync } from '../service';
+import { useTranslation } from 'react-i18next';
+import {Helmet} from 'react-helmet';
 
 const FileUploadComponent = () => {
+    const { t } = useTranslation();
     const [selectedFile, setSelectedFile] = useState(null);
     const [error, setError] = useState('');
     const [isDragging, setIsDragging] = useState(false);
@@ -33,7 +36,7 @@ const FileUploadComponent = () => {
             setSelectedFile(file);
             setError('');
         } else {
-            setError('仅支持上传Word文档 (.doc, .docx)');
+            setError(t('onlySupportWordFiles'));
             setSelectedFile(null);
             e.target.value = '';
         }
@@ -57,14 +60,14 @@ const FileUploadComponent = () => {
             setSelectedFile(file);
             setError('');
         } else {
-            setError('仅支持上传Word文档 (.doc, .docx)');
+            setError(t('onlySupportWordFiles'));
         }
     };
 
     // 异步上传处理函数
     const handleAsyncUpload = async () => {
         if (!selectedFile) {
-            setError('请选择文件');
+            setError(t('pleaseSelectFile'));
             return;
         }
 
@@ -73,16 +76,16 @@ const FileUploadComponent = () => {
 
         try {
             await uploadDocumentAsync(formData);
-            alert('上传请求已提交，后台正在处理');
+            alert(t('uploadRequestSubmitted'));
         } catch (err) {
-            setError('上传出错: ' + (err?.message || JSON.stringify(err)));
-            console.error('上传出错', err);
+            setError(t('uploadError') + (err?.message || JSON.stringify(err)));
+            console.error(t('uploadError'), err);
         }
     };
 
     return (
         <div className="upload-container">
-            <h2 className="title">上传Word文档</h2>
+            <h2 className="title">{t('uploadWordDocument')}</h2>
 
             <div
                 className={`drop-area ${isDragging ? 'dragging' : ''}`}
@@ -99,8 +102,8 @@ const FileUploadComponent = () => {
                 />
                 <label htmlFor="file-input" className="file-label">
                     <div className="upload-icon">📄</div>
-                    <p>拖拽文件到这里 或 点击选择文件</p>
-                    <span className="file-hint">支持格式：.doc, .docx</span>
+                    <p>{t('dragOrSelectFile')}</p>
+                    <span className="file-hint">{t('supportedFormats')}</span>
                 </label>
             </div>
 
@@ -118,15 +121,19 @@ const FileUploadComponent = () => {
                 disabled={!selectedFile}
                 onClick={handleAsyncUpload} // 绑定异步上传
             >
-                异步上传
+                {t('asyncUpload')}
             </button>
         </div>
     );
 };
 
 const FileUploadPage = () => {
+    const { t } = useTranslation();
     return (
         <div className="page-wrapper">
+            <Helmet>
+                <title>{t('')}</title>
+            </Helmet>
             <Header />
             <FileUploadComponent />
             <Footer />
