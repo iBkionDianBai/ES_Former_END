@@ -10,8 +10,8 @@ import GaojiSearchResultPage from './search/GaojiSearchResultPage';
 import ServerErrorPage from "./ErrorPages/ServerErrorPage";
 import ContentViewerPage from "./page/ContentViewerPage";
 import UploadFilePage from "./page/FileUploadPage";
-import { useTranslation } from 'react-i18next';
 import CookieNotice from "./CookieNotice/CookieNotice";
+import AuthGuard from "./AuthGuard/AuthGuard";
 
 
 function App() {
@@ -22,15 +22,28 @@ function App() {
           <Routes>
             {/* 登录页 */}
             <Route path="/" element={<LoginPage />} />
+            <Route path="/login" element={<LoginPage />} />
 
-            {/* 主页面 */}
-            <Route path="/main" element={
-              <>
-                <MainPage /></>
-            } />
+            {/* 受保护的主页面 */}
+            <Route
+                path="/main"
+                element={
+                  <AuthGuard>
+                    <MainPage />
+                  </AuthGuard>
+                }
+            />
 
-            {/* 高级搜索页 */}
-            <Route path="/gaojiSearch" element={<GaojiSearch />} />
+            {/* 受保护的高级搜索页 */}
+            <Route
+                path="/gaojiSearch"
+                element={
+                  <AuthGuard>
+                    <GaojiSearch />
+                  </AuthGuard>
+                }
+            />
+
             {/* 404页面 */}
             <Route path="*" element={<NotFoundPage />} />
             {/* 500页面 */}
@@ -38,13 +51,41 @@ function App() {
             {/* 403页面 */}
             <Route path="/403" element={<ForbiddenPage />} />
             {/* 搜索结果页 */}
-            <Route path="/searchResult" element={<SearchResultPage />} />
+            <Route
+                path="/searchResult"
+                element={
+                  <AuthGuard>
+                    <SearchResultPage />
+                  </AuthGuard>
+                }
+            />
             {/* 高级搜索结果页 */}
-            <Route path="/gaojiSearchResult" element={<GaojiSearchResultPage />} />
+            <Route
+                path="/gaojiSearchResult"
+                element={
+                  <AuthGuard>
+                    <GaojiSearchResultPage />
+                  </AuthGuard>
+                }
+            />
             {/* 内容展示页 */}
-            <Route path="/contentViewer" element={<ContentViewerPage />} />
+            <Route
+                path="/contentViewer"
+                element={
+                  <AuthGuard>
+                    <ContentViewerPage />
+                  </AuthGuard>
+                }
+            />
             {/*  上传文件页面  */}
-            <Route path="/uploadFile" element={<UploadFilePage />} />
+            <Route
+                path="/uploadFile"
+                element={
+                  <AuthGuard>
+                    <UploadFilePage />
+                  </AuthGuard>
+                }
+            />
           </Routes>
         </Router>
       </div>
