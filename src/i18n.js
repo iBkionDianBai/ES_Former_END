@@ -9,7 +9,7 @@ i18n
     .use(LanguageDetector)
     .use(initReactI18next)
     .init({
-        fallbackLng: 'en',
+        fallbackLng: 'zh',
         debug: true,
         detection: {
             order: ['querystring', 'cookie'],
@@ -20,6 +20,10 @@ i18n
         },
         backend: {
             loadPath: '/locales/{{lng}}/translation.json'
+        }
+    }, (error, t) => {
+        if (error) {
+            console.error('Error initializing i18n:', error);
         }
     });
 

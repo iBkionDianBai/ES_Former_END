@@ -2,18 +2,21 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import './ErrorPages.css';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const NotFoundPage = () => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
+
     return (
         <>
             <Helmet>
-                <title>404 - 页面未找到</title>
+                <title>{t('notFound')}</title>
             </Helmet>
             <div className="error-page error-404">
-                <h1>404 - 页面未找到</h1>
-                <p>你访问的页面不存在，请检查网址或返回主页。</p>
-                <button className="back-home-btn" onClick={() => navigate('/main')}>返回首页</button>
+                <h1>{t('notFound')}</h1>
+                <p>{t('notFoundMessage')}</p>
+                <button className="back-home-btn" onClick={() => navigate('/main')}>{t('returnHome')}</button>
             </div>
         </>
     );

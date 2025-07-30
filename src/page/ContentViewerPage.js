@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './ContentViewerPage.css';
 import Header from "./header";
-import {Helmet} from "react-helmet";
+import { Helmet } from "react-helmet";
 import Footer from "./Footer";
+import { useTranslation } from 'react-i18next';
 
 // 工具函数：解析文章内容
 const parseArticleContent = (htmlContent) => {
@@ -58,26 +59,27 @@ const fetchArticle = async () => {
 
 // 导航组件
 const Navigation = ({ activeTab, onTabChange }) => {
+    const { t } = useTranslation();
     return (
         <nav className="navigation">
             <div className="nav-container">
                 <ul className="nav-tabs">
                     <li
-                        className={`tab-item ${activeTab === '目录' ? 'active' : ''}`}
-                        onClick={() => onTabChange('目录')}
+                        className={`tab-item ${activeTab === t('tableOfContents') ? 'active' : ''}`}
+                        onClick={() => onTabChange(t('tableOfContents'))}
                     >
-                        目录
+                        {t('tableOfContents')}
                     </li>
                     <li
-                        className={`tab-item ${activeTab === '图表与表格' ? 'active' : ''}`}
-                        onClick={() => onTabChange('图表与表格')}
+                        className={`tab-item ${activeTab === t('media') ? 'active' : ''}`}
+                        onClick={() => onTabChange(t('media'))}
                     >
-                        图表与表格
+                        {t('media')}
                     </li>
                 </ul>
                 <div className="toolbar">
-                    <button className="tool-btn"><i className="icon">🔍</i><span>放大</span></button>
-                    <button className="tool-btn"><i className="icon">🔎</i><span>缩小</span></button>
+                    <button className="tool-btn"><i className="icon">🔍</i><span>{t('zoomIn')}</span></button>
+                    <button className="tool-btn"><i className="icon">🔎</i><span>{t('zoomOut')}</span></button>
                 </div>
             </div>
         </nav>
@@ -86,9 +88,10 @@ const Navigation = ({ activeTab, onTabChange }) => {
 
 // 侧边栏组件
 const Sidebar = ({ activeTab, tableOfContents, mediaItems, onItemClick, windowHeight }) => {
+    const { t } = useTranslation();
     return (
         <div className="sidebar" style={{ height: `${windowHeight - 100}px` }}>
-            {activeTab === '目录' && (
+            {activeTab === t('tableOfContents') && (
                 <ul className="toc">
                     {tableOfContents.map((item) => (
                         <li
@@ -102,7 +105,7 @@ const Sidebar = ({ activeTab, tableOfContents, mediaItems, onItemClick, windowHe
                 </ul>
             )}
 
-            {activeTab === '图表与表格' && (
+            {activeTab === t('media') && (
                 <ul className="media-list">
                     {mediaItems.map((item) => (
                         <li
@@ -110,7 +113,7 @@ const Sidebar = ({ activeTab, tableOfContents, mediaItems, onItemClick, windowHe
                             className="media-item"
                             onClick={() => onItemClick(item.id)}
                         >
-                            <span className="media-type">{item.type === 'figure' ? '图' : '表'}</span>
+                            <span className="media-type">{item.type === 'figure' ? t('figure') : t('table')}</span>
                             {item.caption}
                         </li>
                     ))}
@@ -134,19 +137,19 @@ const Article = ({ articleContent }) => {
         <div className="event-article" ref={articleRef}>
             <h1 className="article-title">{articleContent.title}</h1>
             <div className="article-meta">
-                <span className="author">作者: 环境科学研究团队</span>
-                <span className="publish-date">发布日期: 2025年5月25日</span>
+                <span className="author">{articleContent.author}</span>
+                <span className="publish-date">{articleContent.publishDate}</span>
             </div>
             <div
                 className="article-content"
                 dangerouslySetInnerHTML={{ __html: articleContent.content }}
             />
             <div className="references">
-                <h3>参考文献</h3>
+                <h3>{articleContent.referencesTitle}</h3>
                 <ol>
-                    <li>IPCC相关文献</li>
-                    <li>环境科学研究</li>
-                    <li>气候变化研究进展</li>
+                    {articleContent.references.map((reference, index) => (
+                        <li key={index}>{reference}</li>
+                    ))}
                 </ol>
             </div>
         </div>
@@ -155,7 +158,8 @@ const Article = ({ articleContent }) => {
 
 // 主内容查看页面
 const ContentViewerPageContent = () => {
-    const [activeTab, setActiveTab] = useState('目录');
+    const { t } = useTranslation();
+    const [activeTab, setActiveTab] = useState(t('tableOfContents'));
     const [articleContent, setArticleContent] = useState(null);
     const [tableOfContents, setTableOfContents] = useState([]);
     const [mediaItems, setMediaItems] = useState([]);
@@ -173,7 +177,7 @@ const ContentViewerPageContent = () => {
             })
             .catch((error) => {
                 console.error('Error fetching article:', error);
-                alert('加载文章失败，请稍后重试。');
+                alert(t('loadArticleFailed'));
             });
 
         const handleResize = () => setWindowHeight(window.innerHeight);
@@ -190,7 +194,7 @@ const ContentViewerPageContent = () => {
     return (
         <div className="app-container">
             <Helmet>
-                <title>{articleContent?.title || '文章详情'}</title>
+                <title>{articleContent?.title || t('articleDetails')}</title>
             </Helmet>
             <Navigation activeTab={activeTab} onTabChange={handleTabChange} />
             <div className="content-wrapper">
@@ -203,7 +207,7 @@ const ContentViewerPageContent = () => {
                 />
                 <div className="main-content">
                     {loading ? (
-                        <div className="loading">文章加载中，请稍候...</div>
+                        <div className="loading">{t('loading')}</div>
                     ) : (
                         <Article articleContent={articleContent} />
                     )}

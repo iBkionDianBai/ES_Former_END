@@ -2,14 +2,14 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import { useTranslation } from 'react-i18next'; // 引入 useTranslation
+import { useTranslation } from 'react-i18next';
 import './MainPage.css';
 import Header from "./header";
 import Footer from "./Footer";
 
 // 搜索组件
 function SearchComponent() {
-    const { t } = useTranslation(); // 获取翻译函数
+    const { t } = useTranslation();
     const [selectedValue, setSelectedValue] = useState('');
     const searchOptions = [t('allContainers'), t('title'), t('school'), t('abstract'), t('fullText'), t('keywords')];
     const navigate = useNavigate();
@@ -68,7 +68,7 @@ function SearchComponent() {
                                 type="text"
                                 value={inputContent}
                                 onChange={(e) => setInputContent(e.target.value)}
-                                placeholder={t('typeToSearch')}
+                                placeholder={t('search')}
                             />
                         </div>
                         <div className="search-btn">
@@ -85,7 +85,7 @@ function SearchComponent() {
 }
 
 function ButtonBar() {
-    const { t } = useTranslation(); // 获取翻译函数
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const handleUploadFileClick = () => {
         navigate("/uploadFile");
@@ -111,7 +111,7 @@ function ButtonBar() {
 }
 
 function MainPage() {
-    const { t } = useTranslation(); // 获取翻译函数
+    const { t } = useTranslation();
     return (
         <div className="page-wrapper">
             <Helmet>

@@ -1,5 +1,8 @@
 {
+  "returnHome": "Return Home",
+  "publicOpinionSystem": "Public Opinion System",
   "welcome": "Welcome to use this search interface",
+  "logout": "Logout",
   "search": "Search",
   "advancedSearch": "Advanced Search",
   "uploadFile": "Upload File",
@@ -40,5 +43,10 @@
   "or": "Or",
   "notInclude": "Not Include",
   "fuzzy": "Fuzzy",
-  "exact": "Exact"
+  "exact": "Exact",
+  "serverErrorMessage": "The server encountered an issue. Please try again later.",
+  "zoomIn": "Zoom In",
+  "zoomOut": "Zoom Out",
+  "notFoundMessage": "The page you are looking for does not exist. Please check the URL or return to the home page.",
+  "forbiddenMessage": "You do not have permission to access this page."
 }

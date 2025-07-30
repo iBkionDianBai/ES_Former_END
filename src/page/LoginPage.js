@@ -11,6 +11,7 @@ import './LoginPage.css';
 import loginBackground from '../image/bg1.jpg';
 import smallBackground from '../image/bg2.jpg';
 import { useNavigate } from'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 // 模拟验证码接口的 mock 函数
 // 该函数返回一个Promise对象，使用setTimeout模拟网络延迟500毫秒后
@@ -29,6 +30,7 @@ const mockFetchCaptcha = () => {
 };
 
 const LoginPage = () => {
+    const { t } = useTranslation();
     const [form] = Form.useForm();
     // 用于存储从后端获取的验证码文本
     const [backendCaptcha, setBackendCaptcha] = useState('');
@@ -48,7 +50,7 @@ const LoginPage = () => {
             setCaptchaImage(response.data.image);
             setBackendCaptcha(response.data.code);
         } catch (error) {
-            console.error('获取验证码失败', error);
+            console.error(t('fetchCaptchaFailed'), error);
         }
     };
 
@@ -74,22 +76,22 @@ const LoginPage = () => {
                 navigate('/main');
             } else {
                 // 如果验证失败，设置错误信息
-                setError('用户名、密码或验证码错误！');
+                setError(t('errorMessage'));
                 // 刷新验证码，调用fetchCaptchaFromBackend函数获取新的验证码
                 fetchCaptchaFromBackend();
                 // 清空验证码输入框，将验证码输入框的值重置为空
                 form.resetFields(['code']);
             }
         } catch (error) {
-            console.error('登录失败:', error);
-            setError('登录请求失败，请稍后重试');
+            console.error(t('loginFailed'), error);
+            setError(t('loginRequestFailed'));
         }
     };
 
     return (
         <>
             <Helmet>
-                <title>登录页</title>
+                <title>{t('loginPageTitle')}</title>
             </Helmet>
 
             <div className="App-container">
@@ -132,7 +134,7 @@ const LoginPage = () => {
                 >
                     <div className="auth-login-div">
                         <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>
-                            高校舆情查询系统
+                            {t('loginSystemName')}
                         </h2>
                         <Form
                             name="normal_login"
@@ -144,22 +146,22 @@ const LoginPage = () => {
                         >
                             <Form.Item
                                 name="username"
-                                rules={[{ required: true, message: '请输入用户名' }]}
+                                rules={[{ required: true, message: t('inputUsername') }]}
                             >
                                 <Input
                                     prefix={<UserOutlined className="auth_icon auth_icon_user" />}
-                                    placeholder="用户名"
+                                    placeholder={t('inputUsername')}
                                     className="auth_input"
                                 />
                             </Form.Item>
 
                             <Form.Item
                                 name="password"
-                                rules={[{ required: true, message: '请输入密码' }]}
+                                rules={[{ required: true, message: t('inputPassword') }]}
                             >
                                 <Input.Password
                                     prefix={<LockOutlined className="auth_icon auth_icon_pwd" />}
-                                    placeholder="密码"
+                                    placeholder={t('inputPassword')}
                                     className="auth_input"
                                     iconRender={(visible) =>
                                         visible? <EyeTwoTone /> : <EyeInvisibleOutlined />
@@ -169,14 +171,14 @@ const LoginPage = () => {
 
                             <Form.Item
                                 name="code"
-                                rules={[{ required: true, message: '请输入验证码' }]}
+                                rules={[{ required: true, message: t('inputCaptcha') }]}
                             >
                                 <Row gutter={8}>
                                     <Col span={12}>
                                         {/* 显示验证码图片，点击图片可调用fetchCaptchaFromBackend函数刷新验证码 */}
                                         <img
                                             src={captchaImage}
-                                            alt="验证码"
+                                            alt={t('inputCaptcha')}
                                             style={{ height: '50px', cursor: 'pointer' }}
                                             onClick={fetchCaptchaFromBackend}
                                         />
@@ -184,7 +186,7 @@ const LoginPage = () => {
                                     <Col span={12}>
                                         {/* 用于用户输入验证码的输入框 */}
                                         <Input
-                                            placeholder="输入验证码"
+                                            placeholder={t('inputCaptcha')}
                                             className="auth_input"
                                         />
                                     </Col>
@@ -204,7 +206,7 @@ const LoginPage = () => {
                                         borderRadius: '8px'
                                     }}
                                 >
-                                    登录
+                                    {t('loginButton')}
                                 </Button>
                             </Form.Item>
 
