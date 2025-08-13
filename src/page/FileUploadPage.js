@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './FileUploadPage.css';
 import Header from "./header";
 import Footer from "./Footer";
-import { uploadDocumentAsync } from '../service';
+import { uploadDocumentAsync } from '../api/service';
 import { useTranslation } from 'react-i18next';
 import {Helmet} from 'react-helmet';
 
@@ -76,6 +76,10 @@ const FileUploadComponent = () => {
 
         try {
             await uploadDocumentAsync(formData);
+            // 清除选中的文件和提示信息
+            setSelectedFile(null);
+            setError('');
+            document.getElementById('file-input').value = '';
             alert(t('uploadRequestSubmitted'));
         } catch (err) {
             setError(t('uploadError') + (err?.message || JSON.stringify(err)));
