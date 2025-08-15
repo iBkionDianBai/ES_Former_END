@@ -6,6 +6,11 @@ import { useTranslation } from 'react-i18next';
 import './MainPage.css';
 import Header from "./header";
 import Footer from "./Footer";
+import RankingBoard from "../MainPageExtend/RankingBoard";
+
+// 图标
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
 
 // 搜索组件
 function SearchComponent() {
@@ -32,49 +37,52 @@ function SearchComponent() {
 
     return (
         <div className="search-area">
-            <div className="banner"></div>
-            <div className="searchmain">
-                <div className="page-title">
-                    <h1>{t('searchDoc')}</h1>
-                </div>
-                <ul className="search-tab">
-                    {tabs.map((tab, index) => (
-                        <li
-                            key={index}
-                            className={activeTab === index ? "on active" : ""}
-                            onClick={() => setActiveTab(index)}
-                        >
-                            {tab.name}
-                        </li>
-                    ))}
-                </ul>
-                <div className={activeTab === 0 ? "search-tab-content-normal" : "search-tab-content-other"}>
-                    <div className="input-box">
-                        <div>
-                            <select
-                                onChange={(e) => setSelectedValue(e.target.value)}
-                                className="sort"
+            <div className="banner">
+                <div className="searchmain">
+                    <ul className="search-tab">
+                        {tabs.map((tab, index) => (
+                            <li
+                                key={index}
+                                className={activeTab === index ? "on active" : ""}
+                                onClick={() => setActiveTab(index)}
                             >
-                                {searchOptions.map((container) => (
-                                    <option key={container} value={container}>{container}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="input-content">
-                            <input
-                                className="input"
-                                type="text"
-                                value={inputContent}
-                                onChange={(e) => setInputContent(e.target.value)}
-                                placeholder={t('search')}
-                            />
-                        </div>
-                        <div className="search-btn">
-                            <button className="btn" onClick={handleSearchClick}>{t('search')}</button>
-                        </div>
+                                {tab.name}
+                            </li>
+                        ))}
+                    </ul>
+                    <div className="page-title">
+                        <h1>{t('searchDoc')}</h1>
                     </div>
-                    <div className="readvce">
-                        <button className="GaojiSearchButton" onClick={handleGaojiSearchClick}>{t('advancedSearch')}</button>
+                    <div className={activeTab === 0 ? "search-tab-content-normal" : "search-tab-content-other"}>
+                        <div className="input-box">
+                            <div className="search-select">
+                                <select
+                                    onChange={(e) => setSelectedValue(e.target.value)}
+                                    className="sort"
+                                >
+                                    {searchOptions.map((container) => (
+                                        <option className="Options" key={container} value={container}>{container}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="input-content">
+                                <input
+                                    className="input"
+                                    type="text"
+                                    value={inputContent}
+                                    onChange={(e) => setInputContent(e.target.value)}
+                                    placeholder={t('search')}
+                                />
+                            </div>
+                            <div className="search-btn">
+                                <button className="btn" onClick={handleSearchClick}>
+                                    <FontAwesomeIcon icon={faSearch} />
+                                </button>
+                            </div>
+                        </div>
+                        <div className="readvce">
+                            <button className="GaojiSearchButton" onClick={handleGaojiSearchClick}>{t('advancedSearch')}</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -94,7 +102,9 @@ function ButtonBar() {
 
     return (
         <div className="button-bar-container">
-            <div className="button-bar-title">🔧{t('toolbar')}：</div>
+            <div className="button-bar-title">
+                <h1>{t('toolbar')}</h1>
+            </div>
             <div className="button-bar">
                 <ul className="select-list">
                     {buttons.map((btn, index) => (
@@ -118,6 +128,7 @@ function MainPage() {
             <Header />
             <SearchComponent />
             <ButtonBar />
+            <RankingBoard />
             <Footer />
         </div>
     );

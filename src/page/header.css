@@ -1,7 +1,7 @@
 .top-section {
     width: 100%;
     text-align: center;
-    background: rgba(45, 62, 89, 0.6);
+    background: linear-gradient(45deg, #12cff6, #5bf3c5);
     height: 60px;
     font-size: 12px;
     display: flex;

@@ -2,70 +2,50 @@
     margin: 0;
     padding: 0;
     list-style: none;
-    font-family: "Microsoft yahei";
     text-decoration: none;
 }
 
-/* top selection */
-
 .banner {
-    position: absolute;
-    left: 0;
-    top: 0;
-    z-index: -1;
-    width: 100%;
-    min-width: 1200px;
-    height: 490px;
-    background: url("../image/banner.png") bottom center repeat-x #1b66e6;
-    overflow: hidden;
+    height: 700px;
+    background: #e1e1e1 !important;
 }
-.banner::after {
-    content: '';
-    display: block;
-    position: absolute;
-    bottom: 0;
-    z-index: 0;
-    width: 100%;
-    height: 88px;
-    background: url("../image/banner-wave.jpg") no-repeat center bottom;
-    background-size: 100% 100%;
-}
-
 .searchmain {
     width: 1090px;
     height: 280px;
-    margin: 50px auto 0 auto;
     clear: both;
 }
 
 .searchmain .page-title {
+    margin-top: 100px;
+    font-family: "Segoe UI Black" , sans-serif;
     margin-bottom: 20px;
-    text-align: center;
+    margin-left: 120px;
+    max-width: 660px;
 }
 .searchmain .page-title h1{
-    font-size: 36px;
-    color: #fff;
+    font-size: 60px;
+    color: #000000;
 }
 
 .searchmain .search-tab {
     height: 50px;
     margin-left: 120px;
     clear: both;
+    border: none;
 }
 
 .searchmain .search-tab li {
-    position: relative;
+    margin-top: 70px;
     float: left;
-    width: 110px;
-    height: 36px;
-    line-height: 32px;
+    width: 150px;
+    height: 40px;
+    line-height: 40px;
     text-align: center;
     font-size: 15px;
-    color: #fff;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.2), transparent);
+    color: #333;
+    background: #ffffff;
     cursor: pointer;
-    border-radius: 2px;
-    border: 1px solid rgba(255,255,255,0.3);
+    /*border: 1px solid rgba(255,255,255,0.3);*/
 }
 .searchmain .search-tab li:hover {
     font-size: 16px;
@@ -74,7 +54,7 @@
 .searchmain .search-tab li.active {
     border-top: 1px solid #fff;
     border-bottom: none;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.4), rgba(255,255,255,0));;
+    background: linear-gradient(90deg, #12cff6, #46f88d);
 }
 .searchmain .search-tab-content-normal {
     display: block;
@@ -89,10 +69,10 @@
 .searchmain .input-box {
     padding: 0;
     display: flex;
-    width: 849px;
-    height: 56px;
+    width: 645px;
+    height: 60px;
     margin-bottom: 24px;
-    border-radius: 4px;
+    border-radius: 150px;
     background: #fff;
     -webkit-box-shadow: -0.07px 2px 4px 0 rgba(0,0,0,0.3608);
     -moz-box-shadow: -0.07px 2px 4px 0 rgba(0,0,0,0.3608);
@@ -103,22 +83,24 @@
 
 .searchmain .sort {
     z-index: 1;
-    width: 120px;
-    height: 56px;
+    width: 150px;
+    height: 60px;
     border: none;
     background: none;
     text-align: center;
+    color: #333;
+    outline: none;
 }
 
 .searchmain .input-box .input{
     border: none;
     outline: none;
-    padding: 17px 0 17px 20px;
-    width: 600px;
-    height: 52px;
-    line-height: 20px;
+    padding-left: 20px;
+    width: 415px;
+    height: 56px;
+    line-height: 32px;
     color: #333;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .searchmain .search-btn{
@@ -126,10 +108,9 @@
     margin-left: 21px;
 }
 .searchmain .search-btn .btn{
-    height: 49px;
-    width: 100px;
-    font-size: 16px;
-    background-color: #1D67E7;
+    height: 53px;
+    width: 53px;
+    background: linear-gradient(90deg, #12cff6, #46f88d);
     float: right;
     margin-top: 3px;
     margin-right: 3px;
@@ -138,17 +119,11 @@
     border: none;
     outline: none;
     cursor: pointer;
-    border-radius: 4px;
-}
-.searchmain .search-btn .btn:hover{
-    background-color: #3040d1;
+    border-radius: 100%;
 }
 
 .searchmain .readvce {
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 100px;
+    width: 150px;
     font-size: 14px;
     text-align: left;
 }
@@ -156,38 +131,32 @@
 .searchmain .readvce .GaojiSearchButton {
     display: inline-block;
     line-height: 28px;
-    color: #fff;
+    color: #000000;
     background: none;
-    width: 60px;
     border: none;
+    font-size: 17px;
 }
 
 .button-bar-container {
     width: 1090px;
-    height: 280px;
-    margin: -50px auto 0 auto;
     clear: both;
 }
 
 .button-bar-title {
+    font-family: "Microsoft YaHei" , sans-serif;
     float: left;
     margin-top: 12px;
-    margin-left: 60px;
-    color: #fff;
+    margin-left: 120px;
+    font-size: 17px;
+    color: #333333;
 }
 
 .button-bar {
     float: left;
-    width: 1000px;
-    height: 90px;
-    margin-left: 60px;
+    width: 100%;
+    margin-left: 100px;
+    margin-top: 40px;
     border-radius: 16px;
-    background-color: rgba(110, 209, 230, 0.12);
-    -webkit-box-shadow: -0.07px 2px 4px 0 rgba(0,0,0,0.3608);
-    -moz-box-shadow: -0.07px 2px 4px 0 rgba(0,0,0,0.3608);
-    -ms-box-shadow: -0.07px 2px 4px 0 rgba(0,0,0,0.3608);
-    -o-box-shadow: -0.07px 2px 4px 0 rgba(0,0,0,0.3608);
-    box-shadow: -0.07px 2px 4px 0 rgba(0,0,0,0.3608);
 }
 
 /* 工具栏按钮列表样式 */
@@ -208,17 +177,20 @@
 /* 工具栏按钮样式 */
 .select-list .btn {
     padding: 10px 20px;
+    height: 200px;
+    width: 250px;
     font-size: 20px;
-    color: #1D67E7;
-    background-color: #fff;
+    color: #333333;
+    background: linear-gradient(90deg, #12cff6, #46f88d);
     border: none;
-    border-radius: 6px;
+    border-radius: 20px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
 /* 悬停效果 */
 .select-list .btn:hover {
-    background-color: #1D67E7;
     color: #fff;
+    font-size: 22px;
+    transition: 0.3s;
 }
