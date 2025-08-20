@@ -136,17 +136,6 @@ const LoginPage = () => {
                 {/* 登录主体容器 */}
                 <div
                     className="right-content-container"
-                    style={{
-                        position: 'absolute',
-                        top: 0,
-                        right: 0,
-                        width: '35%',
-                        height: '100%',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        paddingTop: '150px',
-                        alignItems: 'flex-start'
-                    }}
                 >
                     <div className="auth-login-div">
                         <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>
@@ -214,13 +203,6 @@ const LoginPage = () => {
                                     type="primary"
                                     htmlType="submit"
                                     className="auth_btn"
-                                    style={{
-                                        backgroundColor: '#2A5CAA',
-                                        borderColor: '#2A5CAA',
-                                        width: '100%',
-                                        height: '48px',
-                                        borderRadius: '8px'
-                                    }}
                                 >
                                     {t('loginButton')}
                                 </Button>
