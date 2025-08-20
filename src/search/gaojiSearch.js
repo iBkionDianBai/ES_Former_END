@@ -263,10 +263,10 @@ function GaojiSearchComponent() {
                                     </select>
                                 </div>
                                 <div className="search-item">
-                                                                         <button onClick={() => handleAddRow()} className="action-button">Add</button>
+                                    <button onClick={() => handleAddRow()} className="action-button">{t('add')}</button>
                                     {/* 只在非第一行显示删除按钮 */}
                                     {index > 0 && (
-                                        <button onClick={() => handleRemoveRow(index)} className="action-button">-</button>
+                                        <button onClick={() => handleRemoveRow(index)} className="action-button">{t('delete')}</button>
                                     )}
                                 </div>
                             </div>
@@ -289,8 +289,12 @@ function GaojiSearchComponent() {
                         />
                     </div>
                     <div className="button-section">
-                                                 <button onClick={handleClear} className="action-button">{t('gaojiClear')}</button>
-                                                 <button onClick={handleSearch} className="action-button">{t('gaojiSearch')}</button>
+                        <button onClick={handleClear} className="action-button">
+                            <h3>{t('gaojiClear')}</h3>
+                        </button>
+                        <button onClick={handleSearch} className="action-button">
+                            <h3>{t('gaojiSearch')}</h3>
+                        </button>
                     </div>
                 </div>
                 <div className="search-instruction">

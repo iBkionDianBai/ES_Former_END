@@ -9,13 +9,18 @@
   "inputCaptcha": "Enter Captcha",
   "loginButton": "Login",
 
+  "confirmLogout": "Confirm Logout",
+  "logoutMessage": "Are you sure you want to log out? This action cannot be undone.",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+
   "RankingTitle": "KeywordsRanking",
   "ThemeRanking": "Ranking",
   "ThemeRankingTitle": "ThemeRanking",
   "ThemeRankingItems": "Title",
   "ThemeRankingFreq": "Freq",
 
-  "returnHome": "Return Home",
+  "returnHome": "Home",
   "toolbar": "Tools that you may need",
   "publicOpinionSystem": "Public Opinion System",
   "welcome": "Welcome to use this search interface",
@@ -24,7 +29,7 @@
   "search": "Search",
   "advancedSearch": "Advanced Search",
   "uploadFile": "Upload File",
-  "searchDoc": "Stuff happening anytime & anytime.",
+  "searchDoc": "Stuff happening anytime & anywhere.",
   "retrieval": "Retrieval",
   "other": "Other",
   "allContainers": "All Containers",
@@ -45,6 +50,8 @@
   "dateSort": "Date",
   "ascending": "Ascending",
   "descending": "Descending",
+  "add": "Add",
+  "delete": "Delete",
 
   "welcomeUploadDocument": "Upload File You Like",
   "uploadWordDocument": "Upload Word Document",

@@ -5,67 +5,88 @@
     text-decoration: none;
 }
 
+@font-face {
+    font-family: "Ahroni";
+    src: url("../fonts/Ahroni.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 .banner {
     height: 700px;
     background: #e1e1e1 !important;
 }
+
 .searchmain {
     width: 1090px;
     height: 280px;
-    clear: both;
 }
 
-.searchmain .page-title {
+
+[lang="en"] .searchmain .page-title {
     margin-top: 100px;
-    font-family: "Segoe UI Black" , sans-serif;
+    font-family: "Ahroni", sans-serif;
+
     margin-bottom: 20px;
     margin-left: 120px;
     max-width: 660px;
 }
+
+[lang="zh"] .searchmain .page-title {
+    margin-top: 100px;
+    font-family: "Microsoft YaHei" , sans-serif;
+    margin-bottom: 20px;
+    margin-left: 120px;
+    max-width: 660px;
+}
+
 .searchmain .page-title h1{
     font-size: 60px;
     color: #000000;
 }
 
-.searchmain .search-tab {
-    height: 50px;
+.search-tab ul{
+    padding-top: 70px;
     margin-left: 120px;
-    clear: both;
     border: none;
 }
 
-.searchmain .search-tab li {
-    margin-top: 70px;
+.search-tab li {
     float: left;
-    width: 150px;
-    height: 40px;
     line-height: 40px;
+    width: 150px;
     text-align: center;
     font-size: 15px;
     color: #333;
     background: #ffffff;
-    cursor: pointer;
-    /*border: 1px solid rgba(255,255,255,0.3);*/
+    box-shadow: -0.07px 2px 4px 0 rgba(0,0,0,0.3608);
 }
+
+/* 第一个选项卡 - 只设置左圆角 */
+.search-tab li:first-child {
+    border-radius: 6px 0 0 6px;
+}
+
+/* 最后一个选项卡 - 只设置右圆角 */
+.search-tab li:last-child {
+    border-radius: 0 6px 6px 0;
+}
+
 .searchmain .search-tab li:hover {
     font-size: 16px;
     transition: .3s;
 }
 .searchmain .search-tab li.active {
-    border-top: 1px solid #fff;
-    border-bottom: none;
     background: linear-gradient(90deg, #12cff6, #46f88d);
 }
 .searchmain .search-tab-content-normal {
-    display: block;
-    position: relative;
     margin-left: 120px;
 }
 .searchmain .search-tab-content-other {
-    display: block;
-    position: relative;
     margin-left: 120px;
 }
+
 .searchmain .input-box {
     padding: 0;
     display: flex;

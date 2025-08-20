@@ -381,14 +381,14 @@ function GaojiSearchResultPageContent() {
                                             </td>
                                             <td>{index + 1}</td>
                                             <td>
-                                                <span style={{color: '#1890ff', cursor: 'pointer', display: 'inline-block'}} onClick={() => navigate(`/contentViewer?id=${result.id}`)}>
+                                                <span style={{color: '#12cff6', cursor: 'pointer', display: 'inline-block'}} onClick={() => navigate(`/contentViewer?id=${result.id}`)}>
                                                     {result.title.split(' ')[0]}<br/>{result.title.split(' ').slice(1).join(' ')}
                                                 </span>
                                             </td>
                                             <td>{result.source}</td>
                                             <td>{result.time}</td>
                                             <td>
-                                                <span title={t('read')} style={{cursor: 'pointer', fontSize: '20px', color: '#1890ff'}} onClick={() => navigate(`/contentViewer?id=${result.id}`)}>
+                                                <span title={t('read')} style={{cursor: 'pointer', fontSize: '20px', color: '#12cff6'}} onClick={() => navigate(`/contentViewer?id=${result.id}`)}>
                                                     📖
                                                 </span>
                                             </td>

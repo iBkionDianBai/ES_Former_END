@@ -39,17 +39,19 @@ function SearchComponent() {
         <div className="search-area">
             <div className="banner">
                 <div className="searchmain">
-                    <ul className="search-tab">
-                        {tabs.map((tab, index) => (
-                            <li
-                                key={index}
-                                className={activeTab === index ? "on active" : ""}
-                                onClick={() => setActiveTab(index)}
-                            >
-                                {tab.name}
-                            </li>
-                        ))}
-                    </ul>
+                    <div className="search-tab">
+                        <ul>
+                            {tabs.map((tab, index) => (
+                                <li
+                                    key={index}
+                                    className={activeTab === index ? "on active" : ""}
+                                    onClick={() => setActiveTab(index)}
+                                >
+                                    {tab.name}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
                     <div className="page-title">
                         <h1>{t('searchDoc')}</h1>
                     </div>

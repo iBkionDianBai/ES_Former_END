@@ -1,7 +1,6 @@
 /* 整体搜索页面样式 */
 .search-page {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 20px;
     background-color: #f9f9f9;
     padding: 20px;
     border-radius: 8px;
@@ -118,8 +117,8 @@
     padding: 6px 10px;
     border: none;
     border-radius: 4px;
-    background-color: #007BFF;
-    color: white;
+    background: linear-gradient(90deg, #12cff6, #46f88d);
+    color: #000000;
     cursor: pointer;
     transition: background-color 0.3s ease;
     margin-right: 5px;
@@ -129,43 +128,35 @@
     flex-shrink: 0;
 }
 
-/* 操作按钮悬停时样式 */
-.action-button:hover {
-    background-color: #0056b3;
-}
 
 /* 日期选择区域样式 */
 .date-section {
     margin-top: 20px;
+    margin-left: 40px;
     display: flex;
     align-items: center;
     gap: 10px;
+    max-width: 500px;
 }
 
-/* 类型选择区域样式 */
-.type-section {
-    margin-top: 20px;
-}
-
-/* 类型选项区域样式，使用flex布局实现横向排列 */
-.type-options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-/* 类型复选框项样式 */
-.type-item {
-    display: flex;
-    align-items: center;
+.date-section label {
+    width: 100px;
 }
 
 /* 操作按钮区域样式 */
 .button-section {
     margin-top: 20px;
+    margin-left: 40px;
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 5px;
+    float: left;
+}
+
+.button-section button {
+    width: 120px;
+    min-width: 80px;
+    height: 35px;
 }
 
 /* 检索说明区域样式 */

@@ -9,13 +9,18 @@
   "inputCaptcha": "输入验证码",
   "loginButton": "登录",
 
+  "confirmLogout": "确认退出",
+  "logoutMessage": "是否确定退出账号？此操作无法还原。",
+  "cancel": "取消",
+  "confirm": "确认",
+
   "RankingTitle": "关键词排行",
   "ThemeRankingTitle": "主题关键词排行",
   "ThemeRanking": "排名",
   "ThemeRankingItems": "名称",
   "ThemeRankingFreq": "频数",
 
-  "returnHome": "返回首页",
+  "returnHome": "首页",
   "toolbar": "实用工具",
   "publicOpinionSystem": "舆情系统",
   "welcome": "欢迎使用此搜索界面",
@@ -45,6 +50,8 @@
   "dateSort": "日期",
   "ascending": "升序",
   "descending": "降序",
+  "add": "添加",
+  "delete": "删除",
 
   "welcomeUploadDocument": "欢迎使用上传文档",
   "uploadWordDocument": "上传Word文档",

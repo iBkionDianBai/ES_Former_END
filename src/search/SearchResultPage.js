@@ -187,7 +187,9 @@ function SearchResultPageContent() {
             <div className="search-bar-container">
                 <div className="search-bar">
                     <input type="text" value={inputValue} placeholder={t('inputSearchContent')} onChange={e => setInputValue(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()} />
-                    <button className="refresh-search" onClick={handleSearch}>{t('refreshSearch')}</button>
+                    <button className="refresh-search" onClick={handleSearch}>
+                        <h3>{t('refreshSearch')}</h3>
+                    </button>
                 </div>
                 <div className="search-params">{t('searchContent')}: {translatedSearchText}</div>
             </div>
@@ -326,10 +328,10 @@ function SearchResultPageContent() {
                                     <tr key={result.id}>
                                         <td><input type="checkbox" checked={selectedIds.includes(result.id)} onChange={e => e.target.checked ? setSelectedIds([...selectedIds, result.id]) : setSelectedIds(selectedIds.filter(id => id !== result.id))} /></td>
                                         <td>{(currentPage - 1) * pageSize + index + 1}</td>
-                                        <td><span style={{ color: '#1890ff', cursor: 'pointer' }} onClick={() => navigate(`/contentViewer?id=${result.id}`)}>{result.title.split(' ')[0]}<br />{result.title.split(' ').slice(1).join(' ')}</span></td>
+                                        <td><span style={{ color: '#12cff6', cursor: 'pointer' }} onClick={() => navigate(`/contentViewer?id=${result.id}`)}>{result.title.split(' ')[0]}<br />{result.title.split(' ').slice(1).join(' ')}</span></td>
                                         <td>{result.source}</td>
                                         <td>{result.time}</td>
-                                        <td><span title={t('read')} style={{ cursor: 'pointer', fontSize: '20px', color: '#1890ff' }} onClick={() => navigate(`/contentViewer?id=${result.id}`)}>📖</span></td>
+                                        <td><span title={t('read')} style={{ cursor: 'pointer', fontSize: '20px', color: '#12cff6' }} onClick={() => navigate(`/contentViewer?id=${result.id}`)}>📖</span></td>
                                     </tr>
                                 ))}
                                 </tbody>
