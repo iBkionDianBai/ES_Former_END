@@ -7,7 +7,6 @@ import './MainPage.css';
 import Header from "./header";
 import Footer from "./Footer";
 import RankingBoard from "../MainPageExtend/RankingBoard";
-import shouye1Image from '../image/shouye1.png';
 
 // 图标
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -39,7 +38,6 @@ function SearchComponent() {
     return (
         <div className="search-area">
             <div className="banner">
-                <img src={shouye1Image} alt="首页图片" />
                 <div className="searchmain">
                     <div className="search-tab">
                         <ul>
