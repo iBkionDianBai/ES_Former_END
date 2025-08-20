@@ -284,7 +284,7 @@
 }
 
 .second-line .return-home {
-    width: 50px;
+    padding: 0 12px;
     align-self: center;
     height: 30px;
     position: relative;
@@ -328,5 +328,45 @@
     height: 25px;
     margin-left: 10px;
     margin-top: -5px;
+}
+
+.second-line .readvce {
+    padding: 0 12px;
+    margin-left: 10px;
+    align-self: center;
+    height: 30px;
+    position: relative;
+}
+
+.second-line .readvce::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px; /* 边框厚度 */
+
+    /* 渐变颜色（从左到右） */
+    background: linear-gradient(90deg, #12cff6, #46f88d);
+
+    /* 动画相关设置 */
+    width: 0; /* 初始宽度为0（不显示） */
+    transition: width 0.5s ease; /* 宽度变化的过渡动画 */
+}
+.second-line .readvce:hover::after {
+    width: 100%;
+}
+.second-line .readvce.active::after {
+    width: 100%;
+}
+
+.second-line .readvce .GaojiSearchButton {
+    border: none;
+    background: none;
+}
+
+.second-line .readvce .GaojiSearchButton:hover {
+    transform: translateY(-2px);
+    color: #b5b3b3;
+    transition: 0.3s;
 }
 

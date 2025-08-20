@@ -143,21 +143,6 @@
     border-radius: 100%;
 }
 
-.searchmain .readvce {
-    width: 150px;
-    font-size: 14px;
-    text-align: left;
-}
-
-.searchmain .readvce .GaojiSearchButton {
-    display: inline-block;
-    line-height: 28px;
-    color: #000000;
-    background: none;
-    border: none;
-    font-size: 17px;
-}
-
 .button-bar-container {
     width: 1090px;
     clear: both;

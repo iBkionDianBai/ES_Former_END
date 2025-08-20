@@ -31,10 +31,6 @@ function SearchComponent() {
         }
     };
 
-    const handleGaojiSearchClick = () => {
-        navigate("/gaojiSearch");
-    };
-
     return (
         <div className="search-area">
             <div className="banner">
@@ -81,9 +77,6 @@ function SearchComponent() {
                                     <FontAwesomeIcon icon={faSearch} />
                                 </button>
                             </div>
-                        </div>
-                        <div className="readvce">
-                            <button className="GaojiSearchButton" onClick={handleGaojiSearchClick}>{t('advancedSearch')}</button>
                         </div>
                     </div>
                 </div>

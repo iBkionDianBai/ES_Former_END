@@ -83,6 +83,10 @@ function Header() {
         { code: 'zh', name: '中文' }
     ];
 
+    const handleGaojiSearchClick = () => {
+        navigate("/gaojiSearch");
+    };
+
     return (
         <div className="header-container">
             <div className="first-line">
@@ -141,6 +145,11 @@ function Header() {
                     </button>
                 </div>
                 <div className="cutter"></div>
+                <div className="readvce">
+                    <button className="GaojiSearchButton" onClick={handleGaojiSearchClick}>
+                        <h3>{t('advancedSearch')}</h3>
+                    </button>
+                </div>
             </div>
 
             {/* 退出确认弹窗 */}
