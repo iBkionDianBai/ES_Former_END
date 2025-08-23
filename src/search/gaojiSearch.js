@@ -1,24 +1,23 @@
 import React, {useEffect, useState, useMemo} from 'react'
 import {Helmet} from 'react-helmet';
 import './gaojiSearch.css'
-import axios from "axios";
 import {useLocation, useNavigate} from "react-router-dom";
 import Header from "../page/header";
-import Footer from "../page/Footer";
 import { useTranslation } from 'react-i18next';
+import Footer from "../page/Footer";
 
 
 function GaojiSearchComponent() {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const location = useLocation();
-    
+
     // 使用翻译函数定义常量，避免重名
     const operators = useMemo(() => [t('and'), t('or'), t('notInclude')], [t]);
     const rowRelations = useMemo(() => [t('and'), t('or'), t('notInclude')], [t]);
     const containers = useMemo(() => [t('allContainers'), t('title'), t('school'), t('abstract'), t('fullText'), t('keywords')], [t]);
-    const fuzzyOptions = useMemo(() => [t('fuzzy'), t('exact')], [t]);
-    
+    const fuzzyOptions = useMemo(() => [t('fuzzy'), t('exact'), t('phrase')], [t]);
+
     // 从URL参数q获取初始值
     const searchParams = new URLSearchParams(location.search);
     const q = searchParams.get('q') || '';
@@ -34,17 +33,17 @@ function GaojiSearchComponent() {
     // 处理语言切换时的状态更新
     useEffect(() => {
         // 当语言变化时，更新搜索行的默认值
-        setSearchRows(prevRows => 
+        setSearchRows(prevRows =>
             prevRows.map(row => ({
                 ...row,
                 container: row.container === '全部容器' || row.container === 'All Containers' ? t('allContainers') : row.container,
-                operator: row.operator === '并且' || row.operator === 'And' ? t('and') : 
-                         row.operator === '或者' || row.operator === 'Or' ? t('or') : 
+                operator: row.operator === '并且' || row.operator === 'And' ? t('and') :
+                         row.operator === '或者' || row.operator === 'Or' ? t('or') :
                          row.operator === '不包含' || row.operator === 'Not Include' ? t('notInclude') : row.operator,
-                fuzzy: row.fuzzy === '模糊' || row.fuzzy === 'Fuzzy' ? t('fuzzy') : 
+                fuzzy: row.fuzzy === '模糊' || row.fuzzy === 'Fuzzy' ? t('fuzzy') :
                        row.fuzzy === '精确' || row.fuzzy === 'Exact' ? t('exact') : row.fuzzy,
-                relation: row.relation === '并且' || row.relation === 'And' ? t('and') : 
-                         row.relation === '或者' || row.relation === 'Or' ? t('or') : 
+                relation: row.relation === '并且' || row.relation === 'And' ? t('and') :
+                         row.relation === '或者' || row.relation === 'Or' ? t('or') :
                          row.relation === '不包含' || row.relation === 'Not Include' ? t('notInclude') : row.relation
             }))
         );
@@ -135,7 +134,7 @@ function GaojiSearchComponent() {
             const fuzzy = row.fuzzy || '';
             const relation = row.relation || '';
             const container = row.container || '';
-            
+
             if (k1 || k2) {
                 let condition = '';
                 if (k1 && k2) {
@@ -143,40 +142,40 @@ function GaojiSearchComponent() {
                 } else if (k1) {
                     condition = k1;
                 }
-                
+
                 if (container && container !== t('allContainers')) {
                     condition = `[${container}] ${condition}`;
                 }
-                
+
                 if (fuzzy) {
                     condition += ` (${fuzzy})`;
                 }
-                
+
                 if (index > 0 && relation) {
                     condition = `${relation} ${condition}`;
                 }
-                
+
                 searchConditions.push(condition);
             }
         });
-        
+
         // 构建URL参数
         const params = new URLSearchParams();
-        
+
         // 添加搜索条件
         if (searchConditions.length > 0) {
             params.set('searchConditions', searchConditions.join(' | '));
         }
-        
+
         // 添加日期参数
         if (startDate) params.set('startDate', startDate);
         if (endDate) params.set('endDate', endDate);
-        
+
         // 添加类型参数
         if (searchTypes.length > 0) {
             params.set('types', searchTypes.join('/'));
         }
-        
+
         const url = `/gaojiSearchResult?${params.toString()}`;
         navigate(url);
     };
@@ -191,7 +190,7 @@ function GaojiSearchComponent() {
 
     return (
         <div className="search-page">
-                            <h2>{t('gaojiAdvancedRetrieval')}</h2>
+            <h2>{t('gaojiAdvancedRetrieval')}</h2>
             <div className="main-content">
                 <div className="search-content">
                     <div className="search-rows">

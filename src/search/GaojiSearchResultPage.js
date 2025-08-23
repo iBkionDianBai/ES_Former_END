@@ -3,18 +3,26 @@ import { Helmet } from "react-helmet";
 import GaojiSearchComponent from "./gaojiSearch";
 import "./SearchResultPage.css";
 import { useNavigate, useLocation } from "react-router-dom";
-import Header from "../page/header";
 import Footer from "../page/Footer";
 import { useTranslation } from 'react-i18next';
+import { advancedSearch } from '../api/service';
+
 
 // 计算事件名频度的函数
 const calculateEventNameFrequency = (results) => {
-    const eventNameCount = {};
+    // 确保results是数组，非数组则返回空数组
+    if (!Array.isArray(results)) {
+        console.warn('Invalid results data, expected array', results);
+        return [];
+    }
 
+    const eventNameCount = {};
     results.forEach(item => {
         // 提取事件名（取标题的第一部分作为事件名）
-        const eventName = item.title.split(' ')[0];
-        eventNameCount[eventName] = (eventNameCount[eventName] || 0) + 1;
+        const eventName = item.title?.split(' ')[0]; // 增加item.title存在性判断
+        if (eventName) { // 确保eventName有效
+            eventNameCount[eventName] = (eventNameCount[eventName] || 0) + 1;
+        }
     });
 
     // 转换为数组并按频度排序，取前5个
@@ -25,8 +33,41 @@ const calculateEventNameFrequency = (results) => {
 
     return sortedEvents;
 };
-const sources = ["平台名"];
-const years = ["2020-01-15", "2020-02-20", "2020-03-10", "2020-04-05", "2020-05-25", "2020-06-18", "2020-07-12", "2020-08-08", "2020-09-30", "2020-10-22"];
+
+// 从结果中提取唯一的来源
+const extractUniqueSources = (results) => {
+    if (!Array.isArray(results)) {
+        console.warn('Invalid results data, expected array', results);
+        return [];
+    }
+
+    const sources = new Set();
+    results.forEach(item => {
+        if (item.source) {
+            sources.add(item.source);
+        }
+    });
+
+    return Array.from(sources);
+};
+
+// 从结果中提取唯一的年份（或日期）
+const extractUniqueYears = (results) => {
+    if (!Array.isArray(results)) {
+        console.warn('Invalid results data, expected array', results);
+        return [];
+    }
+
+    const years = new Set();
+    results.forEach(item => {
+        if (item.time) {
+            years.add(item.time);
+        }
+    });
+
+    // 按日期排序
+    return Array.from(years).sort((a, b) => new Date(b) - new Date(a));
+};
 
 
 function GaojiSearchResultPageContent() {
@@ -45,6 +86,8 @@ function GaojiSearchResultPageContent() {
     const [selectedThemes, setSelectedThemes] = useState([]);
     const [selectedSources, setSelectedSources] = useState([]);
     const [selectedYears, setSelectedYears] = useState([]);
+    const [sources, setSources] = useState([]); // 动态来源数据
+    const [years, setYears] = useState([]); // 动态年份数据
     const navigate = useNavigate();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -54,16 +97,15 @@ function GaojiSearchResultPageContent() {
     const types = searchParams.get('types') || '';
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
-    const [useLoadMore, setUseLoadMore] = useState(false);
 
 
     // 翻译搜索条件中的操作符和容器名称
     const translateSearchConditions = (conditions) => {
         if (!conditions) return '';
-        
+
         // 双向翻译：中文到英文，英文到中文
         let translated = conditions;
-        
+
         // 中文到英文
         translated = translated
             .replace(/并且/g, t('and'))
@@ -71,13 +113,14 @@ function GaojiSearchResultPageContent() {
             .replace(/不包含/g, t('notInclude'))
             .replace(/模糊/g, t('fuzzy'))
             .replace(/精确/g, t('exact'))
+            .replace(/短语/g, t('phrase'))
             .replace(/全部容器/g, t('allContainers'))
             .replace(/标题/g, t('title'))
             .replace(/学校/g, t('school'))
             .replace(/摘要/g, t('abstract'))
             .replace(/全文/g, t('fullText'))
             .replace(/关键词/g, t('keywords'));
-        
+
         // 英文到中文（反向翻译）
         translated = translated
             .replace(/\bAnd\b/g, t('and'))
@@ -85,13 +128,14 @@ function GaojiSearchResultPageContent() {
             .replace(/\bNot Include\b/g, t('notInclude'))
             .replace(/\bFuzzy\b/g, t('fuzzy'))
             .replace(/\bExact\b/g, t('exact'))
+            .replace(/\bPhrase\b/g, t('phrase'))
             .replace(/\bAll Containers\b/g, t('allContainers'))
             .replace(/\bTitle\b/g, t('title'))
             .replace(/\bSchool\b/g, t('school'))
             .replace(/\bAbstract\b/g, t('abstract'))
             .replace(/\bFull Text\b/g, t('fullText'))
             .replace(/\bKeywords\b/g, t('keywords'));
-        
+
         return translated;
     };
 
@@ -133,26 +177,36 @@ function GaojiSearchResultPageContent() {
 
     const [searchText, setSearchText] = useState(buildSearchText());
 
+    // 获取搜索结果并计算动态筛选选项
     useEffect(() => {
-        setIsLoading(true);
-        // 模拟API请求延迟
-        const timer = setTimeout(() => {
-            setSearchResults([
-                { id: 1, title: "事件题目一 题目第二行", source: "平台名", time: "2020-01-15" },
-                { id: 2, title: "事件题目二 题目第二行", source: "平台名", time: "2020-02-20" },
-                { id: 3, title: "事件题目三 题目第二行", source: "平台名", time: "2020-03-10" },
-                { id: 4, title: "事件题目四 题目第二行", source: "平台名", time: "2020-04-05" },
-                { id: 5, title: "事件题目五 题目第二行", source: "平台名", time: "2020-05-25" },
-                { id: 6, title: "事件题目六 题目第二行", source: "平台名", time: "2020-06-18" },
-                { id: 7, title: "事件题目七 题目第二行", source: "平台名", time: "2020-07-12" },
-                { id: 8, title: "事件题目八 题目第二行", source: "平台名", time: "2020-08-08" },
-                { id: 9, title: "事件题目九 题目第二行", source: "平台名", time: "2020-09-30" },
-                { id: 10, title: "事件题目十 题目第二行", source: "平台名", time: "2020-10-22" }
-            ]);
-            setIsLoading(false);
-            setSearchText(buildSearchText());
-        }, 500);
-        return () => clearTimeout(timer);
+        const fetchSearchResults = async () => {
+            setIsLoading(true);
+            try {
+                const searchParams = {
+                    searchConditions: searchConditions,
+                    startDate: startDateParam,
+                    endDate: endDateParam,
+                    types: types
+                };
+                const response = await advancedSearch(searchParams);
+                // 关键：无论接口返回什么，都转为数组（非数组则设为空数组）
+                const data = Array.isArray(response.data) ? response.data : [];
+                setSearchResults(data); // 确保存入状态的是数组
+
+                // 从结果中提取来源和年份
+                setSources(extractUniqueSources(data));
+                setYears(extractUniqueYears(data));
+            } catch (err) {
+                console.error('高级搜索接口调用失败', err);
+                setSearchResults([]); // 出错时强制设为空数组
+                setSources([]);
+                setYears([]);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchSearchResults();
     }, [searchConditions, startDateParam, endDateParam, types]);
 
     // 监听语言变化，重新构建搜索内容
@@ -167,16 +221,23 @@ function GaojiSearchResultPageContent() {
     // 动态生成主题选项（事件名频度）
     const themes = calculateEventNameFrequency(searchResults);
 
-    // 添加过滤逻辑
+    // 修改过滤逻辑，添加日期范围筛选
     const filteredResults = searchResults.filter(item => {
-        const eventName = item.title.split(' ')[0];
+        const eventName = item.title?.split(' ')[0];
         const themeOk = selectedThemes.length === 0 || selectedThemes.some(theme => {
             const themeName = theme.split('（')[0];
             return eventName === themeName;
         });
         const sourceOk = selectedSources.length === 0 || selectedSources.includes(item.source);
         const yearOk = selectedYears.length === 0 || selectedYears.includes(item.time);
-        return themeOk && sourceOk && yearOk;
+
+        // 新增：日期范围筛选逻辑
+        const itemDate = new Date(item.time);
+        const startOk = startDate ? itemDate >= new Date(startDate) : true;
+        const endOk = endDate ? itemDate <= new Date(endDate) : true;
+        const dateRangeOk = startOk && endOk;
+
+        return themeOk && sourceOk && yearOk && dateRangeOk; // 加入日期筛选条件
     });
 
     // 添加排序逻辑
@@ -226,7 +287,6 @@ function GaojiSearchResultPageContent() {
             <div className="main-content">
                 {/* 左侧筛选区域，样式与SearchResultPage一致 */}
                 <div className="filter-section">
-                    {/* 主题筛选 */}
                     <div className="filter-container">
                         <div className="filter-header" onClick={() => toggleFilter('theme')} style={{ display: 'flex', alignItems: 'center' }}>
                             <h3 style={{ margin: 0 }}>{t('eventNameFrequency')}</h3>
@@ -236,17 +296,27 @@ function GaojiSearchResultPageContent() {
                         {filterOpen.theme && (
                             <div className="filter-content" style={{ maxHeight: '200px', overflowY: 'auto' }}>
                                 {themes.map((item, idx) => (
-                                    <div className="filter-item" key={idx}>
-                                        <input type="checkbox" checked={selectedThemes.includes(item)} onChange={e => {
-                                            if (e.target.checked) setSelectedThemes([...selectedThemes, item]);
-                                            else setSelectedThemes(selectedThemes.filter(t => t !== item));
-                                        }} /> {item}
+                                    <div key={idx} className="filter-item">
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedThemes.includes(item)}
+                                                onChange={() => {
+                                                    if (selectedThemes.includes(item)) {
+                                                        setSelectedThemes(selectedThemes.filter(t => t !== item));
+                                                    } else {
+                                                        setSelectedThemes([...selectedThemes, item]);
+                                                    }
+                                                }}
+                                            />
+                                            {item}
+                                        </label>
                                     </div>
                                 ))}
                             </div>
                         )}
                     </div>
-                    {/* 来源筛选 */}
+
                     <div className="filter-container">
                         <div className="filter-header" onClick={() => toggleFilter('source')} style={{ display: 'flex', alignItems: 'center' }}>
                             <h3 style={{ margin: 0 }}>{t('source')}</h3>
@@ -254,19 +324,29 @@ function GaojiSearchResultPageContent() {
                             <span className="filter-icon">{filterOpen.source ? '▼' : '▶'}</span>
                         </div>
                         {filterOpen.source && (
-                            <div className="filter-content" style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                                {sources.map((item, idx) => (
-                                    <div className="filter-item" key={idx}>
-                                        <input type="checkbox" checked={selectedSources.includes(item)} onChange={e => {
-                                            if (e.target.checked) setSelectedSources([...selectedSources, item]);
-                                            else setSelectedSources(selectedSources.filter(s => s !== item));
-                                        }} /> {item}
+                            <div className="filter-content">
+                                {sources.map((source, idx) => (
+                                    <div key={idx} className="filter-item">
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedSources.includes(source)}
+                                                onChange={() => {
+                                                    if (selectedSources.includes(source)) {
+                                                        setSelectedSources(selectedSources.filter(s => s !== source));
+                                                    } else {
+                                                        setSelectedSources([...selectedSources, source]);
+                                                    }
+                                                }}
+                                            />
+                                            {source}
+                                        </label>
                                     </div>
                                 ))}
                             </div>
                         )}
                     </div>
-                    {/* 年份筛选 */}
+
                     <div className="filter-container">
                         <div className="filter-header" onClick={() => toggleFilter('year')} style={{ display: 'flex', alignItems: 'center' }}>
                             <h3 style={{ margin: 0 }}>{t('year')}</h3>
@@ -274,25 +354,36 @@ function GaojiSearchResultPageContent() {
                             <span className="filter-icon">{filterOpen.year ? '▼' : '▶'}</span>
                         </div>
                         {filterOpen.year && (
-                            <div className="filter-content" style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                                {years.map((item, idx) => (
-                                    <div className="filter-item" key={idx}>
-                                        <input type="checkbox" checked={selectedYears.includes(item)} onChange={e => {
-                                            if (e.target.checked) setSelectedYears([...selectedYears, item]);
-                                            else setSelectedYears(selectedYears.filter(y => y !== item));
-                                        }} /> {item}
+                            <div className="filter-content">
+                                {years.map((year, idx) => (
+                                    <div key={idx} className="filter-item">
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedYears.includes(year)}
+                                                onChange={() => {
+                                                    if (selectedYears.includes(year)) {
+                                                        setSelectedYears(selectedYears.filter(y => y !== year));
+                                                    } else {
+                                                        setSelectedYears([...selectedYears, year]);
+                                                    }
+                                                }}
+                                            />
+                                            {year}
+                                        </label>
                                     </div>
                                 ))}
                             </div>
                         )}
                     </div>
                 </div>
-                {/* 右侧结果区域 */}
+
+                {/* 右侧结果展示区域 */}
                 <div className="results-section">
                     {isLoading ? (
                         <div className="loading">{t('loading')}...</div>
                     ) : (
-                        <div>
+                        <>
                             <div className="toolbar-row">
                                 <div className="filter-toolbar">
                                     <input
@@ -322,213 +413,93 @@ function GaojiSearchResultPageContent() {
                                         onChange={e => setEndDate(e.target.value)}
                                         className="date-input"
                                     />
+                                    <button className="applyFilter" onClick={() => {
+                                        setCurrentPage(1); // 筛选后重置到第一页
+                                    }}>
+                                        {t('applyFilter')}
+                                    </button>
                                 </div>
                                 <div className="results-toolbar">
-                                    <span>{t('sort')}: </span>
-                                    <select className="sort-select" value={sortField} onChange={e => setSortField(e.target.value)}>
+                                    <span>{t('sortBy')}:</span>
+                                    <select
+                                        className="sort-select"
+                                        value={sortField}
+                                        onChange={(e) => setSortField(e.target.value)}
+                                    >
                                         <option value="relevance">{t('relevance')}</option>
-                                        <option value="date">{t('publishTime')}</option>
+                                        <option value="date">{t('date')}</option>
                                     </select>
                                     <button
                                         className="sort-order-btn"
                                         onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                                        title={sortOrder === 'asc' ? t('ascending') : t('descending')}
-                                        style={{marginLeft: '8px'}}
                                     >
                                         {sortOrder === 'asc' ? '↑' : '↓'}
                                     </button>
-                                    <span style={{marginLeft: '20px'}}>{t('display')}: </span>
+                                    <span style={{ marginLeft: '15px' }}>{t('perPage')}:</span>
                                     <select
                                         className="page-size-select"
                                         value={pageSize}
-                                        onChange={e => {
-                                            setPageSize(Number(e.target.value));
-                                            setCurrentPage(1); // 重置为第一页
-                                        }}
+                                        onChange={(e) => setPageSize(Number(e.target.value))}
                                     >
-                                        <option value="10">{t('items10')}</option>
-                                        <option value="20">{t('items20')}</option>
-                                        <option value="50">{t('items50')}</option>
+                                        <option value={10}>10</option>
+                                        <option value={20}>20</option>
+                                        <option value={50}>50</option>
                                     </select>
                                 </div>
                             </div>
+
                             <table className="results-table">
                                 <thead>
-                                    <tr>
-                                        <th></th>
-                                        <th>{t('serialNumber')}</th>
-                                        <th>{t('title')}</th>
-                                        <th>{t('source')}</th>
-                                        <th>{t('eventTime')}</th>
-                                        <th>{t('operation')}</th>
-                                    </tr>
+                                <tr>
+                                    <th>{t('select')}</th>
+                                    <th>{t('title')}</th>
+                                    <th>{t('source')}</th>
+                                    <th>{t('date')}</th>
+                                </tr>
                                 </thead>
                                 <tbody>
-                                    {sortedResults.map((result, index) => (
-                                        <tr key={result.id}>
-                                            <td>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={selectedIds.includes(result.id)}
-                                                    onChange={e => {
-                                                        if (e.target.checked) {
-                                                            setSelectedIds([...selectedIds, result.id]);
-                                                        } else {
-                                                            setSelectedIds(selectedIds.filter(id => id !== result.id));
-                                                        }
-                                                    }}
-                                                />
-                                            </td>
-                                            <td>{index + 1}</td>
-                                            <td>
-                                                <span style={{color: '#12cff6', cursor: 'pointer', display: 'inline-block'}} onClick={() => navigate(`/contentViewer?id=${result.id}`)}>
-                                                    {result.title.split(' ')[0]}<br/>{result.title.split(' ').slice(1).join(' ')}
-                                                </span>
-                                            </td>
-                                            <td>{result.source}</td>
-                                            <td>{result.time}</td>
-                                            <td>
-                                                <span title={t('read')} style={{cursor: 'pointer', fontSize: '20px', color: '#12cff6'}} onClick={() => navigate(`/contentViewer?id=${result.id}`)}>
-                                                    📖
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                {sortedResults.slice((currentPage - 1) * pageSize, currentPage * pageSize).map((item) => (
+                                    <tr key={item.id}>
+                                        <td>
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedIds.includes(item.id)}
+                                                onChange={() => {
+                                                    if (selectedIds.includes(item.id)) {
+                                                        setSelectedIds(selectedIds.filter(id => id !== item.id));
+                                                    } else {
+                                                        setSelectedIds([...selectedIds, item.id]);
+                                                    }
+                                                }}
+                                            />
+                                        </td>
+                                        <td>{item.title}</td>
+                                        <td>{item.source}</td>
+                                        <td>{item.time}</td>
+                                    </tr>
+                                ))}
                                 </tbody>
                             </table>
-                            {/* 分页区 */}
+
                             <div className="pagination">
-                                <div style={{ marginTop: 5 }}>
-                                    <label><input type="checkbox" checked={useLoadMore} onChange={e => { setUseLoadMore(e.target.checked); setCurrentPage(1); }} /> {t('useLoadMore')}</label>
-                                </div>
-                                {useLoadMore ? (
-                                    <div style={{ textAlign: 'center', marginTop: 5 }}>
-                                        {currentPage * pageSize < sortedResults.length ? (
-                                            <button onClick={() => setCurrentPage(currentPage + 1)}>{t('loadMore')}</button>
-                                        ) : (<span style={{marginLeft: 5}}>{t('loadedAll')}</span>)}
-                                    </div>
-                                ) : (
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
-                                        <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>{t('previousPage')}</button>
-                                        {generatePagination().map((p, i) => p === '...' ? <span key={i}>...</span> : <button key={p} className={currentPage === p ? 'active' : ''} onClick={() => setCurrentPage(p)}>{p}</button>)}
-                                        <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages}>{t('nextPage')}</button>
-                                        <span style={{ marginLeft: 12 }}>{t('jumpTo')}：<input type="number" min={1} max={totalPages} value={currentPage} onChange={(e) => setCurrentPage(Math.min(totalPages, Math.max(1, Number(e.target.value))))} style={{ width: 50, marginLeft: 4 }} /> / {totalPages}</span>
-                                    </div>
-                                )}
+                                {generatePagination().map((page, index) => (
+                                    <button
+                                        key={index}
+                                        className={page === currentPage ? 'active' : ''}
+                                        onClick={() => page !== '...' && setCurrentPage(page)}
+                                        disabled={page === '...'}
+                                    >
+                                        {page}
+                                    </button>
+                                ))}
                             </div>
-                        </div>
+                        </>
                     )}
                 </div>
             </div>
-
-            {/* 柱状图弹窗 */}
-            {showChart && (
-                <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowChart(false)}>
-                    <div style={{ background: '#fff', padding: 24, borderRadius: 8, minWidth: 400, minHeight: 300 }} onClick={e => e.stopPropagation()}>
-                        <h4 style={{textAlign:'center'}}>{t('eventNameFrequencyChart')} {selectedThemes.length > 0 ? `(${t('selectedEvents')}${selectedThemes.length}${t('events')})` : ''}</h4>
-                        {/* 简单SVG柱状图 */}
-                        <svg width="700" height="220">
-                            {(selectedThemes.length > 0 ? selectedThemes : themes).map((item, idx) => {
-                                // 提取事件名和频度
-                                const eventName = item.split('（')[0];
-                                const freq = parseInt(item.match(/（(\d+)）/)[1]);
-                                const barWidth = 40;
-                                const barSpacing = 60;
-                                const startX = 80;
-                                const x = startX + idx * (barWidth + barSpacing);
-                                return (
-                                    <g key={item}>
-                                        <rect x={x} y={180-freq*20} width={barWidth} height={freq*20} fill="#1890ff" />
-                                        <text x={x + barWidth/2} y={205} textAnchor="middle" fontSize="12">{eventName}</text>
-                                        <text x={x + barWidth/2} y={180-freq*20-5} textAnchor="middle" fontSize="12">{freq}</text>
-                                    </g>
-                                );
-                            })}
-                            {/* 坐标轴 */}
-                            <line x1="30" y1="0" x2="30" y2="180" stroke="#333" />
-                            <line x1="30" y1="180" x2="690" y2="180" stroke="#333" />
-                            <text x="0" y="10" fontSize="12">{t('frequency')}</text>
-                            <text x="620" y="210" fontSize="12">{t('eventName')}</text>
-                        </svg>
-                        <div style={{textAlign:'center',marginTop:8}}><button className="chart-close" onClick={()=>setShowChart(false)}>{t('close')}</button></div>
-                    </div>
-                </div>
-            )}
-
-            {showSourceChart && (
-                <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowSourceChart(false)}>
-                    <div style={{ background: '#fff', padding: 24, borderRadius: 8, minWidth: 400, minHeight: 300 }} onClick={e => e.stopPropagation()}>
-                        <h4 style={{textAlign:'center'}}>{t('sourceEventCountChart')}</h4>
-                        <svg width="700" height="220">
-                            {sources.map((item, idx) => {
-                                const count = filteredResults.filter(r => r.source === item).length;
-                                const barWidth = 40;
-                                const barSpacing = 60;
-                                const startX = 80;
-                                const x = startX + idx * (barWidth + barSpacing);
-                                return (
-                                    <g key={item}>
-                                        <rect x={x} y={180-count*20} width={barWidth} height={count*20} fill="#52c41a" />
-                                        <text x={x + barWidth/2} y={205} textAnchor="middle" fontSize="12">{item}</text>
-                                        <text x={x + barWidth/2} y={180-count*20-5} textAnchor="middle" fontSize="12">{count}</text>
-                                    </g>
-                                );
-                            })}
-                            <line x1="40" y1="0" x2="40" y2="180" stroke="#333" />
-                            <line x1="40" y1="180" x2="690" y2="180" stroke="#333" />
-                            <text x="0" y="10" fontSize="12">{t('eventCount')}</text>
-                            <text x="620" y="210" fontSize="12">{t('source')}</text>
-                        </svg>
-                        <div style={{textAlign:'center',marginTop:8}}><button className="chart-close" onClick={()=>setShowSourceChart(false)}>{t('close')}</button></div>
-                    </div>
-                </div>
-            )}
-
-            {showYearChart && (
-                <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowYearChart(false)}>
-                    <div style={{ background: '#fff', padding: 24, borderRadius: 8, minWidth: 740, minHeight: 300 }} onClick={e => e.stopPropagation()}>
-                        <h4 style={{textAlign:'center'}}>{t('yearEventCountChart')}</h4>
-                        <svg width="700" height="220">
-                            {years.map((item, idx) => {
-                                const count = filteredResults.filter(r => r.time === item).length;
-                                const barWidth = 40;
-                                const barSpacing = 16;
-                                const startX = 50;
-                                const x = startX + idx * (barWidth + barSpacing);
-                                return (
-                                    <g key={item}>
-                                        <rect x={x} y={180-count*20} width={barWidth} height={count*20} fill="#faad14" />
-                                        <text x={x + barWidth/2} y={205} textAnchor="middle" fontSize="9">{item.split('-')[0]}</text>
-                                        <text x={x + barWidth/2} y={215} textAnchor="middle" fontSize="9">{item.split('-')[1] + '-' + item.split('-')[2]}</text>
-                                        <text x={x + barWidth/2} y={180-count*20-5} textAnchor="middle" fontSize="12">{count}</text>
-                                    </g>
-                                );
-                            })}
-                            <line x1="40" y1="0" x2="40" y2="180" stroke="#333" />
-                            <line x1="40" y1="180" x2="690" y2="180" stroke="#333" />
-                            <text x="0" y="10" fontSize="12">{t('eventCount')}</text>
-                            <text x="620" y="210" fontSize="12">{t('year')}</text>
-                        </svg>
-                        <div style={{textAlign:'center',marginTop:8}}><button className="chart-close" onClick={()=>setShowYearChart(false)}>{t('close')}</button></div>
-                    </div>
-                </div>
-            )}
+            <Footer />
         </div>
     );
 }
 
-function GaojiSearchResultPage() {
-    return (
-        <div>
-            <>
-                <Helmet>
-                    <title>高级搜索结果</title>
-                </Helmet>
-                <GaojiSearchResultPageContent />
-                <Footer />
-            </>
-        </div>
-    );
-}
-
-export default GaojiSearchResultPage;
+export default GaojiSearchResultPageContent;

@@ -5,13 +5,12 @@ import axios from 'axios';
 import './header.css';
 import { useTranslation } from 'react-i18next';
 import Cookies from 'js-cookie';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-    faGlobe,
-    faChevronDown,
-    faChevronUp,
-    faExclamationCircle // 引入警告图标
-} from '@fortawesome/free-solid-svg-icons';
+    ExclamationCircleOutlined,  // 新增Ant图标
+    GlobalOutlined,             // Ant的地球图标
+    DownOutlined,               // Ant的下拉图标
+    UpOutlined                  // Ant的上拉图标
+} from '@ant-design/icons';
 
 function Header() {
     const navigate = useNavigate();
@@ -108,18 +107,12 @@ function Header() {
 
                     {/* 语言切换下拉框 */}
                     <div className="language-switcher" ref={dropdownRef}>
-                        <div
-                            className="language-trigger"
-                            onClick={() => setIsOpen(!isOpen)}
-                        >
-                            <FontAwesomeIcon icon={faGlobe} className="language-icon" />
+                        <div className="language-trigger" onClick={() => setIsOpen(!isOpen)}>
+                            <GlobalOutlined className="language-icon" />
                             <span className="current-language">
                                 {languageOptions.find(option => option.code === i18n.language)?.name || i18n.language}
                             </span>
-                            <FontAwesomeIcon
-                                icon={isOpen ? faChevronUp : faChevronDown}
-                                className="dropdown-icon"
-                            />
+                            {isOpen ? <UpOutlined className="dropdown-icon" /> : <DownOutlined className="dropdown-icon" />}
                         </div>
 
                         {isOpen && (
@@ -161,10 +154,7 @@ function Header() {
                     {/* 弹窗内容 */}
                     <div className="logout-modal" ref={modalRef}>
                         <div className="modal-header">
-                            <FontAwesomeIcon
-                                icon={faExclamationCircle}
-                                className="warning-icon"
-                            />
+                            <ExclamationCircleOutlined className="warning-icon" />
                             <h3>{t('confirmLogout')}</h3>
                         </div>
                         <div className="modal-body">

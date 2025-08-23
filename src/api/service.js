@@ -8,7 +8,6 @@ const apiService = axios.create({
   baseURL: API_BASE_URL
 })
 
-
 /**
  * 异步上传Word文档
  * @param {FormData} formData 只需包含 file 字段
@@ -19,6 +18,21 @@ export const uploadDocumentAsync = (formData) => {
     headers: {
       'Content-Type': 'multipart/form-data'
     }
+  });
+};
+
+/**
+ * 高级搜索接口
+ * @param {Object} params 搜索参数
+ * @param {string} params.searchConditions 组合搜索条件
+ * @param {string} [params.startDate] 开始日期
+ * @param {string} [params.endDate] 结束日期
+ * @param {string} [params.types] 搜索类型（多个用/分隔）
+ * @returns {Promise}
+ */
+export const advancedSearch = (params) => {
+  return apiService.post('/api/v1/search/advanced', {
+    params: params  // 自动拼接为URL查询参数
   });
 };
 

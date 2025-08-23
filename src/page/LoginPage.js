@@ -1,27 +1,25 @@
-import React, { useEffect, useState } from'react';
-import { Button, Input, Form, Col, Row, Alert } from 'antd';
-import { Helmet } from'react-helmet';
+// src/page/LoginPage.js
+import React, { useEffect, useState, useRef } from 'react';
+import { Helmet } from 'react-helmet';
 import {
     UserOutlined,
     LockOutlined,
     EyeInvisibleOutlined,
-    EyeTwoTone
+    EyeTwoTone,
+    ExclamationCircleOutlined
 } from '@ant-design/icons';
 import './LoginPage.css';
-import loginBackground from '../image/bg1.jpg';
-import smallBackground from '../image/bg2.jpg';
-import { useNavigate } from'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import Cookies from "js-cookie";
 
-// 模拟验证码接口的 mock 函数
-// 该函数返回一个Promise对象，使用setTimeout模拟网络延迟500毫秒后
-// 成功返回包含验证码图片URL和验证码文本的对象
+// 模拟验证码接口
 const mockFetchCaptcha = () => {
     return new Promise((resolve) => {
         setTimeout(() => {
             resolve({
                 data: {
-                    image: 'https://via.placeholder.com/150x50?text=ABCD', // 只是模拟图
+                    image: 'https://via.placeholder.com/150x50?text=ABCD',
                     code: 'ABCD'
                 }
             });
@@ -29,21 +27,82 @@ const mockFetchCaptcha = () => {
     });
 };
 
+const mockLoginApi = (formData) => {
+    return new Promise((resolve, reject) => {
+        // 设置超时时间
+        const timeout = 5000;
+        const timer = setTimeout(() => {
+            reject(new Error('Network Error'));
+        }, timeout);
+
+        // 原有验证逻辑保留
+        setTimeout(() => {
+            clearTimeout(timer); // 清除超时定时器
+            if (formData.username !== 'admin') {
+                reject({
+                    response: {
+                        data: {
+                            code: 'USERNAME_PASSWORD_ERROR',
+                            msg: '用户名不存在'
+                        }
+                    }
+                });
+            } else if (formData.password !== '123456') {
+                reject({
+                    response: {
+                        data: {
+                            code: 'USERNAME_PASSWORD_ERROR',
+                            msg: '密码错误'
+                        }
+                    }
+                });
+            } else if (formData.code.toUpperCase() !== 'ABCD') {
+                reject({
+                    response: {
+                        data: {
+                            code: 'CAPTCHA_ERROR',
+                            msg: '验证码不正确'
+                        }
+                    }
+                });
+            } else {
+                resolve({ token: 'mock-token' });
+            }
+        }, 800);
+    });
+};
+
 const LoginPage = () => {
     const { t, i18n } = useTranslation();
-    const [form] = Form.useForm();
-    // 用于存储从后端获取的验证码文本
-    const [backendCaptcha, setBackendCaptcha] = useState('');
-    // 用于存储验证码图片的URL
-    const [captchaImage, setCaptchaImage] = useState('');
-    const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    // 获取验证码（使用 mock）
-    // 这是一个异步函数，用于从模拟后端获取验证码
-    // 尝试调用mockFetchCaptcha函数获取验证码响应
-    // 如果获取成功，将响应中的验证码图片URL和验证码文本分别设置到captchaImage和backendCaptcha状态中
-    // 如果获取过程中出现错误，在控制台打印错误信息
+    // 表单状态管理
+    const [formData, setFormData] = useState({
+        username: '',
+        password: '',
+        code: '',
+        showPassword: false
+    });
+
+    // 错误信息管理
+    const [errors, setErrors] = useState({
+        username: '',
+        password: '',
+        code: '',
+        general: ''
+    });
+
+    // 验证码相关状态
+    const [backendCaptcha, setBackendCaptcha] = useState('');
+    const [captchaImage, setCaptchaImage] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
+    // 错误弹窗状态
+    const [showErrorModal, setShowErrorModal] = useState(false);
+    const [errorModalMessage, setErrorModalMessage] = useState('');
+    const errorModalRef = useRef(null);
+
+    // 获取验证码
     const fetchCaptchaFromBackend = async () => {
         try {
             const response = await mockFetchCaptcha();
@@ -51,40 +110,127 @@ const LoginPage = () => {
             setBackendCaptcha(response.data.code);
         } catch (error) {
             console.error(t('fetchCaptchaFailed'), error);
+            setErrorModalMessage(t('fetchCaptchaFailed'));
+            setShowErrorModal(true);
         }
     };
 
-    // 组件挂载时执行的副作用函数
-    // 第二个参数是一个空数组，表示该副作用只在组件挂载时执行一次
-    // 组件挂载时调用fetchCaptchaFromBackend函数获取验证码
+    // 组件挂载时获取验证码
     useEffect(() => {
         fetchCaptchaFromBackend();
     }, []);
 
-    const onFinish = async (values) => {
-        try {
-            // 检查用户输入的用户名、密码和验证码是否正确
-            // 用户名和密码固定为admin和123456
-            // 验证码需要与后端获取的backendCaptcha匹配（不区分大小写）
-            if (
-                values.username === 'admin' &&
-                values.password === '123456' &&
-                values.code.toUpperCase() === backendCaptcha.toUpperCase()
-            ) {
-                sessionStorage.setItem('username', values.username);
-                sessionStorage.setItem('token','mock-token');
-                navigate('/main');
-            } else {
-                // 如果验证失败，设置错误信息
-                setError(t('errorMessage'));
-                // 刷新验证码，调用fetchCaptchaFromBackend函数获取新的验证码
-                fetchCaptchaFromBackend();
-                // 清空验证码输入框，将验证码输入框的值重置为空
-                form.resetFields(['code']);
+    // 点击外部关闭弹窗
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (showErrorModal && errorModalRef.current && !errorModalRef.current.contains(event.target)) {
+                setShowErrorModal(false);
             }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showErrorModal]);
+
+    // 输入框变化处理
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+
+        // 清除对应字段的错误信息
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: '' }));
+        }
+    };
+
+    // 密码显示切换
+    const togglePasswordVisibility = () => {
+        setFormData(prev => ({ ...prev, showPassword: !prev.showPassword }));
+    };
+
+    // 表单验证
+    const validateForm = () => {
+        const newErrors = {
+            username: '',
+            password: '',
+            code: '',
+            general: ''
+        };
+        let isValid = true;
+
+        if (!formData.username.trim()) {
+            newErrors.username = t('inputUsername');
+            isValid = false;
+        }
+
+        if (!formData.password) {
+            newErrors.password = t('inputPassword');
+            isValid = false;
+        }
+
+        if (!formData.code.trim()) {
+            newErrors.code = t('inputCaptcha');
+            isValid = false;
+        }
+
+        setErrors(newErrors);
+        return isValid;
+    };
+
+    // 表单提交处理
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setErrors(prev => ({ ...prev, general: '' }));
+
+        if (!validateForm()) {
+            return;
+        }
+
+        try {
+            setIsLoading(true);
+            // 调用登录接口
+            const response = await mockLoginApi(formData);
+
+            // 登录成功逻辑
+            sessionStorage.setItem('username', formData.username);
+            sessionStorage.setItem('token', response.token);
+            navigate('/main');
+
         } catch (error) {
             console.error(t('loginFailed'), error);
-            setError(t('loginRequestFailed'));
+            let errorMsg = '';
+
+            if (error.response) {
+                // 后端返回的错误
+                const errorCode = error.response.data.code;
+                const errorMessage = error.response.data.msg;
+
+                switch(errorCode) {
+                    case 'USERNAME_PASSWORD_ERROR':
+                        errorMsg = t('usernameOrPasswordError') || errorMessage;
+                        break;
+                    case 'CAPTCHA_ERROR':
+                        errorMsg = t('captchaError') || errorMessage;
+                        break;
+                    default:
+                        // 未知错误直接显示后端返回的信息
+                        errorMsg = errorMessage || t('unknownError');
+                }
+            } else {
+                // 网络错误等非后端返回的错误
+                errorMsg = t('networkError');
+            }
+
+            // 显示错误弹窗
+            setErrorModalMessage(errorMsg);
+            setShowErrorModal(true);
+
+            // 刷新验证码
+            fetchCaptchaFromBackend();
+            setFormData(prev => ({ ...prev, code: '' }));
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -92,6 +238,7 @@ const LoginPage = () => {
         i18n.changeLanguage(lng)
             .then(() => {
                 console.log(`Language changed to ${lng}`);
+                Cookies.set('i18next', lng);
             })
             .catch((error) => {
                 console.error('Error changing language:', error);
@@ -99,121 +246,131 @@ const LoginPage = () => {
     };
 
     return (
-        <>
+        <div className="login-page">
             <Helmet>
                 <title>{t('loginPageTitle')}</title>
             </Helmet>
 
-            <div className="App-container">
-                {/* 语言切换按钮 */}
-                <div className="language-switcher" style={{ position: 'absolute', top: 20, right: 20, zIndex: 100 }}>
-                    <span onClick={() => changeLanguage('en')}>EN</span>
-                    <span onClick={() => changeLanguage('zh')}>中文</span>
-                </div>
+            {/* 语言切换按钮 */}
+            <div className="language-switcher" style={{ position: 'absolute', top: 20, right: 20, zIndex: 100 }}>
+                <span onClick={() => changeLanguage('en')} className={i18n.language === 'en' ? 'active' : ''}>EN</span>
+                <span onClick={() => changeLanguage('zh')} className={i18n.language === 'zh' ? 'active' : ''}>中文</span>
+            </div>
 
-                {/* 背景图层 */}
-                <div className="left-content-container">
-                    <div className="auth_bg">
-                        <img
-                            id="bannerbox"
-                            src={loginBackground}
-                            alt=""
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        />
-                        <div
-                            style={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '30%',
-                                transform: 'translate(-50%, -50%)'
-                            }}
-                        >
-                            <img src={smallBackground} alt="" style={{ width: '700px' }} />
-                        </div>
-                    </div>
-                </div>
+            {/* 登录主体容器 */}
+            <div className="content-container">
+                <div className="login-card">
+                    <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>
+                        {t('loginSystemName')}
+                    </h2>
 
-                {/* 登录主体容器 */}
-                <div
-                    className="right-content-container"
-                >
-                    <div className="auth-login-div">
-                        <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>
-                            {t('loginSystemName')}
-                        </h2>
-                        <Form
-                            name="normal_login"
-                            form={form}
-                            className="login-form"
-                            initialValues={{ remember: true }}
-                            onFinish={onFinish}
-                            scrollToFirstError
-                        >
-                            <Form.Item
-                                name="username"
-                                rules={[{ required: true, message: t('inputUsername') }]}
-                            >
-                                <Input
-                                    prefix={<UserOutlined className="auth_icon auth_icon_user" />}
+                    <form onSubmit={handleSubmit} className="login-form">
+                        {/* 用户名输入 */}
+                        <div className="form-item">
+                            <div className="input-wrapper">
+                                <UserOutlined className="auth_icon auth_icon_user" />
+                                <input
+                                    type="text"
+                                    name="username"
+                                    value={formData.username}
+                                    onChange={handleInputChange}
                                     placeholder={t('inputUsername')}
-                                    className="auth_input"
+                                    className={`auth_input ${errors.username ? 'error' : ''}`}
                                 />
-                            </Form.Item>
+                            </div>
+                            {errors.username && <span className="error-message">{errors.username}</span>}
+                        </div>
 
-                            <Form.Item
-                                name="password"
-                                rules={[{ required: true, message: t('inputPassword') }]}
-                            >
-                                <Input.Password
-                                    prefix={<LockOutlined className="auth_icon auth_icon_pwd" />}
+                        {/* 密码输入 */}
+                        <div className="form-item">
+                            <div className="input-wrapper">
+                                <LockOutlined className="auth_icon auth_icon_pwd" />
+                                <input
+                                    type={formData.showPassword ? 'text' : 'password'}
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleInputChange}
                                     placeholder={t('inputPassword')}
-                                    className="auth_input"
-                                    iconRender={(visible) =>
-                                        visible? <EyeTwoTone /> : <EyeInvisibleOutlined />
-                                    }
+                                    className={`auth_input ${errors.password ? 'error' : ''}`}
                                 />
-                            </Form.Item>
-
-                            <Form.Item
-                                name="code"
-                                rules={[{ required: true, message: t('inputCaptcha') }]}
-                            >
-                                <Row gutter={8}>
-                                    <Col span={12}>
-                                        {/* 显示验证码图片，点击图片可调用fetchCaptchaFromBackend函数刷新验证码 */}
-                                        <img
-                                            src={captchaImage}
-                                            alt={t('inputCaptcha')}
-                                            style={{ height: '50px', cursor: 'pointer' }}
-                                            onClick={fetchCaptchaFromBackend}
-                                        />
-                                    </Col>
-                                    <Col span={12}>
-                                        {/* 用于用户输入验证码的输入框 */}
-                                        <Input
-                                            placeholder={t('inputCaptcha')}
-                                            className="auth_input"
-                                        />
-                                    </Col>
-                                </Row>
-                            </Form.Item>
-
-                            <Form.Item>
-                                <Button
-                                    type="primary"
-                                    htmlType="submit"
-                                    className="auth_btn"
+                                <button
+                                    type="button"
+                                    className="password-toggle"
+                                    onClick={togglePasswordVisibility}
                                 >
-                                    {t('loginButton')}
-                                </Button>
-                            </Form.Item>
+                                    {formData.showPassword ? <EyeTwoTone /> : <EyeInvisibleOutlined />}
+                                </button>
+                            </div>
+                            {errors.password && <span className="error-message">{errors.password}</span>}
+                        </div>
 
-                            {error && <Alert type="error" className="mt-4" message={error} />}
-                        </Form>
-                    </div>
+                        {/* 验证码输入 */}
+                        <div className="form-item">
+                            <div className="captcha-container">
+                                <img
+                                    src={captchaImage}
+                                    alt={t('inputCaptcha')}
+                                    style={{ height: '50px', cursor: 'pointer' }}
+                                    onClick={fetchCaptchaFromBackend}
+                                />
+                                <input
+                                    type="text"
+                                    name="code"
+                                    value={formData.code}
+                                    onChange={handleInputChange}
+                                    placeholder={t('inputCaptcha')}
+                                    className={`auth_input captcha-input ${errors.code ? 'error' : ''}`}
+                                />
+                            </div>
+                            {errors.code && <span className="error-message">{errors.code}</span>}
+                        </div>
+
+                        {/* 提交按钮 */}
+                        <div className="form-item">
+                            <button
+                                type="submit"
+                                className="auth_btn"
+                                disabled={isLoading}
+                            >
+                                {isLoading ? t('loggingIn') : t('loginButton')}
+                            </button>
+                        </div>
+
+                        {/* 注册链接 */}
+                        <div style={{ marginTop: 16, textAlign: 'center' }} className="register-link">
+                            {t('noAccount')} <a href="/register" >{t('registerNow')}</a>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </>
+
+            {/* 错误弹窗 */}
+            {showErrorModal && (
+                <>
+                    {/* 背景遮罩 */}
+                    <div className="modal-overlay" onClick={() => setShowErrorModal(false)}></div>
+
+                    {/* 错误弹窗内容 */}
+                    <div className="error-modal" ref={errorModalRef}>
+                        <div className="modal-header">
+                            <ExclamationCircleOutlined className="warning-icon" />
+                            <h3>{t('errorTitle')}</h3>
+                        </div>
+                        <div className="modal-body">
+                            <p>{errorModalMessage}</p>
+                        </div>
+                        <div className="modal-footer">
+                            <button
+                                className="modal-btn confirm-btn"
+                                onClick={() => setShowErrorModal(false)}
+                            >
+                                {t('confirm')}
+                            </button>
+                        </div>
+                    </div>
+                </>
+            )}
+        </div>
     );
 };
 

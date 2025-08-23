@@ -1,0 +1,233 @@
+/* 注册页面整体样式 */
+.register-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    /* 语言切换器 */
+    .language-switcher {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        gap: 15px;
+    }
+
+    .language-switcher span {
+        width: 60px;
+        text-align: center;
+        color: #333;
+        cursor: pointer;
+        font-weight: 500;
+        padding: 5px 10px;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+    }
+
+    .language-switcher span:hover {
+        background-color: rgba(255, 255, 255, 0.8);
+    }
+
+    .language-switcher span.active {
+        background-color: white;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* 注册容器 */
+.register-container {
+    width: 100%;
+    max-width: 450px;
+}
+
+/* 注册卡片 */
+.register-card {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 40px 30px;
+    transition: transform 0.3s ease;
+}
+
+.register-card:hover {
+    transform: translateY(-5px);
+}
+
+/* 标题样式 */
+.register-title {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 30px;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+/* 表单样式 */
+.register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* 表单组样式 */
+.form-group {
+    position: relative;
+}
+
+/* 输入框样式 */
+.form-group input {
+    width: 100%;
+    padding: 14px 14px 14px 50px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+.form-group input.invalid {
+    border-color: #e74c3c;
+}
+
+/* 输入框图标 */
+.input-icon {
+    position: absolute;
+    top: 10px;
+    left: 15px;
+    color: #999;
+    font-size: 18px;
+}
+
+
+/* 密码切换按钮 */
+.toggle-password {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    font-size: 18px;
+    transition: color 0.3s ease;
+}
+
+.toggle-password:hover {
+    color: #333;
+}
+
+/* 复选框组 */
+.checkbox-group {
+    margin-top: 10px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    cursor: pointer;
+}
+
+.checkbox-label input {
+    margin-top: 3px;
+    margin-right: 10px;
+    width: auto;
+    padding: 0;
+}
+
+.checkbox-text {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.5;
+}
+
+.checkbox-text a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.checkbox-text a:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    display: block;
+    margin-top: 4px;
+    color: #f5222d;
+    font-size: 12px;
+}
+
+/* 提示框 */
+.error-alert {
+    background-color: #fef0f0;
+    border-left: 4px solid #e74c3c;
+    color: #e74c3c;
+    padding: 12px 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.success-alert {
+    background-color: #f0f9ed;
+    border-left: 4px solid #52c41a;
+    color: #52c41a;
+    padding: 12px 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+/* 注册按钮 */
+.register-button {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.register-button:hover {
+    background: linear-gradient(135deg, #2980b9 0%, #3498db 100%);
+    transform: translateY(-2px);
+}
+
+.register-button:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* 登录链接 */
+.login-link {
+    text-align: center;
+    margin-top: 25px;
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+.login-link a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}
