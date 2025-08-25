@@ -122,61 +122,82 @@ function GaojiSearchComponent() {
         setEndDate(e.target.value);
     };
 
+    const mapContainerToField = (container) => {
+        switch (container) {
+            case t('title'): return "title";
+            case t('school'): return "school";
+            case t('abstract'): return "abstract";
+            case t('fullText'): return "fullText";
+            case t('keywords'): return "keywords";
+            default: return "all";
+        }
+    };
+
+    const mapOperator = (op) => {
+        if ([t('and'), "And", "and"].includes(op)) return "AND";
+        if ([t('or'), "Or", "or"].includes(op)) return "OR";
+        if ([t('notInclude'), "Not Include"].includes(op)) return "NOT";
+        return "AND";
+    };
+
+    const mapRelation = (rel) => mapOperator(rel); // rowOperator 和 innerOperator 转换规则一样
+    const mapFuzzy = (fuzzy) => {
+        if ([t('fuzzy'), "Fuzzy", "fuzzy"].includes(fuzzy)) return "fuzzy";
+        if ([t('exact'), "Exact", "exact"].includes(fuzzy)) return "exact";
+        if ([t('phrase'), "Phrase", "phrase"].includes(fuzzy)) return "phrase";
+        return "fuzzy";
+    };
 
     // 处理搜索按钮点击事件的函数
     const handleSearch = () => {
         // 构建多行搜索条件
-        const searchConditions = [];
-        searchRows.forEach((row, index) => {
-            const k1 = row.keyword1?.trim();
-            const k2 = row.keyword2?.trim();
-            const operator = row.operator || '';
-            const fuzzy = row.fuzzy || '';
-            const relation = row.relation || '';
-            const container = row.container || '';
+        const conditions = searchRows.map((row, index) => {
+            const k1 = row.keyword1?.trim() || "";
+            const k2 = row.keyword2?.trim() || "";
+            const container = row.container || "";
+            const operator = row.operator || "";
+            const fuzzy = row.fuzzy || "";
+            const relation = row.relation || "";
 
-            if (k1 || k2) {
-                let condition = '';
-                if (k1 && k2) {
-                    condition = `${k1} ${operator} ${k2}`;
-                } else if (k1) {
-                    condition = k1;
-                }
+            // 构建单行条件对象
+            const condition = {
+                field: mapContainerToField(container),      // 转换容器到后端字段
+                keyword1: k1,
+                innerOperator: mapOperator(operator),       // 转换前端操作符到后端 innerOperator
+                keyword2: k2
+            };
 
-                if (container && container !== t('allContainers')) {
-                    condition = `[${container}] ${condition}`;
-                }
-
-                if (fuzzy) {
-                    condition += ` (${fuzzy})`;
-                }
-
-                if (index > 0 && relation) {
-                    condition = `${relation} ${condition}`;
-                }
-
-                searchConditions.push(condition);
+            // 如果不是第一行，添加 rowOperator
+            if (index > 0) {
+                condition.rowOperator = mapRelation(relation);
             }
+
+            return condition;
         });
 
-        // 构建URL参数
-        const params = new URLSearchParams();
+        // 构建完整的请求参数
+        const searchParams = {
+            conditions: conditions,
+            currentPage: 1,
+            pageSize: 10,
+            sortField: "_score",
+            sortOrder: "desc"
+        };
 
-        // 添加搜索条件
-        if (searchConditions.length > 0) {
-            params.set('searchConditions', searchConditions.join(' | '));
+        // 添加日期参数（如果有的话）
+        if (startDate) {
+            searchParams.startDate = startDate;
+        }
+        if (endDate) {
+            searchParams.endDate = endDate;
         }
 
-        // 添加日期参数
-        if (startDate) params.set('startDate', startDate);
-        if (endDate) params.set('endDate', endDate);
+        // 将搜索参数编码为URL参数
+        const urlParams = new URLSearchParams();
+        urlParams.set('searchData', JSON.stringify(searchParams));
 
-        // 添加类型参数
-        if (searchTypes.length > 0) {
-            params.set('types', searchTypes.join('/'));
-        }
-
-        const url = `/gaojiSearchResult?${params.toString()}`;
+        // 跳转到结果页面
+        const url = `/gaojiSearchResult?${urlParams.toString()}`;
         navigate(url);
     };
 

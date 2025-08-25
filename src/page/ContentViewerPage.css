@@ -21,11 +21,16 @@ body {
 .navigation {
     background-color: #f0f0f0;
     border-bottom: 1px solid #ddd;
-    position: sticky; /* 添加 sticky 定位 */
-    top: 60px; /* 从 Header 的下方开始 */
+    position: sticky;
+    /* 添加 sticky 定位 */
+    top: 95px;
+    /* 增加top值，从 Header 的下方开始 */
     left: 0;
     width: 100%;
-    z-index: 100; /* 确保在其他元素之上 */
+    z-index: 100;
+    /* 增加z-index值，确保在header之上 */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    /* 添加阴影效果 */
 }
 
 .nav-container {
@@ -33,6 +38,29 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 0 15px;
+}
+
+/* 文章标题显示区域 */
+.article-title-nav {
+    flex: 1;
+    margin: 0 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.article-title-text {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    text-align: center;
+    max-width: 1600px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 8px 16px;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .nav-tabs {
@@ -64,6 +92,17 @@ body {
 
 .toolbar {
     display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.zoom-info {
+    padding: 6px 12px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #666;
+    margin-right: 5px;
 }
 
 .tool-btn {
@@ -91,7 +130,8 @@ body {
 .content-wrapper {
     display: flex;
     flex: 1;
-    margin-top: 0; /* 留出导航栏的空间 */
+    margin-top: 0;
+    /* 留出导航栏的空间 */
 }
 
 /* 侧边栏样式，固定在左侧 */
@@ -102,10 +142,12 @@ body {
     overflow-y: auto;
     padding: 15px 0;
     position: sticky;
-    top: 110px; /* 设置合适的 top 值，确保侧边栏在导航栏下方固定 */
+    top: 125px;
+    /* 调整top值，确保侧边栏在导航栏下方固定 */
     left: 0;
     bottom: 0;
-    z-index: 90; /* 确保在其他元素之上，但在导航栏之下 */
+    z-index: 90;
+    /* 确保在其他元素之上，但在导航栏之下 */
 }
 
 .toc {
@@ -160,19 +202,149 @@ body {
 /* 主内容区样式 */
 .main-content {
     flex: 1;
-    overflow: hidden;
+    overflow: auto;
+    /* 改为auto以支持缩放后的滚动 */
     padding: 20px 20px;
 }
 
 .event-article {
     flex: 1;
-    overflow-y: auto;
     max-width: 1200px;
-    z-index: 1; /* 设置较低的 z-index，确保在导航栏和侧边栏之后 */
+    z-index: 1;
+    /* 设置较低的 z-index，确保在导航栏和侧边栏之后 */
+    transition: transform 0.2s ease-in-out;
+    /* 添加缩放动画 */
 }
 
 .loading {
     text-align: center;
     font-size: 1.5em;
     color: #666;
+}
+
+/* 错误消息样式 */
+.error-message {
+    text-align: center;
+    padding: 40px;
+    color: #d32f2f;
+}
+
+.error-message h2 {
+    margin-bottom: 16px;
+    color: #d32f2f;
+}
+
+.error-message p {
+    margin-bottom: 20px;
+    font-size: 16px;
+    color: #666;
+}
+
+.error-message button {
+    padding: 10px 20px;
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.error-message button:hover {
+    background-color: #1565c0;
+}
+
+/* 文章内容样式 */
+.article-content {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+/* 继承原有HTML中的样式，同时添加一些基本样式 */
+.article-content h1 {
+    color: #333;
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
+    margin: 20px 0 15px 0;
+    font-size: 1.8em;
+}
+
+.article-content h2 {
+    color: #555;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 5px;
+    margin: 15px 0 10px 0;
+    font-size: 1.4em;
+}
+
+.article-content h3 {
+    color: #777;
+    margin: 12px 0 8px 0;
+    font-size: 1.2em;
+}
+
+.article-content p {
+    margin: 10px 0;
+    text-align: justify;
+    line-height: 1.6;
+}
+
+.article-content table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 15px 0;
+    font-size: 14px;
+}
+
+.article-content th,
+.article-content td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.article-content th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.article-content .center {
+    text-align: center;
+}
+
+.article-content .bold {
+    font-weight: bold;
+}
+
+.article-content .italic {
+    font-style: italic;
+}
+
+.article-content strong {
+    font-weight: bold;
+    color: #d32f2f;
+}
+
+/* 文章标题样式 */
+.article-title {
+    font-size: 2em;
+    color: #333;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #1976d2;
+}
+
+/* 文章元信息样式 */
+.article-meta {
+    margin-bottom: 20px;
+    color: #666;
+    font-size: 14px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.article-meta .author,
+.article-meta .publish-date {
+    margin-right: 20px;
 }

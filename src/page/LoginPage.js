@@ -6,71 +6,21 @@ import {
     LockOutlined,
     EyeInvisibleOutlined,
     EyeTwoTone,
-    ExclamationCircleOutlined
+    ExclamationCircleOutlined, KeyOutlined
 } from '@ant-design/icons';
 import './LoginPage.css';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Cookies from "js-cookie";
+import { setPublicKey, encryptData } from '../utils/rsaEncrypt';
+import {getCaptcha, login, getPublicKey as loginApi, getPublicKey} from '../api/service.js';
 
-// 模拟验证码接口
-const mockFetchCaptcha = () => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve({
-                data: {
-                    image: 'https://via.placeholder.com/150x50?text=ABCD',
-                    code: 'ABCD'
-                }
-            });
-        }, 500);
-    });
+// 获取验证码接口
+const fetchCaptcha = () => {
+    return getCaptcha();
 };
 
-const mockLoginApi = (formData) => {
-    return new Promise((resolve, reject) => {
-        // 设置超时时间
-        const timeout = 5000;
-        const timer = setTimeout(() => {
-            reject(new Error('Network Error'));
-        }, timeout);
-
-        // 原有验证逻辑保留
-        setTimeout(() => {
-            clearTimeout(timer); // 清除超时定时器
-            if (formData.username !== 'admin') {
-                reject({
-                    response: {
-                        data: {
-                            code: 'USERNAME_PASSWORD_ERROR',
-                            msg: '用户名不存在'
-                        }
-                    }
-                });
-            } else if (formData.password !== '123456') {
-                reject({
-                    response: {
-                        data: {
-                            code: 'USERNAME_PASSWORD_ERROR',
-                            msg: '密码错误'
-                        }
-                    }
-                });
-            } else if (formData.code.toUpperCase() !== 'ABCD') {
-                reject({
-                    response: {
-                        data: {
-                            code: 'CAPTCHA_ERROR',
-                            msg: '验证码不正确'
-                        }
-                    }
-                });
-            } else {
-                resolve({ token: 'mock-token' });
-            }
-        }, 800);
-    });
-};
+// 登录接口
 
 const LoginPage = () => {
     const { t, i18n } = useTranslation();
@@ -93,9 +43,9 @@ const LoginPage = () => {
     });
 
     // 验证码相关状态
-    const [backendCaptcha, setBackendCaptcha] = useState('');
     const [captchaImage, setCaptchaImage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [captchaLoading, setCaptchaLoading] = useState(false);
 
     // 错误弹窗状态
     const [showErrorModal, setShowErrorModal] = useState(false);
@@ -105,19 +55,48 @@ const LoginPage = () => {
     // 获取验证码
     const fetchCaptchaFromBackend = async () => {
         try {
-            const response = await mockFetchCaptcha();
-            setCaptchaImage(response.data.image);
-            setBackendCaptcha(response.data.code);
+            setCaptchaLoading(true);
+            // 直接获取验证码图片（后端只返回base64）
+            const response = await fetchCaptcha();
+
+            // 处理后端返回的base64验证码
+            if (response.data) {
+                const captchaImage = response.data;
+
+                // 如果返回的是base64字符串，添加data URL前缀
+                if (captchaImage && !captchaImage.startsWith('data:')) {
+                    setCaptchaImage(`data:image/png;base64,${captchaImage}`);
+                } else {
+                    setCaptchaImage(captchaImage);
+                }
+            } else {
+                throw new Error('获取验证码失败');
+            }
         } catch (error) {
             console.error(t('fetchCaptchaFailed'), error);
-            setErrorModalMessage(t('fetchCaptchaFailed'));
+            setErrorModalMessage(error.response?.data?.message || error.message || t('fetchCaptchaFailed'));
             setShowErrorModal(true);
+        } finally {
+            setCaptchaLoading(false);
         }
     };
 
-    // 组件挂载时获取验证码
+    // 新增获取公钥的函数
+    const fetchPublicKey = async () => {
+        try {
+            const response = await getPublicKey();
+            if (response.data && response.data.publicKey) {
+                setPublicKey(response.data.publicKey);
+            }
+        } catch (error) {
+            console.error('获取公钥失败', error);
+        }
+    };
+
+    // 在组件挂载时获取公钥
     useEffect(() => {
         fetchCaptchaFromBackend();
+        fetchPublicKey(); // 新增这一行
     }, []);
 
     // 点击外部关闭弹窗
@@ -141,6 +120,11 @@ const LoginPage = () => {
         // 清除对应字段的错误信息
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
+        }
+        
+        // 清除通用错误信息
+        if (errors.general) {
+            setErrors(prev => ({ ...prev, general: '' }));
         }
     };
 
@@ -189,50 +173,68 @@ const LoginPage = () => {
 
         try {
             setIsLoading(true);
-            // 调用登录接口
-            const response = await mockLoginApi(formData);
 
-            // 登录成功逻辑
-            sessionStorage.setItem('username', formData.username);
-            sessionStorage.setItem('token', response.token);
-            navigate('/main');
+            const encryptedPassword = encryptData(formData.password);
+            const loginData = {
+                username: formData.username,
+                password: encryptedPassword,
+                captcha: formData.code,
+            };
+
+            const response = await loginApi(loginData);
+
+            // ✅ 成功
+            if (response.data && response.data.code === 200) {
+                const token = response.data.data;
+                sessionStorage.setItem('username', formData.username);
+                sessionStorage.setItem('token', token);
+                navigate('/main');
+            } else {
+                // 后端返回非 200 的情况（理论上会进入 catch，但以防万一）
+                throw new Error(response.data?.msg || '登录失败');
+            }
 
         } catch (error) {
             console.error(t('loginFailed'), error);
             let errorMsg = '';
 
-            if (error.response) {
-                // 后端返回的错误
-                const errorCode = error.response.data.code;
-                const errorMessage = error.response.data.msg;
+            if (error.response && error.response.data) {
+                const errorData = error.response.data;
+                const errorCode = errorData.code;
+                const errorMessage = errorData.msg;
 
-                switch(errorCode) {
-                    case 'USERNAME_PASSWORD_ERROR':
-                        errorMsg = t('usernameOrPasswordError') || errorMessage;
+                // ✅ 根据后端错误码细分 i18n 提示
+                switch (errorCode) {
+                    case 4: // 验证码未获取
+                        errorMsg = t('captchaNotFetched') || errorMessage;
                         break;
-                    case 'CAPTCHA_ERROR':
+                    case 5: // 验证码错误
                         errorMsg = t('captchaError') || errorMessage;
                         break;
-                    default:
-                        // 未知错误直接显示后端返回的信息
+                    case 7: // 用户名密码错误
+                        errorMsg = t('usernameOrPasswordError') || errorMessage;
+                        break;
+                    default: // 其他错误直接显示后端 msg
                         errorMsg = errorMessage || t('unknownError');
                 }
+            } else if (error.message) {
+                errorMsg = error.message;
             } else {
-                // 网络错误等非后端返回的错误
                 errorMsg = t('networkError');
             }
 
-            // 显示错误弹窗
             setErrorModalMessage(errorMsg);
             setShowErrorModal(true);
 
-            // 刷新验证码
+            // 刷新验证码并清空输入框
             fetchCaptchaFromBackend();
             setFormData(prev => ({ ...prev, code: '' }));
+
         } finally {
             setIsLoading(false);
         }
     };
+
 
     const changeLanguage = (lng) => {
         i18n.changeLanguage(lng)
@@ -307,22 +309,51 @@ const LoginPage = () => {
                         {/* 验证码输入 */}
                         <div className="form-item">
                             <div className="captcha-container">
-                                <img
-                                    src={captchaImage}
-                                    alt={t('inputCaptcha')}
-                                    style={{ height: '50px', cursor: 'pointer' }}
-                                    onClick={fetchCaptchaFromBackend}
-                                />
-                                <input
-                                    type="text"
-                                    name="code"
-                                    value={formData.code}
-                                    onChange={handleInputChange}
-                                    placeholder={t('inputCaptcha')}
-                                    className={`auth_input captcha-input ${errors.code ? 'error' : ''}`}
-                                />
+                                {captchaLoading ? (
+                                    <div style={{ 
+                                        height: '50px', 
+                                        width: '150px',
+                                        display: 'flex', 
+                                        alignItems: 'center', 
+                                        justifyContent: 'center',
+                                        border: '1px solid #d9d9d9',
+                                        backgroundColor: '#f5f5f5'
+                                    }}>
+                                        <span>{t('loading')}</span>
+                                    </div>
+                                ) : (
+                                    <img
+                                        src={captchaImage}
+                                        alt={t('inputCaptcha')}
+                                        style={{ 
+                                            height: '50px', 
+                                            cursor: 'pointer',
+                                            border: '1px solid #d9d9d9',
+                                            borderRadius: '4px'
+                                        }}
+                                        onClick={fetchCaptchaFromBackend}
+                                        title={t('clickImageToRefresh')}
+                                    />
+                                )}
+                                <div className="input-wrapper">
+                                    {/* 使用钥匙图标 */}
+                                    <KeyOutlined className="captcha-icon" />  {/* 使用钥匙图标 */}
+                                    <input
+                                        type="text"
+                                        name="code"
+                                        value={formData.code}
+                                        onChange={handleInputChange}
+                                        placeholder={t('inputCaptcha')}
+                                        className={`auth_input captcha-input ${errors.code ? 'error' : ''}`}
+                                        maxLength="6"
+                                        autoComplete="off"
+                                    />
+                                </div>
                             </div>
                             {errors.code && <span className="error-message">{errors.code}</span>}
+                            <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                                {t('clickImageToRefresh')}
+                            </div>
                         </div>
 
                         {/* 提交按钮 */}

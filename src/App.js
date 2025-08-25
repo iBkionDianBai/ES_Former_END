@@ -13,6 +13,8 @@ import UploadFilePage from "./page/FileUploadPage";
 import CookieNotice from "./CookieNotice/CookieNotice";
 import AuthGuard from "./AuthGuard/AuthGuard";
 import RegisterPage from "./page/RegisterPage";
+import Terms from "./Services/Terms";
+import Privacy from "./Services/Privacy";
 
 
 function App() {
@@ -25,6 +27,8 @@ function App() {
             <Route path="/" element={<LoginPage />} />
             <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
 
             {/* 受保护的主页面 */}
             <Route

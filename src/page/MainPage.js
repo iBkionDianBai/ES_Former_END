@@ -1,5 +1,5 @@
 // src/page/MainPage.js
-import React, { useState } from "react";
+import React, {useMemo, useState} from "react";
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { useTranslation } from 'react-i18next';
@@ -20,10 +20,10 @@ function SearchComponent() {
     const navigate = useNavigate();
     const [inputContent, setInputContent] = useState('');
     const [activeTab, setActiveTab] = useState(0);
-    const [tabs] = useState([
+    const tabs = useMemo(() => [
         { name: t('retrieval') },
         { name: t('other') }
-    ]);
+    ], [t]);
 
     const handleSearchClick = () => {
         if (inputContent.trim() !== '') {

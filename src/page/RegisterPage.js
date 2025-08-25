@@ -1,5 +1,5 @@
 // src/page/RegisterPage.js
-import React, { useState, useRef } from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import { Helmet } from 'react-helmet';
 import {
     UserOutlined,
@@ -7,26 +7,15 @@ import {
     EyeInvisibleOutlined,
     EyeTwoTone,
     MailOutlined,
-    PhoneOutlined
+    PhoneOutlined,
+    KeyOutlined
 } from '@ant-design/icons';
 import './RegisterPage.css';
 import { useNavigate, Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import {Trans, useTranslation} from 'react-i18next';
 import Cookies from "js-cookie";
-
-// 模拟注册接口的mock函数
-const mockRegister = (userData) => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            // 模拟用户名已存在的情况
-            if (userData.username === 'admin') {
-                reject(new Error('usernameExists'));
-            } else {
-                resolve({ success: true });
-            }
-        }, 800);
-    });
-};
+import { register, getPublicKey } from '../api/service.js'
+import { setPublicKey, encryptData } from '../utils/rsaEncrypt';
 
 const RegisterPage = () => {
     const { t, i18n } = useTranslation();
@@ -39,6 +28,7 @@ const RegisterPage = () => {
         confirmPassword: '',
         email: '',
         phone: '',
+        invitationCode: '',
         agreement: false,
         showPassword: false,
         showConfirmPassword: false
@@ -120,17 +110,12 @@ const RegisterPage = () => {
             newErrors.confirmPassword = t('passwordMismatch');
         }
 
-        // 邮箱验证
-        if (!formData.email) {
-            newErrors.email = t('inputEmail');
-        } else if (!emailRegex.test(formData.email)) {
+        if (formData.email && !emailRegex.test(formData.email)) {
             newErrors.email = t('emailInvalid');
         }
 
-        // 手机号验证
-        if (!formData.phone) {
-            newErrors.phone = t('inputPhone');
-        } else if (!phoneRegex.test(formData.phone)) {
+        // 手机号验证（非必填，有输入才校验格式）
+        if (formData.phone && !phoneRegex.test(formData.phone)) {
             newErrors.phone = t('phoneInvalid');
         }
 
@@ -143,7 +128,29 @@ const RegisterPage = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const onFinish = async (e) => {
+    // 新增获取公钥的函数
+    const fetchPublicKey = async () => {
+        try {
+            const response = await getPublicKey();
+            console.log('公钥响应:', response); // 添加调试日志
+
+            // 修复：公钥直接在 response.data 中，不是 response.data.publicKey
+            if (response.status === 200) {
+                setPublicKey(response.data.data); // 直接使用 response.data
+                console.log('公钥设置成功:', response.data.data);
+            } else {
+                console.error('获取公钥失败:', response);
+            }
+        } catch (error) {
+            console.error('获取公钥失败', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchPublicKey();
+    }, []);
+
+    const onSubmit = async (e) => {
         e.preventDefault();
         setGeneralError('');
         setSuccessMessage('');
@@ -155,33 +162,66 @@ const RegisterPage = () => {
         try {
             setLoading(true);
 
-            // 调用模拟注册接口
-            await mockRegister({
+            const encryptedPassword = encryptData(formData.password);
+            console.log("1");
+            const encryptedEmail = formData.email ? encryptData(formData.email) : '';
+            const encryptedPhone = formData.phone ? encryptData(formData.phone) : '';
+            const encryptedInvitationCode = formData.invitationCode ? encryptData(formData.invitationCode) : '';
+
+            const response = await register({
                 username: formData.username,
-                password: formData.password,
-                email: formData.email,
-                phone: formData.phone
+                password: encryptedPassword,
+                email: encryptedEmail,
+                phone: encryptedPhone,
+                invitationCode: encryptedInvitationCode
             });
 
-            setSuccessMessage(t('registerSuccess'));
-            formRef.current.reset();
-            setFormData({
-                username: '',
-                password: '',
-                confirmPassword: '',
-                email: '',
-                phone: '',
-                agreement: false,
-                showPassword: false,
-                showConfirmPassword: false
-            });
+            if (response.data && response.data.code === 200) {
+                // 注册成功
+                setSuccessMessage(t('registerSuccess'));
+                formRef.current.reset();
+                setFormData({
+                    username: '',
+                    password: '',
+                    confirmPassword: '',
+                    email: '',
+                    phone: '',
+                    invitationCode: '',
+                    agreement: false,
+                    showPassword: false,
+                    showConfirmPassword: false
+                });
 
-            // 3秒后跳转到登录页
-            setTimeout(() => {
-                navigate('/login');
-            }, 3000);
+                // 3秒后跳转到登录页
+                setTimeout(() => {
+                    navigate('/login');
+                }, 3000);
+            } else {
+                // 后端返回的业务错误
+                const errorCode = response.data?.code;
+                let msg = response.data?.msg || 'registerFailed';
+
+                switch (errorCode) {
+                    case 11: // 用户名已存在
+                        msg = t('usernameExists');
+                        break;
+                    case 12: // 邮箱已存在
+                        msg = t('emailExists');
+                        break;
+                    case 13: // 手机号已存在
+                        msg = t('phoneExists');
+                        break;
+                    case 14: // 邀请码错误
+                        msg = t('invitationCodeError');
+                        break;
+                    default:
+                        msg = t('registerFailed');
+                }
+
+                throw new Error(msg);
+            }
         } catch (err) {
-            setGeneralError(t(err.message) || t('registerFailed'));
+            setGeneralError(err.message || t('registerFailed'));
         } finally {
             setLoading(false);
         }
@@ -211,7 +251,7 @@ const RegisterPage = () => {
                         <div className="success-alert">{successMessage}</div>
                     )}
 
-                    <form ref={formRef} onSubmit={onFinish} className="register-form">
+                    <form ref={formRef} onSubmit={onSubmit} className="register-form">
                         <div className="form-group">
                             <div className="input-icon">
                                 <UserOutlined />
@@ -315,6 +355,21 @@ const RegisterPage = () => {
                             )}
                         </div>
 
+                        <div className="form-group">
+                            <div className="input-icon">
+                                <KeyOutlined />  {/* 使用钥匙图标 */}
+                            </div>
+                            <input
+                                type="text"
+                                name="invitationCode"
+                                value={formData.invitationCode}
+                                onChange={handleInputChange}
+                                placeholder={t('adminInvitationCode')}
+                                className={errors.invitationCode ? 'invalid' : ''}
+                            />
+                            <span className="hint-text">{t('invitationCodeHint')}</span>  {/* 提示文字 */}
+                        </div>
+
                         <div className="form-group checkbox-group">
                             <label className="checkbox-label">
                                 <input
@@ -324,10 +379,13 @@ const RegisterPage = () => {
                                     onChange={handleInputChange}
                                 />
                                 <span className="checkbox-text">
-                                    {t('agreeTermsText', {
-                                        terms: <Link to="/terms">{t('termsOfService')}</Link>,
-                                        privacy: <Link to="/privacy">{t('privacyPolicy')}</Link>
-                                    })}
+                                    <Trans
+                                        i18nKey="agreeTermsText"
+                                        components={{
+                                            terms: <Link to="/terms" className="text-blue-500 underline" />,
+                                            privacy: <Link to="/privacy" className="text-blue-500 underline" />,
+                                        }}
+                                    />
                                 </span>
                             </label>
                             {errors.agreement && (

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Helmet } from "react-helmet";
 import GaojiSearchComponent from "./gaojiSearch";
 import "./SearchResultPage.css";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -76,7 +75,6 @@ function GaojiSearchResultPageContent() {
     const [isLoading, setIsLoading] = useState(true);
     const [sortOrder, setSortOrder] = useState('desc');
     const [sortField, setSortField] = useState('relevance'); // 添加排序字段状态
-    const [selectedIds, setSelectedIds] = useState([]);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [filterOpen, setFilterOpen] = useState({ theme: true, source: true, year: true });
@@ -88,13 +86,13 @@ function GaojiSearchResultPageContent() {
     const [selectedYears, setSelectedYears] = useState([]);
     const [sources, setSources] = useState([]); // 动态来源数据
     const [years, setYears] = useState([]); // 动态年份数据
+    const [totalResults, setTotalResults] = useState(0);
     const navigate = useNavigate();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const searchConditions = searchParams.get('searchConditions') || '';
     const startDateParam = searchParams.get('startDate') || '';
     const endDateParam = searchParams.get('endDate') || '';
-    const types = searchParams.get('types') || '';
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
 
@@ -142,33 +140,64 @@ function GaojiSearchResultPageContent() {
     // 构建完整的检索内容显示
     const buildSearchText = () => {
         let text = '';
-
-        // 处理搜索条件
-        if (searchConditions && searchConditions.trim() !== '') {
-            const conditions = searchConditions.split(' | ');
-            // 翻译每个搜索条件
-            const translatedConditions = conditions.map(condition => translateSearchConditions(condition));
-            text = translatedConditions.join('\n');
-        }
-
-        // 添加日期范围
-        if (startDateParam || endDateParam) {
-            const dateRange = [];
-            if (startDateParam) dateRange.push(startDateParam);
-            if (endDateParam) dateRange.push(endDateParam);
-            if (text) {
-                text += `\n[${t('date')}: ${dateRange.join(' - ')}]`;
-            } else {
-                text = `[${t('date')}: ${dateRange.join(' - ')}]`;
+        
+        // 获取URL参数
+        const urlParams = new URLSearchParams(location.search);
+        const urlSearchData = urlParams.get('searchData');
+        
+        if (urlSearchData) {
+            // 新的参数格式：显示JSON结构
+            try {
+                const searchParams = JSON.parse(decodeURIComponent(urlSearchData));
+                if (searchParams.conditions && searchParams.conditions.length > 0) {
+                    const conditionsText = searchParams.conditions.map((condition, index) => {
+                        let conditionStr = '';
+                        if (index > 0 && condition.rowOperator) {
+                            conditionStr += `${condition.rowOperator} `;
+                        }
+                        conditionStr += `${condition.field}: "${condition.keyword1}"`;
+                        if (condition.keyword2) {
+                            conditionStr += ` ${condition.innerOperator} "${condition.keyword2}"`;
+                        }
+                        conditionStr += ` (${condition.matchType})`;
+                        return conditionStr;
+                    }).join('\n');
+                    text = conditionsText;
+                }
+                
+                // 显示日期范围
+                if (searchParams.startDate || searchParams.endDate) {
+                    const dateRange = [];
+                    if (searchParams.startDate) dateRange.push(searchParams.startDate);
+                    if (searchParams.endDate) dateRange.push(searchParams.endDate);
+                    if (text) {
+                        text += `\n[${t('date')}: ${dateRange.join(' - ')}]`;
+                    } else {
+                        text = `[${t('date')}: ${dateRange.join(' - ')}]`;
+                    }
+                }
+            } catch (e) {
+                console.error('解析搜索参数失败:', e);
+                text = '搜索参数解析错误';
             }
-        }
+        } else {
+            // 兼容旧的参数格式
+            if (searchConditions && searchConditions.trim() !== '') {
+                const conditions = searchConditions.split(' | ');
+                const translatedConditions = conditions.map(condition => translateSearchConditions(condition));
+                text = translatedConditions.join('\n');
+            }
 
-        // 添加类型
-        if (types && types.trim() !== '') {
-            if (text) {
-                text += `\n[${t('type')}: ${types}]`;
-            } else {
-                text = `[${t('type')}: ${types}]`;
+            // 添加日期范围
+            if (startDateParam || endDateParam) {
+                const dateRange = [];
+                if (startDateParam) dateRange.push(startDateParam);
+                if (endDateParam) dateRange.push(endDateParam);
+                if (text) {
+                    text += `\n[${t('date')}: ${dateRange.join(' - ')}]`;
+                } else {
+                    text = `[${t('date')}: ${dateRange.join(' - ')}]`;
+                }
             }
         }
 
@@ -182,20 +211,63 @@ function GaojiSearchResultPageContent() {
         const fetchSearchResults = async () => {
             setIsLoading(true);
             try {
-                const searchParams = {
-                    searchConditions: searchConditions,
-                    startDate: startDateParam,
-                    endDate: endDateParam,
-                    types: types
-                };
+                let searchParams = {};
+                
+                // 从 URL 参数中获取搜索数据
+                const urlParams = new URLSearchParams(location.search);
+                const urlSearchData = urlParams.get('searchData');
+                if (urlSearchData) {
+                    // 新的参数格式：解析JSON
+                    try {
+                        searchParams = JSON.parse(decodeURIComponent(urlSearchData));
+                        // 更新分页参数
+                        searchParams.currentPage = currentPage;
+                        searchParams.pageSize = pageSize;
+                        searchParams.sortField = sortField === 'relevance' ? '_score' : sortField;
+                        searchParams.sortOrder = sortOrder;
+                    } catch (e) {
+                        console.error('解析搜索参数失败:', e);
+                        searchParams = {
+                            conditions: [],
+                            currentPage,
+                            pageSize,
+                            sortField: sortField === 'relevance' ? '_score' : sortField,
+                            sortOrder
+                        };
+                    }
+                } else {
+                    // 兼容旧的参数格式
+                    searchParams = {
+                        searchConditions: searchConditions,
+                        startDate: startDate || startDateParam,
+                        endDate: endDate || endDateParam,
+                        currentPage,
+                        pageSize,
+                        sortField: sortField === 'relevance' ? '_score' : sortField,
+                        sortOrder
+                    };
+                }
+                
+                console.log('发送的搜索参数:', searchParams);
                 const response = await advancedSearch(searchParams);
-                // 关键：无论接口返回什么，都转为数组（非数组则设为空数组）
-                const data = Array.isArray(response.data) ? response.data : [];
-                setSearchResults(data); // 确保存入状态的是数组
-
-                // 从结果中提取来源和年份
-                setSources(extractUniqueSources(data));
-                setYears(extractUniqueYears(data));
+                
+                // 处理新的后端返回结构
+                if (response.data && response.data.code === 200) {
+                    const responseData = response.data.data;
+                    const items = Array.isArray(responseData.items) ? responseData.items : [];
+                    setSearchResults(items);
+                    setTotalResults(responseData.totalCount || 0);
+                    
+                    // 从结果中提取来源和年份（这里先设为空，因为后端没有返回这些字段）
+                    setSources([]);
+                    setYears([]);
+                } else {
+                    // 处理错误情况
+                    setSearchResults([]);
+                    setTotalResults(0);
+                    setSources([]);
+                    setYears([]);
+                }
             } catch (err) {
                 console.error('高级搜索接口调用失败', err);
                 setSearchResults([]); // 出错时强制设为空数组
@@ -207,7 +279,7 @@ function GaojiSearchResultPageContent() {
         };
 
         fetchSearchResults();
-    }, [searchConditions, startDateParam, endDateParam, types]);
+    }, [location.search, currentPage, pageSize, sortField, sortOrder]);
 
     // 监听语言变化，重新构建搜索内容
     useEffect(() => {
@@ -221,23 +293,21 @@ function GaojiSearchResultPageContent() {
     // 动态生成主题选项（事件名频度）
     const themes = calculateEventNameFrequency(searchResults);
 
-    // 修改过滤逻辑，添加日期范围筛选
+    // 修改过滤逻辑，只保留主题筛选
     const filteredResults = searchResults.filter(item => {
         const eventName = item.title?.split(' ')[0];
         const themeOk = selectedThemes.length === 0 || selectedThemes.some(theme => {
             const themeName = theme.split('（')[0];
             return eventName === themeName;
         });
-        const sourceOk = selectedSources.length === 0 || selectedSources.includes(item.source);
-        const yearOk = selectedYears.length === 0 || selectedYears.includes(item.time);
 
-        // 新增：日期范围筛选逻辑
-        const itemDate = new Date(item.time);
-        const startOk = startDate ? itemDate >= new Date(startDate) : true;
-        const endOk = endDate ? itemDate <= new Date(endDate) : true;
-        const dateRangeOk = startOk && endOk;
+        // 日期范围筛选逻辑（如果后端没有日期字段，这里先暂停）
+        // const itemDate = new Date(item.time);
+        // const startOk = startDate ? itemDate >= new Date(startDate) : true;
+        // const endOk = endDate ? itemDate <= new Date(endDate) : true;
+        // const dateRangeOk = startOk && endOk;
 
-        return themeOk && sourceOk && yearOk && dateRangeOk; // 加入日期筛选条件
+        return themeOk; // 只保留主题筛选
     });
 
     // 添加排序逻辑
@@ -317,6 +387,8 @@ function GaojiSearchResultPageContent() {
                         )}
                     </div>
 
+                    {/* 来源和年份筛选暂时隐藏，因为后端没有返回这些数据 */}
+                    {/*
                     <div className="filter-container">
                         <div className="filter-header" onClick={() => toggleFilter('source')} style={{ display: 'flex', alignItems: 'center' }}>
                             <h3 style={{ margin: 0 }}>{t('source')}</h3>
@@ -376,6 +448,7 @@ function GaojiSearchResultPageContent() {
                             </div>
                         )}
                     </div>
+                    */}
                 </div>
 
                 {/* 右侧结果展示区域 */}
@@ -386,20 +459,10 @@ function GaojiSearchResultPageContent() {
                         <>
                             <div className="toolbar-row">
                                 <div className="filter-toolbar">
-                                    <input
-                                        type="checkbox"
-                                        checked={searchResults.length > 0 && selectedIds.length === searchResults.length}
-                                        onChange={e => {
-                                            if (e.target.checked) {
-                                                setSelectedIds(searchResults.map(item => item.id));
-                                            } else {
-                                                setSelectedIds([]);
-                                            }
-                                        }}
-                                    />
-                                    <span style={{marginLeft: 8}}>{t('selectAll')}</span>
-                                    <span style={{marginLeft: 16}}>{t('selectedCount')}: {selectedIds.length}</span>
-                                    <span style={{marginLeft: 24}}>{t('eventTime')}: </span>
+                                    <span className="total-results">
+                                        {t("totalResults", { count: totalResults })}
+                                    </span>
+                                    <span style={{marginLeft: 20}}>{t('eventTime')}: </span>
                                     <input
                                         type="date"
                                         value={startDate}
@@ -451,31 +514,34 @@ function GaojiSearchResultPageContent() {
                             <table className="results-table">
                                 <thead>
                                 <tr>
-                                    <th>{t('select')}</th>
+                                    <th>{t('serialNumber')}</th>
                                     <th>{t('title')}</th>
-                                    <th>{t('source')}</th>
-                                    <th>{t('date')}</th>
+                                    <th>{t('eventTime')}</th>
+                                    <th>{t('operation')}</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {sortedResults.slice((currentPage - 1) * pageSize, currentPage * pageSize).map((item) => (
-                                    <tr key={item.id}>
+                                {searchResults.map((result, index) => (
+                                    <tr key={result.id}>
+                                        <td>{(currentPage - 1) * pageSize + index + 1}</td>
                                         <td>
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedIds.includes(item.id)}
-                                                onChange={() => {
-                                                    if (selectedIds.includes(item.id)) {
-                                                        setSelectedIds(selectedIds.filter(id => id !== item.id));
-                                                    } else {
-                                                        setSelectedIds([...selectedIds, item.id]);
-                                                    }
-                                                }}
-                                            />
+                                            <span 
+                                                style={{ color: '#12cff6', cursor: 'pointer' }} 
+                                                onClick={() => navigate(`/contentViewer?id=${result.id}`)}
+                                            >
+                                                {result.title}
+                                            </span>
                                         </td>
-                                        <td>{item.title}</td>
-                                        <td>{item.source}</td>
-                                        <td>{item.time}</td>
+                                        <td>{/* 时间列暂时留空 */}</td>
+                                        <td>
+                                            <span 
+                                                title={t('read')} 
+                                                style={{ cursor: 'pointer', fontSize: '20px', color: '#12cff6' }} 
+                                                onClick={() => navigate(`/contentViewer?id=${result.id}`)}
+                                            >
+                                                📖
+                                            </span>
+                                        </td>
                                     </tr>
                                 ))}
                                 </tbody>

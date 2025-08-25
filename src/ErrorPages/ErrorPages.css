@@ -38,16 +38,16 @@
 }
 
 .error-404 h1 {
-    color: #fff;
+    color: #333;
 }
 
 .error-404 p {
-    color: #fff;
+    color: #333;
 }
 
 .error-404 {
-    background: url("../image/banner.png") top center repeat-x #1b66e6;
-    color: #fff;
+    background: #f8f9fa;
+    color: #333;
 }
 
 /* 500 页面特定样式 */
@@ -57,14 +57,14 @@
 
 /* 403 页面特定样式 */
 .error-403 {
-    background: url("../image/banner.png") top center repeat-x #1b66e6;
-    color: #fff;
+    background: #f8f9fa;
+    color: #333;
 }
 
 .error-403 h1 {
-    color: #fff;
+    color: #333;
 }
 
 .error-403 p {
-    color: #fff;
+    color: #333;
 }
