@@ -56,6 +56,8 @@ function SearchResultPageContent() {
     const [selectedThemes, setSelectedThemes] = useState([]);
     const [selectedSources, setSelectedSources] = useState([]);
     const [selectedYears, setSelectedYears] = useState([]);
+    const [selectedValue, setSelectedValue] = useState('');
+    const searchOptions = [t('allContainers'), t('title'), t('school'), t('abstract'), t('fullText'), t('keywords')];
 
     // 翻译搜索条件中的操作符和容器名称
     const translateSearchConditions = (conditions) => {
@@ -186,6 +188,16 @@ function SearchResultPageContent() {
         <div>
             <div className="search-bar-container">
                 <div className="search-bar">
+                    <div className="search-select-result">
+                        <select
+                            onChange={(e) => setSelectedValue(e.target.value)}
+                            className="sort-result"
+                        >
+                            {searchOptions.map((container) => (
+                                <option className="Options" key={container} value={container}>{container}</option>
+                            ))}
+                        </select>
+                    </div>
                     <input type="text" value={inputValue} placeholder={t('inputSearchContent')} onChange={e => setInputValue(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()} />
                     <button className="refresh-search" onClick={handleSearch}>
                         <h3>{t('refreshSearch')}</h3>
