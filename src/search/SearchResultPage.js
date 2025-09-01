@@ -37,24 +37,24 @@ function SearchResultPageContent() {
     const [inputValue, setInputValue] = useState(searchText);
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [filterOpen, setFilterOpen] = useState({ theme: true, source: true, year: true });
+    const [filterOpen, setFilterOpen] = useState({ theme: true, year: true });
     const navigate = useNavigate();
     const [sortOrder, setSortOrder] = useState('desc');
     const [sortField, setSortField] = useState('relevance');
-    const [selectedIds, setSelectedIds] = useState([]);
+
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [showChart, setShowChart] = useState(false);
-    const [showSourceChart, setShowSourceChart] = useState(false);
+
     const [showYearChart, setShowYearChart] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [useLoadMore, setUseLoadMore] = useState(false);
 
-    const sourceOptions = ["平台名"];
+
     const yearOptions = ["2020-01-15", "2020-02-20", "2020-03-10", "2020-04-05", "2020-05-25", "2020-06-18", "2020-07-12", "2020-08-08", "2020-09-30", "2020-10-22"];
     const [selectedThemes, setSelectedThemes] = useState([]);
-    const [selectedSources, setSelectedSources] = useState([]);
+
     const [selectedYears, setSelectedYears] = useState([]);
     const [selectedValue, setSelectedValue] = useState('');
     const searchOptions = [t('allContainers'), t('title'), t('school'), t('abstract'), t('fullText'), t('keywords')];
@@ -134,7 +134,7 @@ function SearchResultPageContent() {
 
     useEffect(() => {
         setCurrentPage(1);
-    }, [searchText, selectedThemes, selectedSources, selectedYears]);
+    }, [searchText, selectedThemes, selectedYears]);
 
     // 监听语言变化，重新翻译搜索内容
     useEffect(() => {
@@ -151,9 +151,8 @@ function SearchResultPageContent() {
     const filteredResults = searchResults.filter(item => {
         const eventName = item.title.split(' ')[0];
         const themeOk = selectedThemes.length === 0 || selectedThemes.some(theme => eventName === theme.split('(')[0]);
-        const sourceOk = selectedSources.length === 0 || selectedSources.includes(item.source);
         const yearOk = selectedYears.length === 0 || selectedYears.includes(item.time);
-        return themeOk && sourceOk && yearOk;
+        return themeOk && yearOk;
     });
 
     const sortedResults = [...filteredResults].sort((a, b) => {
@@ -228,25 +227,7 @@ function SearchResultPageContent() {
                         )}
                     </div>
 
-                    <div className="filter-container">
-                        <div className="filter-header" onClick={() => toggleFilter('source')} style={{ display: 'flex', alignItems: 'center' }}>
-                            <h3 style={{ margin: 0 }}>{t('source')}</h3>
-                            <span className="chart-icon" style={{ marginLeft: 8, cursor: 'pointer' }} title="查看柱状图" onClick={e => { e.stopPropagation(); setShowSourceChart(true); }}>📊</span>
-                            <span className="filter-icon">{filterOpen.source ? '▼' : '▶'}</span>
-                        </div>
-                        {filterOpen.source && (
-                            <div className="filter-content" style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                                {sourceOptions.map((item, idx) => (
-                                    <div className="filter-item" key={idx}>
-                                        <input type="checkbox" checked={selectedSources.includes(item)} onChange={e => {
-                                            if (e.target.checked) setSelectedSources([...selectedSources, item]);
-                                            else setSelectedSources(selectedSources.filter(s => s !== item));
-                                        }} /> {item}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+
 
                     <div className="filter-container">
                         <div className="filter-header" onClick={() => toggleFilter('year')} style={{ display: 'flex', alignItems: 'center' }}>
@@ -274,20 +255,7 @@ function SearchResultPageContent() {
                             {/* 工具栏 */}
                             <div className="toolbar-row">
                                 <div className="filter-toolbar">
-                                    <input
-                                        type="checkbox"
-                                        checked={searchResults.length > 0 && selectedIds.length === searchResults.length}
-                                        onChange={e => {
-                                            if (e.target.checked) {
-                                                setSelectedIds(searchResults.map(item => item.id));
-                                            } else {
-                                                setSelectedIds([]);
-                                            }
-                                        }}
-                                    />
-                                    <span style={{marginLeft: 8}}>{t('selectAll')}</span>
-                                    <span style={{marginLeft: 16}}>{t('selectedCount')}: {selectedIds.length}</span>
-                                    <span style={{marginLeft: 24}}>{t('eventTime')}: </span>
+                                    <span>{t('eventTime')}: </span>
                                     <input
                                         type="date"
                                         value={startDate}
@@ -333,17 +301,35 @@ function SearchResultPageContent() {
                             </div>
                             <table className="results-table">
                                 <thead>
-                                <tr><th></th><th>{t('serialNumber')}</th><th>{t('title')}</th><th>{t('source')}</th><th>{t('eventTime')}</th><th>{t('operation')}</th></tr>
+                                <tr>
+                                    <th>{t('serialNumber')}</th>
+                                    <th>{t('title')}</th>
+                                    <th>{t('eventTime')}</th>
+                                    <th>{t('operation')}</th>
+                                </tr>
                                 </thead>
                                 <tbody>
                                 {pagedResults.map((result, index) => (
                                     <tr key={result.id}>
-                                        <td><input type="checkbox" checked={selectedIds.includes(result.id)} onChange={e => e.target.checked ? setSelectedIds([...selectedIds, result.id]) : setSelectedIds(selectedIds.filter(id => id !== result.id))} /></td>
                                         <td>{(currentPage - 1) * pageSize + index + 1}</td>
-                                        <td><span style={{ color: '#12cff6', cursor: 'pointer' }} onClick={() => navigate(`/contentViewer?id=${result.id}`)}>{result.title.split(' ')[0]}<br />{result.title.split(' ').slice(1).join(' ')}</span></td>
-                                        <td>{result.source}</td>
+                                        <td>
+                                            <span 
+                                                style={{ color: '#12cff6', cursor: 'pointer' }} 
+                                                onClick={() => navigate(`/contentViewer?id=${result.id}`)}
+                                            >
+                                                {result.title}
+                                            </span>
+                                        </td>
                                         <td>{result.time}</td>
-                                        <td><span title={t('read')} style={{ cursor: 'pointer', fontSize: '20px', color: '#12cff6' }} onClick={() => navigate(`/contentViewer?id=${result.id}`)}>📖</span></td>
+                                        <td>
+                                            <span 
+                                                title={t('read')} 
+                                                style={{ cursor: 'pointer', fontSize: '20px', color: '#12cff6' }} 
+                                                onClick={() => navigate(`/contentViewer?id=${result.id}`)}
+                                            >
+                                                📖
+                                            </span>
+                                        </td>
                                     </tr>
                                 ))}
                                 </tbody>
@@ -403,34 +389,7 @@ function SearchResultPageContent() {
                                 </div>
                             )}
 
-                            {showSourceChart && (
-                                <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowSourceChart(false)}>
-                                    <div style={{ background: '#fff', padding: 24, borderRadius: 8, minWidth: 400, minHeight: 300 }} onClick={e => e.stopPropagation()}>
-                                        <h4 style={{textAlign:'center'}}>{t('sourceEventCountChart')}</h4>
-                                        <svg width="700" height="220">
-                                            {sources.map((item, idx) => {
-                                                const count = filteredResults.filter(r => r.source === item).length;
-                                                const barWidth = 40;
-                                                const barSpacing = 60;
-                                                const startX = 80;
-                                                const x = startX + idx * (barWidth + barSpacing);
-                                                return (
-                                                    <g key={item}>
-                                                        <rect x={x} y={180-count*20} width={barWidth} height={count*20} fill="#52c41a" />
-                                                        <text x={x + barWidth/2} y={205} textAnchor="middle" fontSize="12">{item}</text>
-                                                        <text x={x + barWidth/2} y={180-count*20-5} textAnchor="middle" fontSize="12">{count}</text>
-                                                    </g>
-                                                );
-                                            })}
-                                            <line x1="40" y1="0" x2="40" y2="180" stroke="#333" />
-                                            <line x1="40" y1="180" x2="690" y2="180" stroke="#333" />
-                                            <text x="0" y="10" fontSize="12">{t('eventCount')}</text>
-                                            <text x="620" y="210" fontSize="12">{t('source')}</text>
-                                        </svg>
-                                        <div style={{textAlign:'center',marginTop:8}}><button className="chart-close" onClick={()=>setShowSourceChart(false)}>{t('close')}</button></div>
-                                    </div>
-                                </div>
-                            )}
+
 
                             {showYearChart && (
                                 <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowYearChart(false)}>
