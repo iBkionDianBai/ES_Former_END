@@ -248,3 +248,103 @@
     background-color: #1D67E7;
     color: #fff;
 }
+
+/* 筛选器头部样式已在上方定义，此处移除重复定义 */
+
+/* chart-icon样式已在上方定义，此处移除重复定义 */
+
+/* 筛选器内容样式已在上方定义，此处移除重复定义 */
+
+/* 日期范围分隔符 */
+.date-separator {
+    margin: 0 6px;
+}
+
+/* 排序按钮间距已在上方定义，此处移除重复定义 */
+
+/* 显示选项间距 */
+.display-label {
+    margin-left: 20px;
+}
+
+/* 可点击链接样式 */
+.clickable-link {
+    color: #12cff6;
+    cursor: pointer;
+}
+
+/* 操作图标样式 */
+.operation-icon {
+    cursor: pointer;
+    font-size: 20px;
+    color: #12cff6;
+}
+
+/* 分页相关样式 */
+.pagination-checkbox {
+    margin-top: 5px;
+}
+
+.load-more-container {
+    text-align: center;
+    margin-top: 5px;
+}
+
+.loaded-all-text {
+    margin-left: 5px;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.jump-to-container {
+    margin-left: 12px;
+}
+
+.jump-to-input {
+    width: 50px;
+    margin-left: 4px;
+}
+
+/* 弹窗样式 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.3);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 24px;
+    border-radius: 8px;
+    min-width: 400px;
+    min-height: 300px;
+}
+
+.modal-content-year {
+    background: #fff;
+    padding: 24px;
+    border-radius: 8px;
+    min-width: 740px;
+    min-height: 300px;
+}
+
+.modal-title {
+    text-align: center;
+}
+
+.modal-close-container {
+    text-align: center;
+    margin-top: 8px;
+}
