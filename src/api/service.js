@@ -5,7 +5,8 @@ import axios from 'axios'
 const API_BASE_URL = 'http://129.211.189.196:8800' // The base URL for your local API
 // const API_BASE_URL = 'http://localhost:8080'
 const apiService = axios.create({
-  baseURL: API_BASE_URL
+  baseURL: API_BASE_URL,
+  withCredentials: true
 })
 
 /**
@@ -29,8 +30,8 @@ export const getPublicKey = () => {
  * @param {Object} loginData 登录数据
  * @param {string} loginData.username 用户名
  * @param {string} loginData.password 密码
- * @param {string} loginData.captcha 验证码
- * @param {string} loginData.captchaId 验证码ID
+ * @param {string} loginData.code 验证码
+ * @param {string} loginData.captchaToken 验证码token
  * @returns {Promise}
  */
 export const login = (loginData) => {

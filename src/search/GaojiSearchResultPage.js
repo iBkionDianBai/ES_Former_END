@@ -159,7 +159,6 @@ function GaojiSearchResultPageContent() {
                         if (condition.keyword2) {
                             conditionStr += ` ${condition.innerOperator} "${condition.keyword2}"`;
                         }
-                        conditionStr += ` (${condition.matchType})`;
                         return conditionStr;
                     }).join('\n');
                     text = conditionsText;
@@ -281,10 +280,10 @@ function GaojiSearchResultPageContent() {
         fetchSearchResults();
     }, [location.search, currentPage, pageSize, sortField, sortOrder]);
 
-    // 监听语言变化，重新构建搜索内容
+    // 监听语言和URL变化，重新构建搜索内容
     useEffect(() => {
         setSearchText(buildSearchText());
-    }, [t]);
+    }, [t, location.search]);
 
     const toggleFilter = (filterName) => {
         setFilterOpen({ ...filterOpen, [filterName]: !filterOpen[filterName] });

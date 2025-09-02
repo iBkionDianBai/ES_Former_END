@@ -18,17 +18,83 @@ function GaojiSearchComponent() {
     const containers = useMemo(() => [t('allContainers'), t('title'), t('school'), t('abstract'), t('fullText'), t('keywords')], [t]);
     const fuzzyOptions = useMemo(() => [t('fuzzy'), t('exact'), t('phrase')], [t]);
 
-    // 从URL参数q获取初始值
-    const searchParams = new URLSearchParams(location.search);
-    const q = searchParams.get('q') || '';
-    // 存储搜索行的状态，每行包含多个搜索条件
-    const [searchRows, setSearchRows] = useState([{ keyword1: q, container: t('allContainers'), operator: t('and'), keyword2: '', fuzzy: t('fuzzy') }]);
+    // 从URL参数获取初始值
+    const [searchRows, setSearchRows] = useState([{ keyword1: '', container: t('allContainers'), operator: t('and'), keyword2: '', fuzzy: t('fuzzy') }]);
     // 存储搜索开始日期
     const [startDate, setStartDate] = useState('');
     // 存储搜索结束日期
     const [endDate, setEndDate] = useState('');
     // 存储用户选择的搜索类型
     const [searchTypes, setSearchTypes] = useState([]);
+
+    // 从URL参数初始化搜索条件
+    useEffect(() => {
+        const urlParams = new URLSearchParams(location.search);
+        const urlSearchData = urlParams.get('searchData');
+        const q = urlParams.get('q') || '';
+        
+        if (urlSearchData) {
+            // 如果存在searchData参数，解析并设置搜索条件
+            try {
+                const searchParams = JSON.parse(decodeURIComponent(urlSearchData));
+                if (searchParams.conditions && searchParams.conditions.length > 0) {
+                    const rows = searchParams.conditions.map((condition, index) => {
+                        const row = {
+                            keyword1: condition.keyword1 || '',
+                            keyword2: condition.keyword2 || '',
+                            container: mapFieldToContainer(condition.field),
+                            operator: mapBackendOperator(condition.innerOperator),
+                            fuzzy: t('fuzzy')
+                        };
+                        
+                        if (index > 0 && condition.rowOperator) {
+                            row.relation = mapBackendOperator(condition.rowOperator);
+                        }
+                        
+                        return row;
+                    });
+                    setSearchRows(rows);
+                }
+                
+                // 设置日期
+                if (searchParams.startDate) {
+                    setStartDate(searchParams.startDate);
+                }
+                if (searchParams.endDate) {
+                    setEndDate(searchParams.endDate);
+                }
+            } catch (e) {
+                console.error('解析搜索参数失败:', e);
+                // 如果解析失败，使用默认值
+                setSearchRows([{ keyword1: '', container: t('allContainers'), operator: t('and'), keyword2: '', fuzzy: t('fuzzy') }]);
+            }
+        } else if (q) {
+            // 如果只有q参数，设置第一行的keyword1
+            setSearchRows([{ keyword1: q, container: t('allContainers'), operator: t('and'), keyword2: '', fuzzy: t('fuzzy') }]);
+        }
+    }, [location.search, t]);
+
+    // 反向映射函数：从后端字段映射到前端容器
+    const mapFieldToContainer = (field) => {
+        switch (field) {
+            case "title": return t('title');
+            case "school": return t('school');
+            case "abstract": return t('abstract');
+            case "fullText": return t('fullText');
+            case "keywords": return t('keywords');
+            default: return t('allContainers');
+        }
+    };
+
+    // 反向映射函数：从后端操作符映射到前端操作符
+    const mapBackendOperator = (op) => {
+        switch (op) {
+            case "AND": return t('and');
+            case "OR": return t('or');
+            case "NOT": return t('notInclude');
+            default: return t('and');
+        }
+    };
 
     // 处理语言切换时的状态更新
     useEffect(() => {

@@ -13,7 +13,9 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Cookies from "js-cookie";
 import { setPublicKey, encryptData } from '../utils/rsaEncrypt';
-import {getCaptcha, login, getPublicKey as loginApi, getPublicKey} from '../api/service.js';
+import {getCaptcha, login, getPublicKey} from '../api/service.js';
+
+
 
 // 获取验证码接口
 const fetchCaptcha = () => {
@@ -44,6 +46,7 @@ const LoginPage = () => {
 
     // 验证码相关状态
     const [captchaImage, setCaptchaImage] = useState('');
+    const [captchaToken, setCaptchaToken] = useState(''); // 改为存储token而不是sessionId
     const [isLoading, setIsLoading] = useState(false);
     const [captchaLoading, setCaptchaLoading] = useState(false);
 
@@ -56,25 +59,32 @@ const LoginPage = () => {
     const fetchCaptchaFromBackend = async () => {
         try {
             setCaptchaLoading(true);
-            // 直接获取验证码图片（后端只返回base64）
+            // 获取验证码数据
             const response = await fetchCaptcha();
 
-            // 处理后端返回的base64验证码
-            if (response.data) {
-                const captchaImage = response.data;
+            // 处理后端返回的验证码数据
+            if (response.data && response.data.code === 200 && response.data.data) {
+                const { image, token } = response.data.data; // 改为获取token而不是sessionId
 
-                // 如果返回的是base64字符串，添加data URL前缀
-                if (captchaImage && !captchaImage.startsWith('data:')) {
-                    setCaptchaImage(`data:image/png;base64,${captchaImage}`);
+                // 设置验证码图片
+                if (image) {
+                    setCaptchaImage(image); // 后端已返回完整的data URL格式
                 } else {
-                    setCaptchaImage(captchaImage);
+                    throw new Error('验证码图片数据为空');
+                }
+
+                // 设置验证码token
+                if (token) {
+                    setCaptchaToken(token); // 保存token
+                } else {
+                    console.warn('未获取到验证码Token');
                 }
             } else {
-                throw new Error('获取验证码失败');
+                throw new Error(response.data?.msg || '获取验证码失败');
             }
         } catch (error) {
             console.error(t('fetchCaptchaFailed'), error);
-            setErrorModalMessage(error.response?.data?.message || error.message || t('fetchCaptchaFailed'));
+            setErrorModalMessage(error.response?.data?.msg || error.message || t('fetchCaptchaFailed'));
             setShowErrorModal(true);
         } finally {
             setCaptchaLoading(false);
@@ -85,8 +95,8 @@ const LoginPage = () => {
     const fetchPublicKey = async () => {
         try {
             const response = await getPublicKey();
-            if (response.data && response.data.publicKey) {
-                setPublicKey(response.data.publicKey);
+            if (response.data && response.data.data) {
+                setPublicKey(response.data.data);  // 传入公钥字符串
             }
         } catch (error) {
             console.error('获取公钥失败', error);
@@ -96,7 +106,7 @@ const LoginPage = () => {
     // 在组件挂载时获取公钥
     useEffect(() => {
         fetchCaptchaFromBackend();
-        fetchPublicKey(); // 新增这一行
+        fetchPublicKey();
     }, []);
 
     // 点击外部关闭弹窗
@@ -174,14 +184,26 @@ const LoginPage = () => {
         try {
             setIsLoading(true);
 
-            const encryptedPassword = encryptData(formData.password);
+            // RSA加密密码，添加错误处理
+            let encryptedPassword;
+            try {
+                encryptedPassword = encryptData(formData.password);
+                if (!encryptedPassword) {
+                    throw new Error('密码加密失败');
+                }
+            } catch (encryptError) {
+                console.error('RSA加密错误:', encryptError);
+                throw new Error('密码加密失败，请检查网络连接并重试');
+            }
+
             const loginData = {
                 username: formData.username,
                 password: encryptedPassword,
-                captcha: formData.code,
+                code: formData.code,
+                captchaToken: captchaToken // 添加验证码token
             };
 
-            const response = await loginApi(loginData);
+            const response = await login(loginData);
 
             // ✅ 成功
             if (response.data && response.data.code === 200) {

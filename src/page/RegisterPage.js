@@ -162,11 +162,25 @@ const RegisterPage = () => {
         try {
             setLoading(true);
 
-            const encryptedPassword = encryptData(formData.password);
-            console.log("1");
-            const encryptedEmail = formData.email ? encryptData(formData.email) : '';
-            const encryptedPhone = formData.phone ? encryptData(formData.phone) : '';
-            const encryptedInvitationCode = formData.invitationCode ? encryptData(formData.invitationCode) : '';
+            // RSA加密处理，添加错误处理
+            let encryptedPassword, encryptedEmail, encryptedPhone, encryptedInvitationCode;
+            
+            try {
+                // 必须加密的密码
+                encryptedPassword = encryptData(formData.password);
+                if (!encryptedPassword) {
+                    throw new Error('密码加密失败');
+                }
+                
+                // 可选加密字段
+                encryptedEmail = formData.email ? encryptData(formData.email) : '';
+                encryptedPhone = formData.phone ? encryptData(formData.phone) : '';
+                encryptedInvitationCode = formData.invitationCode ? encryptData(formData.invitationCode) : '';
+                
+            } catch (encryptError) {
+                console.error('RSA加密错误:', encryptError);
+                throw new Error('数据加密失败，请检查网络连接并重试');
+            }
 
             const response = await register({
                 username: formData.username,
