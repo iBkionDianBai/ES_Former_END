@@ -2,8 +2,8 @@
 
 import axios from 'axios'
 
-// const API_BASE_URL = 'http://129.211.189.196:8800' // The base URL for your local API
-const API_BASE_URL = 'http://localhost:8080'
+const API_BASE_URL = 'http://129.211.189.196:8800' // The base URL for your local API
+// const API_BASE_URL = 'http://localhost:8080'
 const apiService = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true
