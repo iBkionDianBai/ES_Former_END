@@ -65,7 +65,8 @@
 .filter-section {
     width: 300px;
     margin-right: 20px;
-    overflow-y: auto; /* 启用滚动条 */
+    overflow-y: auto;
+    /* 启用滚动条 */
     max-height: calc(100vh - 200px);
 }
 
@@ -89,12 +90,15 @@
 
 .filter-header h3 {
     margin: 0;
-    flex-grow: 1; /* 让标题占据剩余空间 */
+    flex-grow: 1;
+    /* 让标题占据剩余空间 */
 }
 
 .chart-icon {
-    margin-left: auto; /* 让显示图表的图标靠右 */
-    margin-right: 8px; /* 为 Filter icon 留出一些间距 */
+    margin-left: auto;
+    /* 让显示图表的图标靠右 */
+    margin-right: 8px;
+    /* 为 Filter icon 留出一些间距 */
     cursor: pointer;
     color: #1D67E7;
 }
@@ -208,7 +212,8 @@
     margin-bottom: 0;
 }
 
-.sort-select, .page-size-select {
+.sort-select,
+.page-size-select {
     margin-left: 5px;
     padding: 2px 8px;
     font-size: 14px;
@@ -317,8 +322,8 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0,0,0,0.3);
-    z-index: 9999;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 1000;
     display: flex;
     align-items: center;
     justify-content: center;
