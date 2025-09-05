@@ -42,23 +42,15 @@ function SearchResultPageContent() {
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [filterOpen, setFilterOpen] = useState({ theme: true, year: true });
-    const navigate = useNavigate();
-    const [sortOrder, setSortOrder] = useState('desc');
-    const [sortField, setSortField] = useState('relevance');
-
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
-    const [showChart, setShowChart] = useState(false);
-
-    const [showYearChart, setShowYearChart] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [useLoadMore, setUseLoadMore] = useState(false);
 
-
-    const [selectedThemes, setSelectedThemes] = useState([]);
-
-    const [selectedYears, setSelectedYears] = useState([]);
+    const navigate = useNavigate();
+    const [sortOrder, setSortOrder] = useState('desc');
+    const [sortField, setSortField] = useState('relevance');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
     const [selectedValue, setSelectedValue] = useState('');
     const searchOptions = [t('allContainers'), t('title'), t('school'), t('abstract'), t('fullText'), t('keywords')];
 
@@ -137,7 +129,7 @@ function SearchResultPageContent() {
 
     useEffect(() => {
         setCurrentPage(1);
-    }, [searchText, selectedThemes, selectedYears]);
+    }, [searchText]); // 移除selectedThemes和selectedYears依赖
 
     // 监听语言变化，重新翻译搜索内容
     useEffect(() => {
@@ -153,13 +145,8 @@ function SearchResultPageContent() {
     // 动态生成年份选项
     const yearOptions = extractUniqueYears(searchResults);
 
-    const filteredResults = searchResults.filter(item => {
-        const eventName = item.title.split(' ')[0];
-        // 主题项文本形如：`事件名（3）`，用中文括号分割
-        const themeOk = selectedThemes.length === 0 || selectedThemes.some(theme => eventName === theme.split('（')[0]);
-        const yearOk = selectedYears.length === 0 || selectedYears.includes(item.time);
-        return themeOk && yearOk;
-    });
+    // 修改过滤逻辑，现在只用于结果展示，不进行实际筛选
+    const filteredResults = searchResults; // 不进行筛选，显示所有结果
 
     const sortedResults = [...filteredResults].sort((a, b) => {
         if (sortField === 'relevance') {
@@ -211,44 +198,34 @@ function SearchResultPageContent() {
                 <div className="search-params">{t('searchContent')}: {translatedSearchText}</div>
             </div>
             <div className="main-content">
-                {/* 左侧筛选区域 */}
+                {/* 左侧结果展示栏 */}
                 <div className="filter-section">
                     <div className="filter-container">
                         <div className="filter-header" onClick={() => toggleFilter('theme')}>
                             <h3>{t('eventNameFrequency')}</h3>
-                            <span className="chart-icon" title="查看柱状图" onClick={e => { e.stopPropagation(); setShowChart(true); }}>📊</span>
                             <span className="filter-icon">{filterOpen.theme ? '▼' : '▶'}</span>
                         </div>
                         {filterOpen.theme && (
                             <div className="filter-content">
                                 {themes.map((item, idx) => (
                                     <div className="filter-item" key={idx}>
-                                        <input type="checkbox" checked={selectedThemes.includes(item)} onChange={e => {
-                                            if (e.target.checked) setSelectedThemes([...selectedThemes, item]);
-                                            else setSelectedThemes(selectedThemes.filter(t => t !== item));
-                                        }} /> {item}
+                                        <span>{item}</span>
                                     </div>
                                 ))}
                             </div>
                         )}
                     </div>
 
-
-
                     <div className="filter-container">
                         <div className="filter-header" onClick={() => toggleFilter('year')}>
                             <h3>{t('year')}</h3>
-                            <span className="chart-icon" title="查看柱状图" onClick={e => { e.stopPropagation(); setShowYearChart(true); }}>📊</span>
                             <span className="filter-icon">{filterOpen.year ? '▼' : '▶'}</span>
                         </div>
                         {filterOpen.year && (
                             <div className="filter-content">
                                 {yearOptions.map((item, idx) => (
                                     <div className="filter-item" key={idx}>
-                                        <input type="checkbox" checked={selectedYears.includes(item)} onChange={e => {
-                                            if (e.target.checked) setSelectedYears([...selectedYears, item]);
-                                            else setSelectedYears(selectedYears.filter(y => y !== item));
-                                        }} /> {item}
+                                        <span>{item}</span>
                                     </div>
                                 ))}
                             </div>
@@ -258,38 +235,44 @@ function SearchResultPageContent() {
                 <div className="results-section">
                     {isLoading ? (<div className="loading">{t('loading')}...</div>) : (
                         <>
-                            {/* 工具栏 */}
                             <div className="toolbar-row">
                                 <div className="filter-toolbar">
-                                    <span>{t('eventTime')}: </span>
+                                    <span className="total-results">
+                                        {t("totalResults", { count: searchResults.length })}
+                                    </span>
+                                    <span style={{marginLeft: 20}}>{t('eventTime')}: </span>
                                     <input
                                         type="date"
                                         value={startDate}
                                         onChange={e => setStartDate(e.target.value)}
                                         className="date-input"
                                     />
-                                    <span className="date-separator">—</span>
+                                    <span style={{margin: '0 6px'}}>—</span>
                                     <input
                                         type="date"
                                         value={endDate}
                                         onChange={e => setEndDate(e.target.value)}
                                         className="date-input"
                                     />
+                                    <button className="applyFilter" onClick={() => {
+                                        setCurrentPage(1); // 筛选后重置到第一页
+                                    }}>
+                                        {t('applyFilter')}
+                                    </button>
                                 </div>
                                 <div className="results-toolbar">
-                                    <span>{t('sort')}: </span>
+                                    <span>{t('sortBy')}:</span>
                                     <select className="sort-select" value={sortField} onChange={e => setSortField(e.target.value)}>
                                         <option value="relevance">{t('relevance')}</option>
-                                        <option value="date">{t('publishTime')}</option>
+                                        <option value="date">{t('date')}</option>
                                     </select>
                                     <button
                                         className="sort-order-btn"
                                         onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                                        title={sortOrder === 'asc' ? t('ascending') : t('descending')}
                                     >
                                         {sortOrder === 'asc' ? '↑' : '↓'}
                                     </button>
-                                    <span className="display-label">{t('display')}: </span>
+                                    <span style={{ marginLeft: '15px' }}>{t('perPage')}:</span>
                                     <select
                                         className="page-size-select"
                                         value={pageSize}
@@ -298,9 +281,9 @@ function SearchResultPageContent() {
                                             setCurrentPage(1); // 重置为第一页
                                         }}
                                     >
-                                        <option value="10">{t('items10')}</option>
-                                        <option value="20">{t('items20')}</option>
-                                        <option value="50">{t('items50')}</option>
+                                        <option value={10}>10</option>
+                                        <option value={20}>20</option>
+                                        <option value={50}>50</option>
                                     </select>
                                 </div>
                             </div>
@@ -340,91 +323,18 @@ function SearchResultPageContent() {
                                 </tbody>
                             </table>
 
-                            {/* 分页区 */}
                             <div className="pagination">
-                                <div className="pagination-checkbox">
-                                    <label><input type="checkbox" checked={useLoadMore} onChange={e => { setUseLoadMore(e.target.checked); setCurrentPage(1); }} /> {t('useLoadMore')}</label>
-                                </div>
-                                {useLoadMore ? (
-                                    <div className="load-more-container">
-                                        {currentPage * pageSize < sortedResults.length ? (
-                                            <button onClick={() => setCurrentPage(currentPage + 1)}>{t('loadMore')}</button>
-                                        ) : (<span className="loaded-all-text">{t('loadedAll')}</span>)}
-                                    </div>
-                                ) : (
-                                    <div className="pagination-controls">
-                                        <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>{t('previousPage')}</button>
-                                        {generatePagination().map((p, i) => p === '...' ? <span key={i}>...</span> : <button key={p} className={currentPage === p ? 'active' : ''} onClick={() => setCurrentPage(p)}>{p}</button>)}
-                                        <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages}>{t('nextPage')}</button>
-                                        <span className="jump-to-container">{t('jumpTo')}：<input type="number" min={1} max={totalPages} value={currentPage} onChange={(e) => setCurrentPage(Math.min(totalPages, Math.max(1, Number(e.target.value))))} className="jump-to-input" /> / {totalPages}</span>
-                                    </div>
-                                )}
+                                {generatePagination().map((page, index) => (
+                                    <button
+                                        key={index}
+                                        className={page === currentPage ? 'active' : ''}
+                                        onClick={() => page !== '...' && setCurrentPage(page)}
+                                        disabled={page === '...'}
+                                    >
+                                        {page}
+                                    </button>
+                                ))}
                             </div>
-                            {/* 柱状图弹窗 */}
-                            {showChart && (
-                                <div className="modal-overlay" onClick={() => setShowChart(false)}>
-                                    <div className="modal-content" onClick={e => e.stopPropagation()}>
-                                        <h4 className="modal-title">{t('eventNameFrequencyChart')} {selectedThemes.length > 0 ? `(${t('selectedEvents')}${selectedThemes.length}${t('events')})` : ''}</h4>
-                                        {/* 简单SVG柱状图 */}
-                                        <svg width="700" height="220">
-                                            {(selectedThemes.length > 0 ? selectedThemes : themes).map((item, idx) => {
-                                                // 提取事件名和频度
-                                                const eventName = item.split('（')[0];
-                                                const freq = parseInt(item.match(/（(\d+)）/)[1]);
-                                                const barWidth = 40;
-                                                const barSpacing = 60;
-                                                const startX = 80;
-                                                const x = startX + idx * (barWidth + barSpacing);
-                                                return (
-                                                    <g key={item}>
-                                                        <rect x={x} y={180-freq*20} width={barWidth} height={freq*20} fill="#1890ff" />
-                                                        <text x={x + barWidth/2} y={205} textAnchor="middle" fontSize="12">{eventName}</text>
-                                                        <text x={x + barWidth/2} y={180-freq*20-5} textAnchor="middle" fontSize="12">{freq}</text>
-                                                    </g>
-                                                );
-                                            })}
-                                            {/* 坐标轴 */}
-                                            <line x1="30" y1="0" x2="30" y2="180" stroke="#333" />
-                                            <line x1="30" y1="180" x2="690" y2="180" stroke="#333" />
-                                            <text x="0" y="10" fontSize="12">{t('frequency')}</text>
-                                            <text x="620" y="210" fontSize="12">{t('eventName')}</text>
-                                        </svg>
-                                        <div className="modal-close-container"><button className="chart-close" onClick={()=>setShowChart(false)}>{t('close')}</button></div>
-                                    </div>
-                                </div>
-                            )}
-
-
-
-                            {showYearChart && (
-                                <div className="modal-overlay" onClick={() => setShowYearChart(false)}>
-                                    <div className="modal-content-year" onClick={e => e.stopPropagation()}>
-                                        <h4 className="modal-title">{t('yearEventCountChart')}</h4>
-                                        <svg width="700" height="220">
-                                            {yearOptions.map((item, idx) => {
-                                                const count = filteredResults.filter(r => r.time === item).length;
-                                                const barWidth = 40;
-                                                const barSpacing = 16;
-                                                const startX = 50;
-                                                const x = startX + idx * (barWidth + barSpacing);
-                                                return (
-                                                    <g key={item}>
-                                                        <rect x={x} y={180-count*20} width={barWidth} height={count*20} fill="#faad14" />
-                                                        <text x={x + barWidth/2} y={205} textAnchor="middle" fontSize="9">{item.split('-')[0]}</text>
-                                                        <text x={x + barWidth/2} y={215} textAnchor="middle" fontSize="9">{item.split('-')[1] + '-' + item.split('-')[2]}</text>
-                                                        <text x={x + barWidth/2} y={180-count*20-5} textAnchor="middle" fontSize="12">{count}</text>
-                                                    </g>
-                                                );
-                                            })}
-                                            <line x1="40" y1="0" x2="40" y2="180" stroke="#333" />
-                                            <line x1="40" y1="180" x2="690" y2="180" stroke="#333" />
-                                            <text x="0" y="10" fontSize="12">{t('eventCount')}</text>
-                                            <text x="620" y="210" fontSize="12">{t('year')}</text>
-                                        </svg>
-                                        <div className="modal-close-container"><button className="chart-close" onClick={()=>setShowYearChart(false)}>{t('close')}</button></div>
-                                    </div>
-                                </div>
-                            )}
                         </>
                     )}
                 </div>

@@ -80,7 +80,7 @@ function GaojiSearchComponent() {
             case "title": return t('title');
             case "school": return t('school');
             case "abstract": return t('abstract');
-            case "fullText": return t('fullText');
+            case "content": return t('fullText');
             case "keywords": return t('keywords');
             default: return t('allContainers');
         }
@@ -193,7 +193,7 @@ function GaojiSearchComponent() {
             case t('title'): return "title";
             case t('school'): return "school";
             case t('abstract'): return "abstract";
-            case t('fullText'): return "fullText";
+            case t('fullText'): return "content";
             case t('keywords'): return "keywords";
             default: return "all";
         }

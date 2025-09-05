@@ -216,16 +216,16 @@ const RegisterPage = () => {
                 let msg = response.data?.msg || 'registerFailed';
 
                 switch (errorCode) {
-                    case 11: // 用户名已存在
+                    case 21: // 用户名已存在
                         msg = t('usernameExists');
                         break;
-                    case 12: // 邮箱已存在
+                    case 22: // 邮箱已存在
                         msg = t('emailExists');
                         break;
-                    case 13: // 手机号已存在
+                    case 23: // 手机号已存在
                         msg = t('phoneExists');
                         break;
-                    case 14: // 邀请码错误
+                    case 24: // 邀请码错误
                         msg = t('invitationCodeError');
                         break;
                     default:

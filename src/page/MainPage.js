@@ -3,10 +3,12 @@ import React, {useMemo, useState} from "react";
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { useTranslation } from 'react-i18next';
+import { message } from 'antd';
 import './MainPage.css';
 import Header from "./header";
 import Footer from "./Footer";
 import RankingBoard from "../MainPageExtend/RankingBoard";
+import { checkAdminPermission } from '../api/service';
 
 // 图标
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -91,8 +93,51 @@ function ButtonBar() {
     const handleUploadFileClick = () => {
         navigate("/uploadFile");
     }
+    
+    const handleAdminToolsClick = async () => {
+        try {
+            // 验证管理员权限
+            const response = await checkAdminPermission();
+            
+            if (response.data.code === 200 && response.data.data === true) {
+                // 管理员验证通过，跳转到管理员页面
+                navigate("/adminTools");
+            } else {
+                // 非管理员用户，跳转到403页面
+                navigate('/403');
+            }
+        } catch (error) {
+            console.error('管理员权限验证失败:', error);
+            
+            if (error.response && error.response.data) {
+                const { code, msg } = error.response.data;
+                
+                switch (code) {
+                    case 500:
+                        if (msg === '未登录') {
+                            message.error(t('notLoggedIn') || '请先登录');
+                            navigate('/login');
+                        } else if (msg === '身份验证失败') {
+                            message.error(t('authenticationFailed') || '身份验证失败，请重新登录');
+                            navigate('/login');
+                        } else if (msg === '非管理员用户') {
+                            // 非管理员用户，跳转到403页面
+                            navigate('/403');
+                        } else {
+                            message.error(msg || t('unknownError') || '未知错误');
+                        }
+                        break;
+                    default:
+                        message.error(msg || t('unknownError') || '未知错误');
+                }
+            } else {
+                message.error(t('networkError') || '网络错误，请稍后重试');
+            }
+        }
+    }
     const buttons = [
         { label: t('uploadFile'), onClick: handleUploadFileClick },
+        { label: t('adminTools') || '管理员工具', onClick: handleAdminToolsClick },
     ];
 
     return (

@@ -10,6 +10,8 @@ import GaojiSearchResultPage from './search/GaojiSearchResultPage';
 import ServerErrorPage from "./ErrorPages/ServerErrorPage";
 import ContentViewerPage from "./page/ContentViewerPage";
 import UploadFilePage from "./page/FileUploadPage";
+import AdminToolsPage from "./page/AdminToolsPage";
+import DirectoryPage from "./page/DirectoryPage";
 import CookieNotice from "./CookieNotice/CookieNotice";
 import AuthGuard from "./AuthGuard/AuthGuard";
 import RegisterPage from "./page/RegisterPage";
@@ -89,6 +91,24 @@ function App() {
                 element={
                   <AuthGuard>
                     <UploadFilePage />
+                  </AuthGuard>
+                }
+            />
+            {/*  管理员工具页面  */}
+            <Route
+                path="/adminTools"
+                element={
+                  <AuthGuard>
+                    <AdminToolsPage />
+                  </AuthGuard>
+                }
+            />
+            {/*  目录查看页面  */}
+            <Route
+                path="/directory"
+                element={
+                  <AuthGuard>
+                    <DirectoryPage />
                   </AuthGuard>
                 }
             />

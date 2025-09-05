@@ -78,12 +78,6 @@ function GaojiSearchResultPageContent() {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [filterOpen, setFilterOpen] = useState({ theme: true, source: true, year: true });
-    const [showChart, setShowChart] = useState(false);
-    const [showSourceChart, setShowSourceChart] = useState(false);
-    const [showYearChart, setShowYearChart] = useState(false);
-    const [selectedThemes, setSelectedThemes] = useState([]);
-    const [selectedSources, setSelectedSources] = useState([]);
-    const [selectedYears, setSelectedYears] = useState([]);
     const [sources, setSources] = useState([]); // 动态来源数据
     const [years, setYears] = useState([]); // 动态年份数据
     const [totalResults, setTotalResults] = useState(0);
@@ -292,22 +286,8 @@ function GaojiSearchResultPageContent() {
     // 动态生成主题选项（事件名频度）
     const themes = calculateEventNameFrequency(searchResults);
 
-    // 修改过滤逻辑，只保留主题筛选
-    const filteredResults = searchResults.filter(item => {
-        const eventName = item.title?.split(' ')[0];
-        const themeOk = selectedThemes.length === 0 || selectedThemes.some(theme => {
-            const themeName = theme.split('（')[0];
-            return eventName === themeName;
-        });
-
-        // 日期范围筛选逻辑（如果后端没有日期字段，这里先暂停）
-        // const itemDate = new Date(item.time);
-        // const startOk = startDate ? itemDate >= new Date(startDate) : true;
-        // const endOk = endDate ? itemDate <= new Date(endDate) : true;
-        // const dateRangeOk = startOk && endOk;
-
-        return themeOk; // 只保留主题筛选
-    });
+    // 修改过滤逻辑，现在只用于结果展示，不进行实际筛选
+    const filteredResults = searchResults; // 不进行筛选，显示所有结果
 
     // 添加排序逻辑
     const sortedResults = [...filteredResults].sort((a, b) => {
@@ -354,32 +334,18 @@ function GaojiSearchResultPageContent() {
                 <div className="search-params" style={{ whiteSpace: 'pre-line' }}>{t('searchContent')}: {searchText}</div>
             </div>
             <div className="main-content">
-                {/* 左侧筛选区域，样式与SearchResultPage一致 */}
+                {/* 左侧结果展示栏 */}
                 <div className="filter-section">
                     <div className="filter-container">
                         <div className="filter-header" onClick={() => toggleFilter('theme')} style={{ display: 'flex', alignItems: 'center' }}>
                             <h3 style={{ margin: 0 }}>{t('eventNameFrequency')}</h3>
-                            <span className="chart-icon" style={{ marginLeft: 8, cursor: 'pointer' }} title="查看柱状图" onClick={e => { e.stopPropagation(); setShowChart(true); }}>📊</span>
                             <span className="filter-icon">{filterOpen.theme ? '▼' : '▶'}</span>
                         </div>
                         {filterOpen.theme && (
                             <div className="filter-content" style={{ maxHeight: '200px', overflowY: 'auto' }}>
                                 {themes.map((item, idx) => (
                                     <div key={idx} className="filter-item">
-                                        <label>
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedThemes.includes(item)}
-                                                onChange={() => {
-                                                    if (selectedThemes.includes(item)) {
-                                                        setSelectedThemes(selectedThemes.filter(t => t !== item));
-                                                    } else {
-                                                        setSelectedThemes([...selectedThemes, item]);
-                                                    }
-                                                }}
-                                            />
-                                            {item}
-                                        </label>
+                                        <span>{item}</span>
                                     </div>
                                 ))}
                             </div>
@@ -459,7 +425,7 @@ function GaojiSearchResultPageContent() {
                             <div className="toolbar-row">
                                 <div className="filter-toolbar">
                                     <span className="total-results">
-                                        {t("totalResults", { count: totalResults })}
+                                        {t("totalResults", { count: searchResults.length })}
                                     </span>
                                     <span style={{marginLeft: 20}}>{t('eventTime')}: </span>
                                     <input
@@ -562,6 +528,7 @@ function GaojiSearchResultPageContent() {
                     )}
                 </div>
             </div>
+            
             <Footer />
         </div>
     );

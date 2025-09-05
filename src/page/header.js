@@ -86,6 +86,10 @@ function Header() {
         navigate("/gaojiSearch");
     };
 
+    const handleDirectoryClick = () => {
+        navigate("/directory");
+    };
+
     return (
         <div className="header-container">
             <div className="first-line">
@@ -141,6 +145,11 @@ function Header() {
                 <div className="readvce">
                     <button className="GaojiSearchButton" onClick={handleGaojiSearchClick}>
                         <h3>{t('advancedSearch')}</h3>
+                    </button>
+                </div>
+                <div className="directory-nav">
+                    <button className="DirectoryButton" onClick={handleDirectoryClick}>
+                        <h3>{t('directoryView')}</h3>
                     </button>
                 </div>
             </div>

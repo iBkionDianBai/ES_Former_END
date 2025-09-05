@@ -207,7 +207,7 @@ const LoginPage = () => {
 
             // ✅ 成功
             if (response.data && response.data.code === 200) {
-                const token = response.data.data;
+                const token = response.data.msg;
                 sessionStorage.setItem('username', formData.username);
                 sessionStorage.setItem('token', token);
                 navigate('/main');
@@ -235,6 +235,9 @@ const LoginPage = () => {
                         break;
                     case 7: // 用户名密码错误
                         errorMsg = t('usernameOrPasswordError') || errorMessage;
+                        break;
+                    case 8: // 用户账户已被封禁
+                        errorMsg = t('accountBanned') || errorMessage;
                         break;
                     default: // 其他错误直接显示后端 msg
                         errorMsg = errorMessage || t('unknownError');

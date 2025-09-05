@@ -9,8 +9,6 @@ export const setPublicKey = (rawKey) => {
             throw new Error('无效的公钥数据');
         }
 
-        console.log('原始公钥:', rawKey);
-
         // 格式化为 PEM 格式
         const pemKey = `-----BEGIN PUBLIC KEY-----\n${rawKey.replace(/(.{64})/g, '$1\n')}\n-----END PUBLIC KEY-----`;
 
