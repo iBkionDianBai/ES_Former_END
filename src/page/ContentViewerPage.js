@@ -13,6 +13,26 @@ const parseArticleContent = (htmlContent) => {
     const tempElement = document.createElement('div');
     tempElement.innerHTML = htmlContent;
 
+    // 清除所有元素的内联样式，防止影响页面布局
+    const allElements = tempElement.querySelectorAll('*');
+    allElements.forEach(element => {
+        element.removeAttribute('style');
+        // 同时移除class属性以避免外部CSS类影响
+        // 但保留一些语义化重要的类名，如目录、图表等需要的类名
+        const classes = element.className;
+        if (classes && typeof classes === 'string') {
+            // 保留一些特定的类名，移除其他可能影响样式的类名
+            const preservedClasses = classes.split(' ').filter(cls => 
+                cls.startsWith('toc-') || 
+                cls.startsWith('figure-') || 
+                cls.startsWith('table-') ||
+                cls === 'caption' ||
+                cls === 'media'
+            ).join(' ');
+            element.className = preservedClasses;
+        }
+    });
+
     // 提取目录（优先查找h1标签，然后查找h2, h3）
     const headings = Array.from(tempElement.querySelectorAll('h1, h2, h3'));
     const toc = headings.map((heading, index) => {
@@ -20,10 +40,26 @@ const parseArticleContent = (htmlContent) => {
         if (!heading.id) {
             heading.id = `heading-${index}`;
         }
+        
+        // 根据标题内容判断级别，处理中文标题格式
+        let level = heading.tagName === 'H1' ? 1 : heading.tagName === 'H2' ? 2 : 3;
+        const text = heading.textContent?.trim() || `Heading ${index + 1}`;
+        
+        // 检查是否为中文标题格式并调整级别
+        // 例如："一、"、"二、"等格式通常为二级标题
+        // "(一)"、"(二)"等格式通常为三级标题
+        if (/^[一二三四五六七八九十]+、/.test(text)) {
+            level = 2; // 中文数字+顿号格式为二级标题
+        } else if (/^\([一二三四五六七八九十]+\)/.test(text)) {
+            level = 3; // 中文数字+括号格式为三级标题
+        } else if (/^[(（][一二三四五六七八九十]+[)）]/.test(text)) {
+            level = 3; // 中文数字+全角或半角括号格式为三级标题
+        }
+        
         return {
             id: heading.id,
-            text: heading.textContent?.trim() || `Heading ${index + 1}`,
-            level: heading.tagName === 'H1' ? 1 : heading.tagName === 'H2' ? 2 : 3,
+            text: text,
+            level: level,
         };
     });
 
@@ -64,7 +100,7 @@ const parseArticleContent = (htmlContent) => {
     // 将修改后的HTML更新回去
     const updatedContent = tempElement.innerHTML;
 
-    return { toc, media };
+    return { toc, media, updatedContent };
 };
 
 // API 请求函数
@@ -108,20 +144,35 @@ const fetchArticle = async (articleId) => {
                     title = firstH1.textContent.trim();
                 }
                 
-                // 获取body内容，但排除head中的style标签
-                const bodyContent = doc.body?.innerHTML || htmlContent;
-                
-                // 提取head中的style内容
-                const styleElement = doc.querySelector('head style');
-                let styles = '';
-                if (styleElement) {
-                    styles = `<style>${styleElement.textContent}</style>`;
+                // 清除body标签的样式影响
+                const bodyElement = doc.body;
+                if (bodyElement) {
+                    // 移除body标签上的所有样式属性
+                    bodyElement.removeAttribute('style');
+                    bodyElement.removeAttribute('class');
                 }
+                
+                // 获取body内容
+                const bodyContent = bodyElement?.innerHTML || htmlContent;
+                
+                // 提取head中的style内容，但不直接应用
+                // 而是将其转换为更安全的内联样式
+                let styles = '';
+                const styleElements = doc.querySelectorAll('head style, style');
+                styleElements.forEach(styleEl => {
+                    if (styleEl.textContent) {
+                        styles += styleEl.textContent;
+                    }
+                });
+                
+                // 将样式转换为更安全的形式（可选）
+                // 这里我们简单地移除所有样式，以确保不会影响页面布局
+                styles = '';
                 
                 return {
                     id: articleData.id,
                     title: title.length > 50 ? title.substring(0, 50) + '...' : title,
-                    content: styles + bodyContent, // 将样式和内容合并
+                    content: bodyContent, // 只使用清理后的内容
                     author: '',
                     publishDate: '',
                     references: [],
@@ -195,7 +246,7 @@ const Sidebar = ({ activeTab, tableOfContents, mediaItems, onItemClick, windowHe
                     {tableOfContents.map((item) => (
                         <li
                             key={item.id}
-                            className={`toc-item ${item.level === 2 ? 'sub-toc-item' : ''}`}
+                            className={`toc-item level-${item.level}`}
                             onClick={() => onItemClick(item.id)}
                         >
                             {item.text}
@@ -270,7 +321,7 @@ const Article = ({ articleContent, zoomLevel }) => {
 };
 
 // 主内容查看页面
-const ContentViewerPageContent = () => {
+const ContentViewerPage = () => {
     const { t } = useTranslation();
     const [searchParams] = useSearchParams();
     const [activeTab, setActiveTab] = useState(t('tableOfContents'));
@@ -306,8 +357,12 @@ const ContentViewerPageContent = () => {
         
         fetchArticle(articleId)
             .then((data) => {
-                setArticleContent(data);
-                const { toc, media } = parseArticleContent(data.content);
+                const { toc, media, updatedContent } = parseArticleContent(data.content);
+                // 使用更新后的内容，确保ID正确应用
+                setArticleContent({
+                    ...data,
+                    content: updatedContent
+                });
                 setTableOfContents(toc);
                 setMediaItems(media);
                 setLoading(false);
@@ -325,15 +380,76 @@ const ContentViewerPageContent = () => {
 
     const handleTabChange = (tab) => setActiveTab(tab);
     const handleScrollTo = (id) => {
-        const element = document.getElementById(id);
-        if (element) element.scrollIntoView({ behavior: 'smooth' });
+        console.log('Attempting to scroll to:', id);
+        
+        // 尝试多种方式查找元素
+        let element = document.getElementById(id);
+        
+        if (!element) {
+            // 如果直接查找不到，尝试在文章内容区域内查找
+            const articleContainer = document.querySelector('.article-content');
+            if (articleContainer) {
+                element = articleContainer.querySelector(`#${id}`);
+            }
+        }
+        
+        if (!element) {
+            // 尝试通过CSS选择器查找
+            element = document.querySelector(`[id="${id}"]`);
+        }
+        
+        if (element) {
+            console.log('Found element:', element);
+            
+            // 考虑缩放和导航栏高度
+            const navigationHeight = document.querySelector('.navigation')?.offsetHeight || 125;
+            const headerHeight = 95; // header高度
+            const totalOffset = navigationHeight + headerHeight + 20; // 额外的间距
+            
+            // 计算目标位置
+            const elementRect = element.getBoundingClientRect();
+            const scrollTop = window.pageYOffset + elementRect.top - totalOffset;
+            
+            // 平滑滚动到目标位置
+            window.scrollTo({
+                top: scrollTop,
+                behavior: 'smooth'
+            });
+            
+            // 高亮目标元素（可选）
+            element.style.backgroundColor = 'rgba(102, 126, 234, 0.1)';
+            setTimeout(() => {
+                element.style.backgroundColor = '';
+            }, 2000);
+        } else {
+            console.warn('Element not found with id:', id);
+            // 如果找不到元素，尝试通过文本匹配查找
+            const allHeadings = document.querySelectorAll('.article-content h1, .article-content h2, .article-content h3');
+            const targetTocItem = tableOfContents.find(item => item.id === id);
+            
+            if (targetTocItem) {
+                const matchingHeading = Array.from(allHeadings).find(heading => 
+                    heading.textContent?.trim() === targetTocItem.text
+                );
+                
+                if (matchingHeading) {
+                    console.log('Found heading by text match:', matchingHeading);
+                    matchingHeading.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start',
+                        inline: 'nearest'
+                    });
+                }
+            }
+        }
     };
 
     return (
-        <div className="app-container">
+        <div>
             <Helmet>
                 <title>{articleContent?.title || t('articleDetails')}</title>
             </Helmet>
+            <Header />
             <Navigation 
                 activeTab={activeTab} 
                 onTabChange={handleTabChange}
@@ -367,16 +483,5 @@ const ContentViewerPageContent = () => {
         </div>
     );
 };
-
-function ContentViewerPage() {
-    return (
-        <div>
-            <>
-                <Header />
-                <ContentViewerPageContent />
-            </>
-        </div>
-    );
-}
 
 export default ContentViewerPage;
