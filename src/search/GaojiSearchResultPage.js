@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Footer from "../page/Footer";
 import { useTranslation } from 'react-i18next';
 import { advancedSearch } from '../api/service';
+import { EyeOutlined } from '@ant-design/icons';
 
 
 // 计算事件名频度的函数
@@ -59,8 +60,8 @@ const extractUniqueYears = (results) => {
 
     const years = new Set();
     results.forEach(item => {
-        if (item.time) {
-            years.add(item.time);
+        if (item.date) {
+            years.add(item.date);
         }
     });
 
@@ -285,6 +286,8 @@ function GaojiSearchResultPageContent() {
 
     // 动态生成主题选项（事件名频度）
     const themes = calculateEventNameFrequency(searchResults);
+    // 动态生成年份选项
+    const yearOptions = extractUniqueYears(searchResults);
 
     // 修改过滤逻辑，现在只用于结果展示，不进行实际筛选
     const filteredResults = searchResults; // 不进行筛选，显示所有结果
@@ -345,6 +348,22 @@ function GaojiSearchResultPageContent() {
                             <div className="filter-content" style={{ maxHeight: '200px', overflowY: 'auto' }}>
                                 {themes.map((item, idx) => (
                                     <div key={idx} className="filter-item">
+                                        <span>{item}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="filter-container">
+                        <div className="filter-header" onClick={() => toggleFilter('year')}>
+                            <h3>{t('year')}</h3>
+                            <span className="filter-icon">{filterOpen.year ? '▼' : '▶'}</span>
+                        </div>
+                        {filterOpen.year && (
+                            <div className="filter-content">
+                                {yearOptions.map((item, idx) => (
+                                    <div className="filter-item" key={idx}>
                                         <span>{item}</span>
                                     </div>
                                 ))}
@@ -491,21 +510,19 @@ function GaojiSearchResultPageContent() {
                                         <td>{(currentPage - 1) * pageSize + index + 1}</td>
                                         <td>
                                             <span 
-                                                style={{ color: '#12cff6', cursor: 'pointer' }} 
+                                                className="item-name"
                                                 onClick={() => navigate(`/contentViewer?id=${result.id}`)}
                                             >
                                                 {result.title}
                                             </span>
                                         </td>
-                                        <td>{/* 时间列暂时留空 */}</td>
+                                        <td>{result.date || '-'}</td>
                                         <td>
-                                            <span 
-                                                title={t('read')} 
-                                                style={{ cursor: 'pointer', fontSize: '20px', color: '#12cff6' }} 
+                                            <EyeOutlined
+                                                title={t('read')}
+                                                className="operation-icon"
                                                 onClick={() => navigate(`/contentViewer?id=${result.id}`)}
-                                            >
-                                                📖
-                                            </span>
+                                            />
                                         </td>
                                     </tr>
                                 ))}

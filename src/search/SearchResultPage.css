@@ -42,8 +42,8 @@
 .refresh-search {
     height: 40px;
     padding: 0 20px;
-    background: linear-gradient(90deg, #12cff6, #46f88d);
-    color: #000000;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    color: #ffffff;
     border: none;
     border-radius: 0 4px 4px 0;
     cursor: pointer;
@@ -100,7 +100,7 @@
     margin-right: 8px;
     /* 为 Filter icon 留出一些间距 */
     cursor: pointer;
-    color: #1D67E7;
+    color: #667eea;
 }
 
 .filter-icon {
@@ -140,6 +140,15 @@
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
+
+    .item-name {
+        color: #333;
+        cursor: pointer;
+    }
+
+    .item-name:hover {
+        color: #667eea;
+    }
 }
 
 .results-table th,
@@ -175,7 +184,7 @@
 }
 
 .pagination button.active {
-    background: linear-gradient(90deg, #12cff6, #46f88d);
+    background: linear-gradient(90deg, #667eea, #764ba2);
     color: white;
 }
 
@@ -201,7 +210,8 @@
     padding: 6px 12px;
     border: none;
     margin-left: 10px;
-    background: linear-gradient(90deg, #12cff6, #46f88d);
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    color: #ffffff;
     border-radius: 4px;
 }
 
@@ -241,7 +251,7 @@
 .chart-close {
     padding: 10px 20px;
     font-size: 16px;
-    color: #1D67E7;
+    color: #667eea;
     background-color: #fff;
     border: none;
     border-radius: 6px;
@@ -250,7 +260,7 @@
 }
 
 .chart-close:hover {
-    background-color: #1D67E7;
+    background-color: #667eea;
     color: #fff;
 }
 
@@ -274,7 +284,7 @@
 
 /* 可点击链接样式 */
 .clickable-link {
-    color: #12cff6;
+    color: #667eea;
     cursor: pointer;
 }
 
@@ -282,7 +292,16 @@
 .operation-icon {
     cursor: pointer;
     font-size: 20px;
-    color: #12cff6;
+    color: #667eea;
+    transition: all 0.3s ease;
+    padding: 2px;
+    border-radius: 4px;
+}
+
+.operation-icon:hover {
+    color: #764ba2;
+    background-color: rgba(102, 126, 234, 0.1);
+    transform: scale(1.1);
 }
 
 /* 分页相关样式 */

@@ -25,7 +25,7 @@
 /* 标题 */
 .theme-ranking-title {
     font-family: "Microsoft YaHei", sans-serif;
-    background: linear-gradient(90deg, #12cff6, #46f88d);
+    background: linear-gradient(90deg, #667eea, #764ba2);
     color: white;
     padding: 12px;
     font-size: 20px;
@@ -62,14 +62,17 @@
     height: 70px;
     background: linear-gradient(90deg, #b0eaf5, #e0faff);
 }
+
 .top-2 {
     height: 70px;
     background: linear-gradient(90deg, #c9f0ff, #f0fbff);
 }
+
 .top-3 {
     height: 70px;
     background: linear-gradient(90deg, #dceeff, #f5faff);
 }
+
 .normal {
     background: #dde2e7;
 }
@@ -92,6 +95,7 @@
     transform: translateZ(0);
     transition: transform 0.3s ease;
 }
+
 .rank-badge:hover {
     transform: translateY(-3px) scale(1.05);
 }
@@ -102,12 +106,14 @@
     font-size: 20px;
     background: linear-gradient(135deg, #17d6d6, #00a4a4);
 }
+
 .badge-2 {
     height: 50px;
     width: 70px;
     font-size: 20px;
     background: linear-gradient(135deg, #19b9f0, #0090c0);
 }
+
 .badge-3 {
     height: 50px;
     width: 70px;
@@ -121,11 +127,13 @@
     text-align: center;
     font-weight: bold;
 }
+
 .name-cell {
     font-size: 20px;
     text-align: left;
     padding-left: 40px;
 }
+
 .freq-cell {
     font-size: 20px;
     text-align: center;
@@ -138,6 +146,7 @@
         transform: translateY(8px);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;

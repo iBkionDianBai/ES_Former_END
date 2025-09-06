@@ -376,5 +376,8 @@
   "authenticationFailed": "Authentication failed, please log in again",
   "adminPermissionDenied": "You do not have administrator privileges to access this page",
   "networkError": "Network error, please try again later",
-  "unknownError": "Unknown error"
+  "unknownError": "Unknown error",
+  "searchFailed": "Search failed",
+  "searchError": "Search error",
+  "noResults": "No matching results found"
 }

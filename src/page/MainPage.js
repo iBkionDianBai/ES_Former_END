@@ -1,5 +1,5 @@
 // src/page/MainPage.js
-import React, {useMemo, useState} from "react";
+import React, {useMemo, useState, useEffect, useRef} from "react";
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { useTranslation } from 'react-i18next';
@@ -13,11 +13,14 @@ import { checkAdminPermission } from '../api/service';
 // 图标
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import { DownOutlined } from '@ant-design/icons';
 
 // 搜索组件
 function SearchComponent() {
     const { t } = useTranslation();
-    const [selectedValue, setSelectedValue] = useState('');
+    const [selectedValue, setSelectedValue] = useState(t('allContainers'));
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
     const searchOptions = [t('allContainers'), t('title'), t('school'), t('abstract'), t('fullText'), t('keywords')];
     const navigate = useNavigate();
     const [inputContent, setInputContent] = useState('');
@@ -28,10 +31,31 @@ function SearchComponent() {
     ], [t]);
 
     const handleSearchClick = () => {
-        if (inputContent.trim() !== '') {
-            navigate('/searchResult?q=' + encodeURIComponent(inputContent.trim()));
-        }
+        // 允许空搜索，显示所有结果
+        navigate('/searchResult?q=' + encodeURIComponent(inputContent.trim()));
     };
+
+    const handleOptionSelect = (option) => {
+        setSelectedValue(option);
+        setDropdownOpen(false);
+    };
+
+    // 点击外部关闭下拉菜单
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setDropdownOpen(false);
+            }
+        };
+
+        if (dropdownOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [dropdownOpen]);
 
     return (
         <div className="search-area">
@@ -56,14 +80,32 @@ function SearchComponent() {
                     <div className={activeTab === 0 ? "search-tab-content-normal" : "search-tab-content-other"}>
                         <div className="input-box">
                             <div className="search-select">
-                                <select
-                                    onChange={(e) => setSelectedValue(e.target.value)}
-                                    className="sort"
+                                <div 
+                                    ref={dropdownRef}
+                                    className="custom-select sort"
+                                    onClick={() => setDropdownOpen(!dropdownOpen)}
                                 >
-                                    {searchOptions.map((container) => (
-                                        <option className="Options" key={container} value={container}>{container}</option>
-                                    ))}
-                                </select>
+                                    <span className="select-text">{selectedValue}</span>
+                                    <DownOutlined 
+                                        className={`dropdown-arrow ${dropdownOpen ? 'open' : ''}`} 
+                                    />
+                                    {dropdownOpen && (
+                                        <div className="dropdown-menu">
+                                            {searchOptions.map((option) => (
+                                                <div 
+                                                    key={option} 
+                                                    className={`dropdown-option ${selectedValue === option ? 'selected' : ''}`}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleOptionSelect(option);
+                                                    }}
+                                                >
+                                                    {option}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                             <div className="input-content">
                                 <input
@@ -71,6 +113,7 @@ function SearchComponent() {
                                     type="text"
                                     value={inputContent}
                                     onChange={(e) => setInputContent(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleSearchClick()}
                                     placeholder={t('search')}
                                 />
                             </div>

@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
+import { message } from "antd";
+import { EyeOutlined } from '@ant-design/icons';
 import "./SearchResultPage.css";
 import '../index'
 import Header from "../page/header";
 import Footer from "../page/Footer";
 import { useTranslation } from 'react-i18next';
+import { simpleSearch } from '../api/service';
 
 // 计算事件名频度的函数（显示全部，不截断）
 const calculateEventNameFrequency = (results) => {
@@ -28,7 +31,7 @@ const extractUniqueYears = (results) => {
     if (!Array.isArray(results)) return [];
     const years = new Set();
     results.forEach(item => {
-        if (item.time) years.add(item.time);
+        if (item.date) years.add(item.date); // 修改为 date 字段
     });
     return Array.from(years).sort((a, b) => new Date(b) - new Date(a));
 };
@@ -41,17 +44,18 @@ function SearchResultPageContent() {
     const [inputValue, setInputValue] = useState(searchText);
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [totalResults, setTotalResults] = useState(0);
+    const [totalPages, setTotalPages] = useState(0); // 添加总页数状态
     const [filterOpen, setFilterOpen] = useState({ theme: true, year: true });
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
-    const [useLoadMore, setUseLoadMore] = useState(false);
 
     const navigate = useNavigate();
     const [sortOrder, setSortOrder] = useState('desc');
     const [sortField, setSortField] = useState('relevance');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
-    const [selectedValue, setSelectedValue] = useState('');
+    const [selectedValue, setSelectedValue] = useState(t('allContainers'));
     const searchOptions = [t('allContainers'), t('title'), t('school'), t('abstract'), t('fullText'), t('keywords')];
 
     // 翻译搜索条件中的操作符和容器名称
@@ -94,47 +98,101 @@ function SearchResultPageContent() {
 
     // 构建翻译后的搜索内容
     const buildTranslatedSearchText = () => {
+        // 获取当前选择的搜索字段
+        const currentField = selectedValue || t('allContainers');
+        
         if (!searchText || searchText.trim() === '') {
-            return '';
+            // 空搜索时显示“显示所有结果”
+            return `${currentField}: 显示所有结果`;
         }
-        return translateSearchConditions(searchText);
+        
+        // 构建显示文本：字段名 + 关键词
+        return `${currentField}: "${searchText.trim()}"`;
     };
 
     const [translatedSearchText, setTranslatedSearchText] = useState(buildTranslatedSearchText());
 
     const handleSearch = () => {
-        if (inputValue.trim() !== '') {
-            navigate('/searchResult?q=' + encodeURIComponent(inputValue.trim()));
+        // 允许空搜索，显示所有结果
+        navigate('/searchResult?q=' + encodeURIComponent(inputValue.trim()));
+    };
+
+    // 映射前端容器名称到后端字段名
+    const mapContainerToField = (container) => {
+        const mapping = {
+            [t('allContainers')]: 'all',
+            [t('title')]: 'title',
+            [t('school')]: 'school',
+            [t('abstract')]: 'abstract',
+            [t('fullText')]: 'content',
+            [t('keywords')]: 'keywords'
+        };
+        return mapping[container] || 'all';
+    };
+
+    // 执行搜索请求的函数
+    const performSearch = async () => {
+        setIsLoading(true);
+        try {
+            // 构建搜索参数
+            const searchField = mapContainerToField(selectedValue || t('allContainers'));
+            const searchParams = {
+                conditions: [
+                    {
+                        field: searchField,
+                        keyword: searchText ? searchText.trim() : '' // 允许空搜索
+                    }
+                ],
+                currentPage: currentPage,
+                pageSize: pageSize,
+                sortField: sortField === 'relevance' ? '_score' : 'time',
+                sortOrder: sortOrder,
+                enableHighlight: true
+            };
+
+            console.log('发送搜索请求:', searchParams);
+            
+            const response = await simpleSearch(searchParams);
+            console.log('搜索响应:', response.data);
+            
+            if (response.data.code === 200) {
+                const { data } = response.data;
+                setSearchResults(data.items || []); // 修改为 items
+                setTotalResults(data.totalCount || 0); // 修改为 totalCount
+                setTotalPages(data.totalPages || 0); // 使用后端返回的总页数
+            } else {
+                console.error('搜索失败:', response.data.msg);
+                message.error(response.data.msg || t('searchFailed') || '搜索失败');
+                setSearchResults([]);
+                setTotalResults(0);
+            }
+        } catch (error) {
+            console.error('搜索接口调用失败:', error);
+            if (error.response && error.response.data) {
+                message.error(error.response.data.msg || t('searchError') || '搜索出错');
+            } else {
+                message.error(t('networkError') || '网络连接错误');
+            }
+            setSearchResults([]);
+            setTotalResults(0);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setSearchResults([
-                { id: 1, title: "事件题目一 题目第二行", source: "平台名", time: "2020-01-15" },
-                { id: 2, title: "事件题目二 题目第二行", source: "平台名", time: "2020-02-20" },
-                { id: 3, title: "事件题目三 题目第二行", source: "平台名", time: "2020-03-10" },
-                { id: 4, title: "事件题目四 题目第二行", source: "平台名", time: "2020-04-05" },
-                { id: 5, title: "事件题目五 题目第二行", source: "平台名", time: "2020-05-25" },
-                { id: 6, title: "事件题目六 题目第二行", source: "平台名", time: "2020-06-18" },
-                { id: 7, title: "事件题目七 题目第二行", source: "平台名", time: "2020-07-12" },
-                { id: 8, title: "事件题目八 题目第二行", source: "平台名", time: "2020-08-08" },
-                { id: 9, title: "事件题目九 题目第二行", source: "平台名", time: "2020-09-30" },
-                { id: 10, title: "事件题目十 题目第二行", source: "平台名", time: "2020-10-22" }
-            ]);
-            setIsLoading(false);
-        }, 500);
-        return () => clearTimeout(timer);
-    }, [searchText]);
+        performSearch();
+    }, [searchText, currentPage, pageSize, sortField, sortOrder, selectedValue]); // 添加 selectedValue 依赖
 
+    // 在搜索关键词变化时重置到第一页
     useEffect(() => {
         setCurrentPage(1);
-    }, [searchText]); // 移除selectedThemes和selectedYears依赖
+    }, [searchText]);
 
     // 监听语言变化，重新翻译搜索内容
     useEffect(() => {
         setTranslatedSearchText(buildTranslatedSearchText());
-    }, [t, searchText]);
+    }, [t, searchText, selectedValue]); // 添加 selectedValue 依赖
 
     const toggleFilter = (filterName) => {
         setFilterOpen({ ...filterOpen, [filterName]: !filterOpen[filterName] });
@@ -145,22 +203,12 @@ function SearchResultPageContent() {
     // 动态生成年份选项
     const yearOptions = extractUniqueYears(searchResults);
 
-    // 修改过滤逻辑，现在只用于结果展示，不进行实际筛选
     const filteredResults = searchResults; // 不进行筛选，显示所有结果
 
-    const sortedResults = [...filteredResults].sort((a, b) => {
-        if (sortField === 'relevance') {
-            return sortOrder === 'asc' ? a.id - b.id : b.id - a.id;
-        } else if (sortField === 'date') {
-            return sortOrder === 'asc' ? new Date(a.time) - new Date(b.time) : new Date(b.time) - new Date(a.time);
-        }
-        return 0;
-    });
+    const sortedResults = [...filteredResults]; // 后端已经排序，前端不需要再次排序
 
-    const totalPages = Math.ceil(sortedResults.length / pageSize);
-    const pagedResults = useLoadMore
-        ? sortedResults.slice(0, currentPage * pageSize)
-        : sortedResults.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+    // 使用后端返回的分页信息
+    const pagedResults = sortedResults; // 后端已经分页，前端不需要再次分页
 
     const generatePagination = () => {
         return Array.from({ length: totalPages }, (_, i) => i + 1)
@@ -182,6 +230,7 @@ function SearchResultPageContent() {
                 <div className="search-bar">
                     <div className="search-select-result">
                         <select
+                            value={selectedValue}
                             onChange={(e) => setSelectedValue(e.target.value)}
                             className="sort-result"
                         >
@@ -238,7 +287,7 @@ function SearchResultPageContent() {
                             <div className="toolbar-row">
                                 <div className="filter-toolbar">
                                     <span className="total-results">
-                                        {t("totalResults", { count: searchResults.length })}
+                                        {t("totalResults", { count: totalResults })}
                                     </span>
                                     <span style={{marginLeft: 20}}>{t('eventTime')}: </span>
                                     <input
@@ -256,6 +305,7 @@ function SearchResultPageContent() {
                                     />
                                     <button className="applyFilter" onClick={() => {
                                         setCurrentPage(1); // 筛选后重置到第一页
+                                        performSearch(); // 重新执行搜索
                                     }}>
                                         {t('applyFilter')}
                                     </button>
@@ -302,21 +352,19 @@ function SearchResultPageContent() {
                                         <td>{(currentPage - 1) * pageSize + index + 1}</td>
                                         <td>
                                             <span 
-                                                className="clickable-link"
+                                                className="item-name"
                                                 onClick={() => navigate(`/contentViewer?id=${result.id}`)}
                                             >
                                                 {result.title}
                                             </span>
                                         </td>
-                                        <td>{result.time}</td>
+                                        <td>{result.date || '-'}</td>
                                         <td>
-                                            <span 
-                                                title={t('read')} 
+                                            <EyeOutlined
+                                                title={t('read')}
                                                 className="operation-icon"
                                                 onClick={() => navigate(`/contentViewer?id=${result.id}`)}
-                                            >
-                                                📖
-                                            </span>
+                                            />
                                         </td>
                                     </tr>
                                 ))}

@@ -362,5 +362,8 @@
   "authenticationFailed": "身份验证失败，请重新登录",
   "adminPermissionDenied": "您没有管理员权限，无法访问此页面",
   "networkError": "网络错误，请稍后重试",
-  "unknownError": "未知错误"
+  "unknownError": "未知错误",
+  "searchFailed": "搜索失败",
+  "searchError": "搜索出错",
+  "noResults": "没有找到匹配的结果"
 }

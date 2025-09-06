@@ -2,8 +2,8 @@
 
 import axios from 'axios'
 
-// const API_BASE_URL = 'http://129.211.189.196:8800' // The base URL for your local API
-const API_BASE_URL = 'http://localhost:8080'
+const API_BASE_URL = 'http://129.211.189.196:8800' // The base URL for your local API
+// const API_BASE_URL = 'http://localhost:8080'
 const apiService = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true
@@ -112,6 +112,21 @@ export const uploadDocumentAsync = (formData) => {
  */
 export const getArticleContent = (articleId) => {
   return apiService.get(`/api/v1/search/detail/${articleId}`);
+};
+
+/**
+ * 普通搜索接口
+ * @param {Object} params 搜索参数
+ * @param {Array} params.conditions 搜索条件数组，支持多条件搜索，返回基本信息列表（id、title）
+ * @param {number} params.currentPage 当前页码
+ * @param {number} params.pageSize 每页条数
+ * @param {string} [params.sortField] 排序字段
+ * @param {string} [params.sortOrder] 排序方向（asc/desc）
+ * @param {boolean} [params.enableHighlight] 是否启用高亮
+ * @returns {Promise}
+ */
+export const simpleSearch = (params) => {
+  return apiService.post('/api/v1/simple-search/search', params);
 };
 
 /**
