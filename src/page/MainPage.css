@@ -1,0 +1,455 @@
+* {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-decoration: none;
+}
+
+@font-face {
+    font-family: "Ahroni";
+    src: url("../fonts/Ahroni.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+.banner {
+    height: 700px;
+    background: #e1e1e1 !important;
+}
+
+.searchmain {
+    width: 1090px;
+    height: 280px;
+}
+
+
+[lang="en"] .searchmain .page-title {
+    margin-top: 100px;
+    font-family: "Ahroni", sans-serif;
+
+    margin-bottom: 20px;
+    margin-left: 120px;
+    max-width: 660px;
+}
+
+[lang="zh"] .searchmain .page-title {
+    margin-top: 100px;
+    font-family: "Microsoft YaHei", sans-serif;
+    margin-bottom: 20px;
+    margin-left: 120px;
+    max-width: 660px;
+}
+
+.searchmain .page-title h1 {
+    font-size: 60px;
+    color: #000000;
+}
+
+.search-tab ul {
+    padding-top: 70px;
+    margin-left: 120px;
+    border: none;
+}
+
+.search-tab li {
+    float: left;
+    line-height: 40px;
+    width: 150px;
+    text-align: center;
+    font-size: 15px;
+    color: #333;
+    background: #ffffff;
+    box-shadow: -0.07px 2px 4px 0 rgba(0, 0, 0, 0.3608);
+}
+
+/* 第一个选项卡 - 只设置左圆角 */
+.search-tab li:first-child {
+    border-radius: 6px 0 0 6px;
+}
+
+/* 最后一个选项卡 - 只设置右圆角 */
+.search-tab li:last-child {
+    border-radius: 0 6px 6px 0;
+}
+
+.searchmain .search-tab li:hover {
+    font-size: 16px;
+    transition: .3s;
+}
+
+.searchmain .search-tab li.active {
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    color: #fff;
+}
+
+.searchmain .search-tab-content-normal {
+    margin-left: 120px;
+}
+
+.searchmain .search-tab-content-other {
+    margin-left: 120px;
+}
+
+.searchmain .input-box {
+    padding: 0;
+    display: flex;
+    width: 100%;
+    max-width: 700px;
+    height: 3.75rem;
+    /* 60px */
+    margin-bottom: 1.5rem;
+    border-radius: 3.75rem;
+    /* 完全圆角 */
+    background: #fff;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1), 0 0.25rem 1rem rgba(102, 126, 234, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: visible; /* 确保下拉菜单不会被裁剪 */
+}
+
+.searchmain .input-box:hover {
+    box-shadow: 0 0.25rem 0.5rem rgba(102, 126, 234, 0.2), 0 0.5rem 1.5rem rgba(102, 126, 234, 0.15);
+    transform: translateY(-0.125rem);
+}
+
+.searchmain .input-box:focus-within {
+    box-shadow: 0 0 0 0.1875rem rgba(102, 126, 234, 0.15), 0 0.5rem 2rem rgba(102, 126, 234, 0.2);
+    transform: translateY(-0.125rem);
+}
+
+.searchmain .sort {
+    z-index: 1;
+    width: 150px;
+    height: 60px;
+    border: none;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    text-align: center;
+    color: #333;
+    outline: none;
+    border-radius: 3.75rem 0 0 3.75rem;
+    /* 与custom-select保持一致 */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: none;
+    /* 移除可能造成遮挡的内阴影 */
+    position: relative;
+    padding: 0 25px 0 15px;
+    /* 调整内边距，为箭头留出合适空间 */
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.searchmain .sort:hover {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #ffffff;
+    transform: scale(1.02);
+    /* 悬停时改变箭头颜色为白色 */
+}
+
+.searchmain .sort:focus {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+/* 为选择器添加一个装饰性的分隔线 */
+.searchmain .sort::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 15%;
+    height: 70%;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, rgba(102, 126, 234, 0.3), transparent);
+}
+
+/* 为下拉选项添加样式以提高可读性 */
+.searchmain .sort option {
+    background-color: #ffffff;
+    color: #333333;
+    padding: 8px 15px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    /* 为不同浏览器提供兼容性 */
+}
+
+.searchmain .sort option:hover {
+    background-color: #667eea;
+    color: #ffffff;
+}
+
+.searchmain .sort option:checked {
+    background-color: #667eea;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* 针对 WebKit 浏览器的下拉菜单样式 */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    .searchmain .sort option {
+        background: #ffffff;
+        color: #333333;
+    }
+
+    .searchmain .sort option:hover {
+        background: #f8f9fa;
+        color: #333333;
+    }
+}
+
+/* Firefox 特殊处理 */
+@-moz-document url-prefix() {
+    .searchmain .sort {
+        text-indent: 0.01px;
+        text-overflow: '';
+    }
+
+    .searchmain .sort option {
+        background-color: #ffffff;
+        color: #333333;
+        font-weight: 500;
+    }
+}
+
+/* 输入框容器 */
+.searchmain .input-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    z-index: 1;
+    /* 确保输入框在正确层级 */
+}
+
+.searchmain .input-box .input {
+    border: none;
+    outline: none;
+    padding: 0 1.25rem;
+    /* 20px */
+    width: 100%;
+    height: 100%;
+    color: #333;
+    font-size: 1rem;
+    /* 16px */
+    background: transparent;
+    border-radius: 0;
+}
+
+.searchmain .input-box .input:focus {
+    background: rgba(102, 126, 234, 0.05);
+}
+
+/* 搜索按钮容器 */
+.searchmain .search-btn {
+    flex: 0 0 3.75rem;
+    /* 固定宽度等于高度 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.1875rem;
+    /* 3px */
+    z-index: 1;
+    /* 确保搜索按钮在正确层级 */
+}
+
+.searchmain .search-btn .btn {
+    width: 3.3125rem;
+    /* 53px */
+    height: 3.3125rem;
+    /* 53px */
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    color: #fff;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 0.125rem 0.25rem rgba(102, 126, 234, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.searchmain .search-btn .btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+}
+
+.searchmain .search-btn .btn:active {
+    transform: scale(0.98);
+}
+
+.button-bar-container {
+    width: 1090px;
+    clear: both;
+}
+
+.button-bar-title {
+    font-family: "Microsoft YaHei", sans-serif;
+    float: left;
+    margin-top: 12px;
+    margin-left: 120px;
+    font-size: 17px;
+    color: #333333;
+}
+
+.button-bar {
+    float: left;
+    width: 100%;
+    margin-left: 100px;
+    margin-top: 40px;
+    border-radius: 16px;
+}
+
+/* 工具栏按钮列表样式 */
+.select-list {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100%;
+    padding-left: 20px;
+    gap: 20px;
+    /* 按钮之间的间距 */
+}
+
+/* 单个按钮容器 */
+.select-list li {
+    list-style: none;
+}
+
+/* 工具栏按钮样式 */
+.select-list .btn {
+    padding: 10px 20px;
+    height: 100px;
+    width: 250px;
+    font-size: 20px;
+    color: #ffffff;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* 悬停效果 */
+.select-list .btn:hover {
+    color: #fff;
+    font-size: 22px;
+    transition: 0.3s;
+}
+
+/* 搜索选择器容器 */
+.searchmain .search-select {
+    position: relative;
+    flex: 0 0 10rem;
+    /* 固定宽度 160px */
+    z-index: 2;
+    /* 确保下拉框在输入框之上 */
+}
+
+.searchmain .custom-select {
+    height: 100%;
+    border: none;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    color: #333;
+    outline: none;
+    border-radius: 3.75rem 0 0 3.75rem;
+    /* 左侧圆角 */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: none;
+    /* 移除可能造成遮挡的阴影 */
+    position: relative;
+    padding: 0 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    /* 14px */
+    font-weight: 500;
+}
+
+.searchmain .custom-select:hover {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #ffffff;
+    transform: scale(1.02);
+}
+
+.searchmain .custom-select:focus {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+.searchmain .select-text {
+    flex: 1;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.searchmain .dropdown-arrow {
+    font-size: 0.75rem;
+    /* 12px */
+    transition: transform 0.3s ease;
+    margin-left: 0.5rem;
+    flex-shrink: 0;
+}
+
+.searchmain .dropdown-arrow.open {
+    transform: rotate(180deg);
+}
+
+.searchmain .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 0.0625rem solid #e9ecef;
+    border-radius: 0.5rem;
+    /* 8px */
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    margin-top: 0.25rem;
+    overflow: hidden;
+    max-height: 18.75rem;
+    /* 300px */
+    overflow-y: auto;
+    min-width: 10rem;
+    width: auto;
+}
+
+.searchmain .dropdown-option {
+    padding: 0.75rem 1rem;
+    /* 12px 16px */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #333333;
+    font-size: 0.875rem;
+    /* 14px */
+    font-weight: 500;
+    border-bottom: 0.0625rem solid #f0f0f0;
+}
+
+.searchmain .dropdown-option:last-child {
+    border-bottom: none;
+}
+
+.searchmain .dropdown-option:hover {
+    background: #f8f9fa;
+    color: #667eea;
+}
+
+.searchmain .dropdown-option.selected {
+    background: #667eea;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.searchmain .dropdown-option.selected:hover {
+    background: #5a67d8;
+}

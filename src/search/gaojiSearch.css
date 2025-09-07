@@ -1,0 +1,230 @@
+/* 整体搜索页面样式 */
+.search-page {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+}
+
+/* 主内容区域样式，使用flex布局 */
+.main-content {
+    display: flex;
+    gap: 20px;
+    min-width: 0;
+}
+
+/* 搜索内容区域样式 */
+.search-content {
+    flex: 2;
+    min-width: 0;
+}
+
+/* 搜索行容器样式 */
+.search-rows {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+/* 每一行搜索条件样式 */
+.search-row {
+    display: grid;
+    grid-template-columns: 80px 120px 1fr 80px 1fr 80px 120px;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 10px;
+    min-width: 0;
+    width: 100%;
+}
+
+/* 搜索项样式 */
+.search-item {
+    margin-right: 10px;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+}
+
+/* 关系选择框样式 */
+.relation-select {
+    width: 80px;
+    min-width: 80px;
+    flex-shrink: 0;
+}
+
+/* 容器选择框样式 */
+.container-select {
+    width: 120px;
+    min-width: 120px;
+    flex-shrink: 0;
+}
+
+/* 关键词输入框样式 */
+.keyword-input {
+    min-width: 150px;
+    width: 100%;
+    flex: 1;
+}
+
+/* 操作符选择框样式 */
+.operator-select {
+    width: 80px;
+    min-width: 80px;
+    flex-shrink: 0;
+}
+
+/* 模糊搜索选择框样式 */
+.fuzzy-select {
+    width: 80px;
+    min-width: 80px;
+    flex-shrink: 0;
+}
+
+/* 下拉选择框和输入框通用样式 */
+.select-box,
+.input-box {
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+}
+
+/* 下拉选择框和输入框聚焦时样式 */
+.select-box:focus,
+.input-box:focus {
+    border-color: #667eea;
+}
+
+/* 按钮容器样式 */
+.search-item:last-child {
+    width: 120px;
+    min-width: 120px;
+    flex-shrink: 0;
+    display: flex;
+    gap: 5px;
+    justify-content: flex-start;
+}
+
+/* 操作按钮样式 */
+.action-button {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-right: 5px;
+    white-space: nowrap;
+    min-width: 50px;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+
+/* 日期选择区域样式 */
+.date-section {
+    margin-top: 20px;
+    margin-left: 40px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 500px;
+}
+
+.date-section label {
+    width: 100px;
+}
+
+/* 操作按钮区域样式 */
+.button-section {
+    margin-top: 20px;
+    margin-left: 40px;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    float: left;
+}
+
+.button-section button {
+    width: 120px;
+    min-width: 80px;
+    height: 35px;
+}
+
+/* 检索说明区域样式 */
+.search-instruction {
+    flex: 1;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/* 检索说明区域标题样式 */
+.search-instruction h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* 检索说明区域段落样式 */
+.search-instruction p {
+    font-size: 14px;
+    color: #666;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+    .search-row {
+        grid-template-columns: 80px 100px 1fr 70px 1fr 70px 100px;
+        gap: 8px;
+    }
+
+    .container-select {
+        width: 100px;
+        min-width: 100px;
+    }
+
+    .operator-select,
+    .fuzzy-select {
+        width: 70px;
+        min-width: 70px;
+    }
+
+    .search-item:last-child {
+        width: 100px;
+        min-width: 100px;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        flex-direction: column;
+    }
+
+    .search-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .search-item {
+        margin-right: 0;
+    }
+
+    .relation-select,
+    .container-select,
+    .operator-select,
+    .fuzzy-select,
+    .search-item:last-child {
+        width: 100%;
+        min-width: 0;
+    }
+}

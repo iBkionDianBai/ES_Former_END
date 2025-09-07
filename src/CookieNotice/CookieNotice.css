@@ -1,0 +1,32 @@
+/* Cookie 提示框样式 */
+.cookie-notice {
+    position: fixed;
+    bottom: 20px;
+    right: -30%; /* 初始位置在页面右侧之外 */
+    width: 30%; /* 缩小提示框宽度 */
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    z-index: 1000;
+    border-radius: 8px; /* 添加圆角 */
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2); /* 添加阴影 */
+    opacity: 0; /* 初始透明度为 0 */
+    transition: right 0.5s ease, opacity 0.5s ease; /* 添加过渡效果 */
+    border-bottom: #5f6368 3px solid;
+}
+
+/* 滑入动画类 */
+.slide-in {
+    right: 20px; /* 滑入到指定位置 */
+    opacity: 1; /* 显示提示框 */
+}
+
+.cookie-notice button {
+    background-color: white;
+    color: #333;
+    border: none;
+    padding: 5px 10px;
+    margin-left: 10px;
+    cursor: pointer;
+}
