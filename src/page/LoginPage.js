@@ -351,7 +351,7 @@ const LoginPage = () => {
                                         src={captchaImage}
                                         alt={t('inputCaptcha')}
                                         style={{ 
-                                            height: '50px', 
+                                            height: '50px',
                                             cursor: 'pointer',
                                             border: '1px solid #d9d9d9',
                                             borderRadius: '4px'
