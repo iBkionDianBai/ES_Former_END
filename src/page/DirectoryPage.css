@@ -41,7 +41,8 @@
 }
 
 .search-input {
-    width: 100%;
+    width: 250px;
+    height: 20px;
     padding: 12px 20px 12px 45px;
     border: 2px solid #e1e8ed;
     border-radius: 25px;
@@ -149,7 +150,6 @@
 }
 
 .file-item {
-    display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 15px 25px;
@@ -198,7 +198,26 @@
 
 .file-date {
     min-width: 100px;
-    text-align: right;
+    text-align: left;
+}
+
+.file-detail {
+    display: flex;
+    align-items: center;
+}
+
+.file-school {
+    min-width: 30vh;
+}
+
+.file-summary {
+    display: inline-block;
+    max-width: 100vh;          /* 限制最大宽度 */
+    white-space: nowrap;       /* 不换行 */
+    overflow: hidden;          /* 超出隐藏 */
+    text-overflow: ellipsis;   /* 超出部分省略号 */
+    vertical-align: middle;
+    cursor: pointer;
 }
 
 .no-results {

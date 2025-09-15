@@ -7,7 +7,7 @@ import Footer from "./Footer";
 import { Helmet } from "react-helmet";
 import { useTranslation } from 'react-i18next';
 import { FolderOutlined, FileTextOutlined, SearchOutlined } from '@ant-design/icons';
-import { simpleSearch } from '../api/service';
+import {articleList} from '../api/service';
 
 function DirectoryPage() {
     const { t } = useTranslation();
@@ -29,7 +29,7 @@ function DirectoryPage() {
             
             console.log(`获取第${currentPage}页数据:`, params);
             
-            const response = await simpleSearch(params);
+            const response = await articleList(params);
             
             if (response.data.code === 200) {
                 const { data } = response.data;
@@ -171,10 +171,14 @@ function DirectoryPage() {
                                             <div className="file-info">
                                                 <FileTextOutlined style={{ marginRight: '8px', fontSize: '16px', color: '#1890ff' }} />
                                                 <span className="file-name">{result.title}</span>
+                                                <span className="file-number">#{index + 1}</span>
                                             </div>
                                             <div className="file-meta">
-                                                <span className="file-date">{result.date || '-'}</span>
-                                                <span className="file-number">#{index + 1}</span>
+                                                <span className="file-date">{result.eventStartTime || '-'}</span>
+                                            </div>
+                                            <div className="file-detail">
+                                                <span className="file-school">{result.schoolName || '-'}</span>
+                                                <span className="file-summary" title={result.summary}>{result.summary || '-'}</span>
                                             </div>
                                         </div>
                                     ))}

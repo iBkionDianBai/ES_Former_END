@@ -492,12 +492,12 @@ function AdminToolsPage() {
                             placeholder={t('searchUsers') || '搜索用户（用户名、邮箱、手机号、角色）'}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="search-input"
+                            className="atp-search-input"
                         />
                     </div>
 
                     {/* 筛选条件 */}
-                    <div className="filter-section">
+                    <div className="atp-filter-section">
                         <div className="filter-group">
                             <label className="filter-label">{t('adminFilter') || '管理员筛选'}</label>
                             <select 

@@ -147,6 +147,21 @@ export const advancedSearch = (params) => {
 };
 
 /**
+ * 文章列表接口
+ * @param {Object} params 搜索参数
+ * @param {Array} params.conditions 搜索条件数组，支持多条件搜索，返回基本信息列表（id、title）
+ * @param {number} params.currentPage 当前页码
+ * @param {number} params.pageSize 每页条数
+ * @param {string} [params.sortField] 排序字段
+ * @param {string} [params.sortOrder] 排序方向（asc/desc）
+ * @param {boolean} [params.enableHighlight] 是否启用高亮
+ * @returns {Promise}
+ */
+export const articleList = (params) => {
+  return apiService.post('/api/v1/article-list/all', params);
+};
+
+/**
  * 管理员权限验证接口
  * @returns {Promise}
  */
