@@ -174,11 +174,11 @@ function DirectoryPage() {
                                                 <span className="file-number">#{index + 1}</span>
                                             </div>
                                             <div className="file-meta">
-                                                <span className="file-date">{result.eventStartTime || '-'}</span>
+                                                <span className="file-summary" title={result.summary}>{result.summary || '-'}</span>
                                             </div>
                                             <div className="file-detail">
                                                 <span className="file-school">{result.schoolName || '-'}</span>
-                                                <span className="file-summary" title={result.summary}>{result.summary || '-'}</span>
+                                                <span className="file-date">{result.eventStartTime || '-'}</span>
                                             </div>
                                         </div>
                                     ))}

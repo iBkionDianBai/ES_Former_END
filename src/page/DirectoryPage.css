@@ -198,12 +198,15 @@
 
 .file-date {
     min-width: 100px;
-    text-align: left;
+    text-align: right;
 }
 
 .file-detail {
+    margin-top: 25px;
     display: flex;
-    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #6c757d;
 }
 
 .file-school {
@@ -211,9 +214,12 @@
 }
 
 .file-summary {
-    display: inline-block;
-    max-width: 100vh;          /* 限制最大宽度 */
-    white-space: nowrap;       /* 不换行 */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;      /* 显示2行 */
+    -webkit-box-orient: vertical;
+    line-height: 1.5em;
+    max-height: 3em;            /* 2行 = 1.5em * 2 */
+    max-width: 120vh;          /* 限制最大宽度 */
     overflow: hidden;          /* 超出隐藏 */
     text-overflow: ellipsis;   /* 超出部分省略号 */
     vertical-align: middle;
