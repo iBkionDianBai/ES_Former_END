@@ -204,7 +204,7 @@ function ButtonBar({ isFirstPage = false }) {
     return (
         <div className="button-bar-container">
             <div className="button-bar-title">
-                <h1>{t('toolbar')}</h1>
+                <h1 className="button-bar-title-content" data-text={t('toolbar')}>{t('toolbar')}</h1>
             </div>
             <div className="button-bar">
                 <ul className="select-list">

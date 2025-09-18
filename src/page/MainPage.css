@@ -443,11 +443,32 @@
 }
 
 .button-bar-title {
-    font-family: "Microsoft YaHei", sans-serif;
+    display: flex;
+    justify-content: center; /* 水平居中 */
     margin-bottom: 20px;
-    font-size: 17px;
-    color: #333333;
-    text-align: center;
+}
+
+.button-bar-title .button-bar-title-content{
+    position: relative;
+    font-size: 40px;
+    font-weight: bold;
+    color: #333333; /* 前景文字颜色 */
+    z-index: 1;
+}
+
+.button-bar-title .button-bar-title-content::after {
+    white-space: nowrap;
+    content: attr(data-text);   /* 复制文字 */
+    position: absolute;
+    left: -25%;
+    top: -60%;
+    font-size: 60px; /* 比正文字大 */
+    color: transparent; /* 背景文字颜色 */
+    background: #e5e5e5;
+    background-clip: text;
+    -webkit-background-clip: text;
+    z-index: -1; /* 放到后面 */
+    border-bottom: #e5e5e5 solid 1px;
 }
 
 .button-bar {
