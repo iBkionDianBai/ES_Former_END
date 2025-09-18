@@ -2,13 +2,30 @@
     margin-left: 120px;
     margin-top: 50px;
     font-size: 18px;
+    text-align: center;
+    margin-left: 0;
 }
 
 /* 让排行榜整体居中 */
 .ranking-container {
     display: flex;
-    margin-left: 100px;
+    justify-content: center;
+    margin: 0 auto;
     padding: 20px;
+    max-width: 1090px;
+}
+
+/* 排行榜主容器居中 */
+.ranking-board {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 1090px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
 }
 
 /* 排行榜外层 */
@@ -20,6 +37,7 @@
     padding: 16px;
     font-family: "Microsoft YaHei", sans-serif;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin: 0 auto;
 }
 
 /* 标题 */
