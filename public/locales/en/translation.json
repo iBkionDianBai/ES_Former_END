@@ -379,5 +379,7 @@
   "unknownError": "Unknown error",
   "searchFailed": "Search failed",
   "searchError": "Search error",
-  "noResults": "No matching results found"
+  "noResults": "No matching results found",
+
+  "scrollDown": "Scroll down for more"
 }

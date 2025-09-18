@@ -130,6 +130,16 @@ function SearchComponent({ isFirstPage = true }) {
                     </div>
                 </div>
             </div>
+            {/* 向下滑动提示 */}
+            <div className="scroll-hint">
+                <div className="mouse">
+                    <span className="wheel"></span>
+                </div>
+                <div className="arrow">
+                    <span></span>
+                </div>
+                <div className="hint-text">{t('scrollDown') || '向下滑动'}</div>
+            </div>
         </div>
     );
 }
@@ -311,28 +321,28 @@ function MainPage() {
             {/* Header渲染 */}
             {shouldShowHeader && <Header />}
             
-            {/* 调试信息 */}
-            <div style={{
-                position: 'fixed',
-                top: '10px',
-                right: '10px',
-                background: 'rgba(0,0,0,0.8)',
-                color: 'white',
-                padding: '10px',
-                borderRadius: '5px',
-                fontSize: '12px',
-                zIndex: 9999
-            }}>
-                <div>当前页面: {currentPage}</div>
-                <div>Header显示: {showHeader ? '是' : '否'}</div>
-                <div>应该显示Header: {shouldShowHeader ? '是' : '否'}</div>
-                <button onClick={() => switchToPage(2)} style={{marginTop: '5px', padding: '5px'}}>
-                    切换到第二页
-                </button>
-                <button onClick={() => switchToPage(1)} style={{marginTop: '5px', padding: '5px', marginLeft: '5px'}}>
-                    切换到第一页
-                </button>
-            </div>
+            {/*/!* 调试信息 *!/*/}
+            {/*<div style={{*/}
+            {/*    position: 'fixed',*/}
+            {/*    top: '10px',*/}
+            {/*    right: '10px',*/}
+            {/*    background: 'rgba(0,0,0,0.8)',*/}
+            {/*    color: 'white',*/}
+            {/*    padding: '10px',*/}
+            {/*    borderRadius: '5px',*/}
+            {/*    fontSize: '12px',*/}
+            {/*    zIndex: 9999*/}
+            {/*}}>*/}
+            {/*    <div>当前页面: {currentPage}</div>*/}
+            {/*    <div>Header显示: {showHeader ? '是' : '否'}</div>*/}
+            {/*    <div>应该显示Header: {shouldShowHeader ? '是' : '否'}</div>*/}
+            {/*    <button onClick={() => switchToPage(2)} style={{marginTop: '5px', padding: '5px'}}>*/}
+            {/*        切换到第二页*/}
+            {/*    </button>*/}
+            {/*    <button onClick={() => switchToPage(1)} style={{marginTop: '5px', padding: '5px', marginLeft: '5px'}}>*/}
+            {/*        切换到第一页*/}
+            {/*    </button>*/}
+            {/*</div>*/}
             
             <div className="page-content" ref={pageRef}>
                 <div className="first-page">
@@ -340,7 +350,7 @@ function MainPage() {
                 </div>
                 <div className="second-page">
                     <ButtonBar isFirstPage={false} />
-                    <RankingBoard />
+                    {/*<RankingBoard />*/}
                 </div>
             </div>
             <Footer />
