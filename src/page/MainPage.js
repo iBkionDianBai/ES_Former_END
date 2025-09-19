@@ -9,6 +9,7 @@ import Header from "./header";
 import Footer from "./Footer";
 import RankingBoard from "../MainPageExtend/RankingBoard";
 import { checkAdminPermission } from '../api/service';
+import backgroundVideo from '../videos/shouye1.mp4';
 
 // 图标
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -61,6 +62,22 @@ function SearchComponent({ isFirstPage = true }) {
     return (
         <div className={`search-area ${isFirstPage ? 'first-page' : 'second-page'}`}>
             <div className="banner">
+                {/* 第一页添加视频背景 */}
+                {isFirstPage && (
+                    <video 
+                        className="background-video"
+                        autoPlay 
+                        muted 
+                        loop 
+                        playsInline
+                        src={backgroundVideo}
+                        onLoadStart={() => console.log('视频开始加载')}
+                        onCanPlay={() => console.log('视频可以播放')}
+                        onError={(e) => console.error('视频加载错误:', e)}
+                        onLoad={() => console.log('视频加载完成')}
+                    >
+                    </video>
+                )}
                 <div className="searchmain">
                     {/* 注释掉检索和其它按钮 */}
                     {/* {isFirstPage && (
