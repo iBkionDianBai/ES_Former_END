@@ -64,19 +64,21 @@ function SearchComponent({ isFirstPage = true }) {
             <div className="banner">
                 {/* 第一页添加视频背景 */}
                 {isFirstPage && (
-                    <video 
-                        className="background-video"
-                        autoPlay 
-                        muted 
-                        loop 
-                        playsInline
-                        src={backgroundVideo}
-                        onLoadStart={() => console.log('视频开始加载')}
-                        onCanPlay={() => console.log('视频可以播放')}
-                        onError={(e) => console.error('视频加载错误:', e)}
-                        onLoad={() => console.log('视频加载完成')}
-                    >
-                    </video>
+                    <div className="video-mask">
+                        <video
+                            className="background-video"
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            src={backgroundVideo}
+                            onLoadStart={() => console.log('视频开始加载')}
+                            onCanPlay={() => console.log('视频可以播放')}
+                            onError={(e) => console.error('视频加载错误:', e)}
+                            onLoad={() => console.log('视频加载完成')}
+                        >
+                        </video>
+                    </div>
                 )}
                 <div className="searchmain">
                     {/* 注释掉检索和其它按钮 */}

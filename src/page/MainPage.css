@@ -96,7 +96,7 @@
 
 .scroll-hint .hint-text {
     font-size: 12px;
-    color: rgba(0,0,0,0.6);
+    color: rgba(51, 51, 51);
 }
 
 .first-page .search-area {
@@ -116,6 +116,16 @@
     position: relative;
     overflow: hidden;
     background: #e1e1e1; /* 备用背景色，当视频加载失败时显示 */
+}
+
+.video-mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.03); /* 这里设置了半透明黑色，可根据需求调整颜色和透明度 */
+    z-index: 1; /* 确保遮罩在视频上方显示，可根据实际布局调整层级 */
 }
 
 /* 视频背景样式 */
